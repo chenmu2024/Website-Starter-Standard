@@ -19,7 +19,7 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 
 ## SEO / GEO change gate
 
-- [ ] I reviewed the applicable rules in `SEO-GEO-QUALITY-GATE.md`.
+- [ ] I reviewed the applicable rules in `SEO-GEO-QUALITY-GATE.md` and the project brief.
 - [ ] Approved core keywords were preserved; any change is explicitly owner-approved.
 - [ ] Metadata / heading hierarchy / canonical / robots behavior remain correct.
 - [ ] New important routes are covered by crawlable internal linking and sitemap where applicable.
@@ -27,9 +27,13 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 - [ ] Programmatic templates add real page-specific value; this change does not mass-create keyword/name swaps.
 - [ ] Hreflang/canonical parity was checked if multilingual routes changed.
 - [ ] Structured data remains truthful and valid if affected.
-- [ ] No numeric SEO/keyword data was invented.
+- [ ] No numeric SEO/keyword/AI-visibility data was invented.
+- [ ] Factual/time-sensitive claims have sources and freshness handling where needed.
+- [ ] No special AI-only markup/files or crawler rules were added without a documented reason.
 
 ## L1 verification
+
+Attach or summarize concrete evidence in `SEO-GEO-RELEASE-EVIDENCE.md` or the PR description.
 
 - [ ] Build/type/lint checks relevant to this project pass.
 - [ ] Changed important routes do not return unintended 404/redirect behavior.

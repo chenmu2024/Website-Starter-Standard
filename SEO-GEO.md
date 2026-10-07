@@ -22,7 +22,9 @@
 - Valid sitemap coverage for canonical indexable routes.
 - Working images/assets and correct 404/redirect behavior.
 
-## GEO / answer-engine readability
+## GEO / AI-search readiness
+
+Google's generative-AI Search features still depend on core Search ranking and quality systems. Do not build a parallel "AI SEO" layer that weakens normal SEO.
 
 - Direct definitions/answers where appropriate.
 - Self-contained factual passages.
@@ -30,8 +32,12 @@
 - Tables/examples for comparisons and procedures.
 - Explicit units, assumptions, formulas and limitations for tools.
 - Primary-source attribution for factual/changing claims.
+- Clear entity identity for the site/organization/author when it materially helps trust or disambiguation.
+- Distinguish original analysis/data/tool output from third-party facts.
 - Do not create separate near-duplicate "AI keyword" pages.
-- `llms.txt` is optional interoperability metadata, not a default Google ranking lever.
+- Do not invent special AI-only schema or markup.
+- `llms.txt` is optional interoperability metadata; Google does not require it for Search or generative-AI Search features.
+- `Google-Extended` controls certain Google model-training/product uses and does not control Google Search inclusion or ranking.
 
 ## Programmatic SEO
 

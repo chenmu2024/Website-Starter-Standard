@@ -12,8 +12,9 @@ Do not start page-level UI implementation until the following are complete:
 4. Competitor/reference analysis completed.
 5. Full project PRD and information architecture completed.
 6. Project-specific `DESIGN.md` completed.
-7. Applicable SEO/GEO, programmatic SEO, and international architecture from `SEO-GEO-QUALITY-GATE.md` defined.
-8. Design tokens and reusable base components defined.
+7. `SEO-GEO-PROJECT-BRIEF.md` completed with keyword/intent ownership, indexation, sources, entities, schema, and international rules.
+8. Applicable SEO/GEO, programmatic SEO, and international architecture from `SEO-GEO-QUALITY-GATE.md` defined.
+9. Design tokens and reusable base components defined.
 
 Then implement the complete planned site, responsive behavior, SEO/GEO, QA, deployment, and production verification.
 
@@ -44,13 +45,15 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 - Maintain crawlable initial content, heading hierarchy, canonical URLs, robots directives, sitemap coverage, internal linking, valid structured data, and real 404 behavior.
 - Programmatic pages must provide standalone value and meaningful differentiation; do not mass-publish name/keyword swaps.
 - Multilingual sites must pass canonical/hreflang and localization checks.
-- GEO work must improve extractability, evidence, clarity, and usefulness; it must not create near-duplicate "AI keyword" pages.
+- GEO work must improve extractability, evidence, clarity, originality, and usefulness; it must not create near-duplicate "AI keyword" pages.
+- Do not add AI-only files/markup solely because a GEO checklist says so. Google states that its generative-AI Search features use normal Search foundations and do not require special AI markup.
+- `Google-Extended` is a model-training/product control, not a Google Search indexing/ranking control. Do not confuse crawler/training permissions with search visibility.
 - Treat third-party thresholds as internal heuristics, not search-engine rules.
 
 ## 5. Audit levels
 
 - L1 change/commit audit after SEO-sensitive changes.
-- L2 release audit before production launch/major release.
+- L2 release audit before production launch/major release, with evidence recorded in `SEO-GEO-RELEASE-EVIDENCE.md`.
 - L3 periodic full audit only when production data or a major review justifies it.
 
 Do not spend full-audit model/API cost on every trivial commit. Prefer deterministic checks for status codes, counts, duplicate ratios, schema syntax, arithmetic, and route coverage.

@@ -26,6 +26,9 @@ Before page production begins, define:
 7. International structure where applicable: language/region codes, URL strategy, canonical and hreflang relationships.
 8. Sitemap ownership and generation method.
 9. Structured-data types that truthfully match visible content.
+10. Source/evidence registry for factual or time-sensitive claims: source URL/owner, claim supported, checked date, refresh rule, and failure fallback.
+11. Entity map for important Organization/Person/Product/SoftwareApplication/VideoGame/etc. entities where identity or disambiguation matters.
+12. Release evidence plan: which checks are deterministic, which require visual/manual review, and which require production/Search Console data.
 
 Do not create multiple indexable pages whose only difference is a keyword variation while satisfying the same intent.
 
@@ -118,7 +121,19 @@ Never publish hundreds of pages merely because generation is technically possibl
 
 ## 6. GEO / AI-search gate
 
-GEO does not replace SEO. The baseline is still crawlability, indexability, useful content, authority, and clear structure.
+GEO does not replace SEO. The baseline is still crawlability, indexability, useful original content, authority, and clear structure.
+
+Google's current guidance for its generative-AI Search features explicitly says normal SEO best practices still apply because those experiences are grounded in core Search ranking and quality systems. Do not create a separate technical stack whose only purpose is "AI optimization."
+
+### Required AI-search principles
+
+- Optimize the same canonical pages for people, classic Search, and AI-assisted Search; do not create duplicate "AI answer" versions.
+- Prefer original value: first-party tools, measurements, examples, screenshots, datasets, comparisons, workflows, or analysis.
+- Make important claims attributable: identify the source, the checked date where freshness matters, and what is interpretation vs sourced fact.
+- Keep entity names and relationships consistent across visible content, metadata, structured data, About/Contact pages, and citations where applicable.
+- A page should be quotable in useful self-contained passages without becoming keyword-stuffed or repetitive.
+- If content is substantially automated/AI-assisted and disclosure would reasonably answer "how was this created?", document or disclose the workflow appropriately.
+- Large-scale AI generation without meaningful added value is prohibited by this standard.
 
 Important pages should improve answer extraction through:
 
@@ -135,9 +150,17 @@ Important pages should improve answer extraction through:
 
 Do not create artificial "AI keywords" or multiple near-duplicate pages for query variants.
 
-`llms.txt` may be reported or generated as an optional interoperability file, but it must not be presented as a Google ranking/citation lever without new primary-source evidence.
+### AI-specific files and crawler controls
 
-AI crawler controls must distinguish search visibility from model-training permission. Do not treat training crawlers and search crawlers as interchangeable.
+- Do not require special AI-only markup for Google Search. Google states that no special machine-readable AI text file or markup is required for visibility in its generative-AI Search features.
+- `llms.txt` may be generated as optional interoperability metadata for non-Google systems, but it is not a Google Search requirement.
+- AI crawler controls must distinguish search visibility from model-training/product permission.
+- `Google-Extended` is a standalone control for certain Gemini/Vertex AI training and grounding uses; Google documents that it does not affect Search inclusion or ranking.
+- Document any decision to block/allow training crawlers separately from the site's Search robots policy.
+
+### Measurement
+
+When available, measure AI-search performance using first-party Search Console reporting rather than invented "AI visibility scores." Record the date range and report/filter used. For sites with meaningful image-driven discovery, include Search Console multimodal search reporting (Lens/image-input surfaces) in L3 review.
 
 ## 7. International SEO / hreflang gate
 
@@ -161,12 +184,14 @@ For multilingual or multi-region sites:
 - Validate generated schema and prevent template placeholders from shipping.
 - Do not add schema solely because a type exists in Schema.org; confirm current Google eligibility before promising a rich result.
 - FAQ content may still be useful to users, but do not promise Google FAQ rich results based on legacy guidance.
+- Structured data must not be used as a generic GEO hack. Add only types that describe the visible page and are useful for machine understanding or supported search features.
 - Do not recommend deprecated rich-result tactics as current SEO strategy.
 
 ## 9. Content quality / trust gate
 
 - No placeholder copy.
-- No fabricated statistics, citations, testimonials, reviews, credentials, or usage numbers.
+- No fabricated statistics, citations, testimonials, reviews, credentials, usage numbers, "AI visibility" scores, or synthetic authority claims.
+- AI-assisted content must add meaningful original value; mass generation or summarization without added value fails this gate.
 - Claims that can change should carry a source and date when useful.
 - Tool pages must explain inputs, outputs, assumptions, edge cases, and examples where relevant.
 - Avoid generic intros written only to lengthen the page.
@@ -183,6 +208,8 @@ For multilingual or multi-region sites:
 - Lazy-load offscreen media, not the critical hero/LCP asset when that harms LCP.
 - Alt text should describe meaningful image purpose; decorative images should not receive keyword-stuffed alt text.
 - Ensure social/OG images exist when the page is designed to be shared.
+- Important visual pages should keep captions/context close enough that image meaning is understandable to users and multimodal search systems.
+- For original charts/screenshots/diagrams, preserve enough nearby text to explain what the visual proves or demonstrates.
 
 ## 11. Internal linking and crawl architecture
 
@@ -206,7 +233,7 @@ For multilingual or multi-region sites:
 
 ### L1 — Change / commit audit
 
-Run after SEO-sensitive changes. Fast, deterministic checks:
+Run after SEO-sensitive changes. Fast, deterministic checks. Record the actual command/result/evidence rather than checking boxes from memory:
 
 - build/type/lint as applicable
 - important route status/404s
@@ -237,6 +264,8 @@ Run before production launch or a major release:
 Run after sufficient production data exists or on major periodic reviews:
 
 - Search Console queries/indexing
+- Search Console generative-AI features reporting when available
+- Search Console multimodal/image-input reporting when relevant
 - CrUX field data when available
 - analytics/landing-page performance when connected
 - content gaps/cannibalization
@@ -317,9 +346,12 @@ This standard incorporates useful engineering patterns from the open-source `Agr
 Primary references to consult when rules are time-sensitive:
 
 - Google Search Central: https://developers.google.com/search/
+- Google Search generative-AI optimization guide: https://developers.google.com/search/docs/fundamentals/ai-optimization-guide
+- Google guidance for generative-AI content: https://developers.google.com/search/docs/fundamentals/using-gen-ai-content
 - Google Search spam policies: https://developers.google.com/search/docs/essentials/spam-policies
 - Google localized versions/hreflang: https://developers.google.com/search/docs/specialty/international/localized-versions
 - Schema.org: https://schema.org/
 - web.dev Core Web Vitals: https://web.dev/vitals/
+- Google crawler controls / Google-Extended: https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
 - IndexNow: https://www.indexnow.org/
 - Upstream inspiration: https://github.com/AgriciDaniel/claude-seo

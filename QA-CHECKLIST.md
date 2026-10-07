@@ -25,7 +25,9 @@
 - [ ] Numeric Volume/KD/CPC/SERP/traffic claims have an identified data source.
 - [ ] Intent-to-canonical-page mapping is complete.
 - [ ] No obvious cannibalization or near-duplicate intent pages.
+- [ ] `SEO-GEO-PROJECT-BRIEF.md` is complete for this project.
 - [ ] `SEO-GEO-QUALITY-GATE.md` was reviewed.
+- [ ] Time-sensitive factual claims have a source/check-date/refresh rule where appropriate.
 
 ## SEO / GEO — technical
 - [ ] Titles/descriptions complete and intent-aligned.
@@ -57,13 +59,17 @@
 - [ ] `x-default` is used only where a real fallback exists.
 - [ ] Localized pages differ where market context requires it.
 
-## GEO / answer readiness
+## GEO / AI-search readiness
 - [ ] Important pages answer/define the core topic early where appropriate.
 - [ ] Factual blocks can be understood without surrounding fluff.
 - [ ] Tables/examples/questions are used only where useful.
 - [ ] Tool assumptions, units, formulas, and limitations are explicit.
 - [ ] Changing/factual claims use reliable sources where needed.
 - [ ] No near-duplicate pages were created solely for AI-query variants.
+- [ ] Important entities/names are consistent across page copy, metadata and schema.
+- [ ] No special AI-only markup/files were added without a documented interoperability need.
+- [ ] Training-crawler decisions are documented separately from Search crawl/index rules.
+- [ ] AI-assisted/generated content adds original value and does not exist merely at scale.
 
 ## Content / media
 - [ ] No placeholder copy.
@@ -97,8 +103,10 @@
 ## Audit / drift
 - [ ] Applicable L1 checks passed for SEO-sensitive changes.
 - [ ] L2 release audit passed before launch/major release.
+- [ ] `SEO-GEO-RELEASE-EVIDENCE.md` contains concrete evidence for this release.
 - [ ] A production baseline was recorded for important routes after acceptance.
 - [ ] L3 full audit is performed when production data or a major review justifies it.
+- [ ] Search Console AI/multimodal reporting is reviewed when the site has enough relevant data.
 
 ## Final visual review
 - [ ] Hero is clear within seconds.
