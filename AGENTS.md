@@ -6,7 +6,7 @@ These rules are mandatory for every website created from this starter.
 
 Do not start page-level UI implementation until the following are complete:
 
-1. User intent, site goal, monetization model, and cost constraints understood.
+1. User intent, site goal, monetization model, and cost constraints understood; for new opportunities and major pivots, complete the evidence-first business decision in `OPC-BUSINESS-GATE.md` and record observed evidence in `OPC-BUSINESS-EVIDENCE.md`.
 2. Keyword research reviewed and explicitly approved keywords locked.
 3. Search intent mapped to canonical destinations; no unresolved cannibalization plan.
 4. Competitor/reference analysis completed.
@@ -65,6 +65,15 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 - Do not add AI-only files/markup solely because a GEO checklist says so. Google states that its generative-AI Search features use normal Search foundations and do not require special AI markup.
 - `Google-Extended` is a model-training/product control, not a Google Search indexing/ranking control. Do not confuse crawler/training permissions with search visibility.
 - Treat third-party thresholds as internal heuristics, not search-engine rules.
+
+## 4B. Commercial opportunity gate (OPC-inspired)
+
+- Read `OPC-BUSINESS-GATE.md` for new projects, significant expansions, business pivots and periodic post-launch business review.
+- On new opportunities, complete the project-specific `OPC-BUSINESS-EVIDENCE.md` **before material development**, with sourced and dated search demand, SERP, comparable traffic, business model and validation plan. Unknown data stays `UNVERIFIED`; neither Google Trends relative values nor CPC imply proven demand/revenue.
+- Use the evidence-first six-dimension priority screen and owner-reviewed GO / TEST / HOLD / STOP. Never auto-build or auto-delete based on the heuristic score.
+- For existing sites, do not block urgent SEO/UI/function fixes pending a new commercial evaluation; never silently change already-approved keywords, primary routes, content, brand or the agreed full project scope.
+- Before declaring commercial success, collect real GSC/user/revenue/cost data. Prefer free sources and require explicit approval for paid APIs or fixed recurring charges.
+- The `easychen/opc-methodology` project is an attributed conceptual reference. Do not copy or redistribute its CC BY-NC-SA Skill content for commercial use.
 
 ## 5. Audit levels
 
