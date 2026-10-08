@@ -28,6 +28,14 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 - [ ] Applicable P0/P1 UI blockers were fixed before declaring the release ready.
 - [ ] `UI-RELEASE-EVIDENCE.md` (or equivalent linked PR evidence) records actual executed checks, reproducible results and explicit `NOT RUN` items; Impeccable detector findings are not treated as proof of full quality.
 
+## OPC business evidence (new project, major expansion or pivot only)
+
+- [ ] Where applicable, I reviewed `OPC-BUSINESS-GATE.md` and linked/updated the project `OPC-BUSINESS-EVIDENCE.md`.
+- [ ] Demand, Volume/KD/CPC, competitor traffic, business claims and six-dimension judgments use actual source/date, or explicitly say UNVERIFIED.
+- [ ] Monetization, fixed-cost cap, main validation risk and explicit human GO / TEST / HOLD / STOP decision are recorded if a new business direction is proposed.
+- [ ] Existing-site repairs are not blocked by a new business study; owner-approved keywords and route intents were not silently changed.
+- [ ] No paid dependencies or third-party non-commercial Skill text were silently adopted.
+
 ## SEO / GEO change gate
 
 - [ ] I reviewed the applicable rules in `SEO-GEO-QUALITY-GATE.md` and the project brief.
