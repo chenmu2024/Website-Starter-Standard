@@ -8,7 +8,7 @@ This starter prevents a common failure mode in AI-built websites: development be
 
 ## Mandatory workflow
 
-1. Research real user demand, search intent, keywords, competitors, and monetization.
+1. For a new opportunity or major business pivot, review real demand, competitive evidence, monetization, costs and validation risks in `OPC-BUSINESS-GATE.md`; record the verified inputs and an explicit owner decision in `OPC-BUSINESS-EVIDENCE.md`.
 2. Lock approved core keywords and map one primary intent to one canonical destination.
 3. Analyze 2–4 high-quality design references.
 4. Complete the project PRD and full information architecture.
@@ -24,6 +24,8 @@ This starter prevents a common failure mode in AI-built websites: development be
 ## Files
 
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
+- `OPC-BUSINESS-GATE.md` — evidence-first opportunity, monetization, MVP and operating-review policy for new ventures and pivots.
+- `OPC-BUSINESS-EVIDENCE.md` — per-project source/date decision record, including unverified inputs and post-launch scorecard.
 - `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
 - `IMPECCABLE-UI-QUALITY-GATE.md` — mandatory UX/a11y/responsive/i18n/performance review derived from Impeccable; optional CLI, hooks and Live mode remain opt-in.
 - `UI-RELEASE-EVIDENCE.md` — per-project evidence template for real UI checks, missing checks and P0/P1 release blockers.
@@ -53,6 +55,10 @@ Google's generative-AI search features do not require special AI-only markup or 
 `AgriciDaniel/claude-seo` is a useful open-source reference for technical SEO, GEO, programmatic SEO, international SEO, schema, auditing, and drift concepts. This starter distills applicable rules into `SEO-GEO-QUALITY-GATE.md`; downstream projects do not need the plugin installed unless explicitly useful.
 
 Rules from third-party projects are not automatically treated as Google requirements. Primary-source documentation wins, and numeric keyword/SEO data must come from an identified data source.
+
+## Business strategy reference
+
+The [easychen/opc-methodology](https://github.com/easychen/opc-methodology) framework informs our original evidence-screening checklist (niche, monetization, MVP, conversion, asset reuse and business review). We do not vendor or install its CC BY-NC-SA Skill text. This adds no paid APIs and does not change existing SEO/GEO, UI, keyword-lock or Cloudflare requirements.
 
 ## Owner defaults
 
