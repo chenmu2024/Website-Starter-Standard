@@ -14,10 +14,10 @@ This starter prevents a common failure mode in AI-built websites: development be
 4. Complete the project PRD and full information architecture.
 5. Customize `DESIGN.md` for the project.
 6. Complete `SEO-GEO-PROJECT-BRIEF.md` and the architecture in `SEO-GEO-QUALITY-GATE.md` before mass page production.
-7. Define tokens and reusable components; apply the page-type-aware audit and UI workflow in `TASTE-UI-PROTOCOL.md`.
+7. Define tokens and reusable components; apply the page-type-aware design workflow in `TASTE-UI-PROTOCOL.md` and the UI evaluation gate in `IMPECCABLE-UI-QUALITY-GATE.md`.
 8. Implement the complete planned site, including programmatic/international rules where applicable.
 9. Run L1 checks during development and collect concrete evidence in `SEO-GEO-RELEASE-EVIDENCE.md`.
-10. Run the L2 release audit, Visual QA, and `QA-CHECKLIST.md` before launch.
+10. Run the L2 release audit, Visual QA, `IMPECCABLE-UI-QUALITY-GATE.md` and `QA-CHECKLIST.md` before launch; record actual UI checks in `UI-RELEASE-EVIDENCE.md`.
 11. Deploy and verify the real production site.
 12. Record a production SEO baseline for later drift/regression checks; use L3 audits when real production data exists.
 
@@ -25,6 +25,8 @@ This starter prevents a common failure mode in AI-built websites: development be
 
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
 - `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
+- `IMPECCABLE-UI-QUALITY-GATE.md` — mandatory UX/a11y/responsive/i18n/performance review derived from Impeccable; optional CLI, hooks and Live mode remain opt-in.
+- `UI-RELEASE-EVIDENCE.md` — per-project evidence template for real UI checks, missing checks and P0/P1 release blockers.
 - `DESIGN.md` — project-specific design-system template.
 - `SEO-GEO.md` — concise search and answer-engine policy.
 - `SEO-GEO-QUALITY-GATE.md` — detailed mandatory SEO/GEO, programmatic SEO, international SEO, audit, and launch gate.
@@ -37,6 +39,10 @@ This starter prevents a common failure mode in AI-built websites: development be
 ## Design references
 
 `VoltAgent/awesome-design-md` is a required design-reference source when applicable. Taste Skill's design-read, redesign audit, and conditional image-to-code methods are selectively adapted in `TASTE-UI-PROTOCOL.md` (not blindly installed). Learn and combine appropriate design logic; do not clone a single brand's visual identity. For tool-first websites, usability, crawlability, and performance outrank cinematic art direction.
+
+## UI quality reference model
+
+[pbakaus/impeccable](https://github.com/pbakaus/impeccable) informs the review categories and optional deterministic UI detector described in `IMPECCABLE-UI-QUALITY-GATE.md`. For every site, perform the **process and checks** with available tools; installing Impeccable is not required. Do not auto-install its binary, edit hooks, browser extension, or Live server into this starter or downstream projects. If explicitly approved for a trusted project, review/pin its version, start with project-scoped **no-hooks** installation, record actual scan outputs, and treat heuristic findings as diagnostic evidence rather than an automatic redesign mandate.
 
 ## Current search / AI-search position
 

@@ -12,6 +12,8 @@
 - [ ] No unjustified gradients/glow/glass/shadows.
 - [ ] No generic AI-template look.
 - [ ] `TASTE-UI-PROTOCOL.md` was applied for the page type; design read, variance/motion/density choices, and first-screen task hierarchy are justified.
+- [ ] Visitor mode (Operate / Read / Persuade / Experience) was set for each affected surface; tool/task views keep actual controls and results prominent.
+- [ ] `IMPECCABLE-UI-QUALITY-GATE.md` was reviewed; false-positive aesthetic preferences have not overridden brand/user intent.
 - [ ] Important fonts/color accents/radii/spacing are consistent; existing brand identity is preserved unless owner-approved.
 - [ ] For redesigns, a concrete scan/diagnosis and before/after functionality + visual + SEO baseline was reviewed.
 - [ ] No needlessly repeated generic card grids, nested containers or stock-image filler; justified exceptions are documented.
@@ -25,6 +27,7 @@
 - [ ] No horizontal overflow except intentional scrollers.
 - [ ] Representative widths around 360/390/768/1024/1440px were visually checked where browser access exists, or skipped checks are marked `not run`.
 - [ ] Tool controls and results path remain discoverable on small laptop and mobile viewports.
+- [ ] Long localized text, Unicode/diacritics, text zoom, and any custom touch/drag controls were tested where applicable.
 
 ## SEO / GEO — governance
 - [ ] Approved core keywords were preserved exactly unless owner-approved changes are documented.
@@ -98,6 +101,8 @@
 - [ ] Reduced-motion respected where applicable.
 - [ ] Dynamic effects justify their performance cost; existing dependencies and lighter CSS alternatives were considered before adding a motion library.
 - [ ] Measurements are recorded when run; unmeasured Web Vitals are explicitly labeled as unverified, not passed.
+- [ ] Form labels, accessible errors and complete empty/loading/invalid/disabled/success state behavior were exercised where applicable.
+- [ ] P0/P1 interaction, accessibility, layout, SEO or functionality blockers are closed before release acceptance.
 
 ## Technical / production
 - [ ] Production build succeeds.
@@ -112,6 +117,8 @@
 - [ ] Applicable L1 checks passed for SEO-sensitive changes.
 - [ ] L2 release audit passed before launch/major release.
 - [ ] `SEO-GEO-RELEASE-EVIDENCE.md` contains concrete evidence for this release.
+- [ ] `UI-RELEASE-EVIDENCE.md` contains actual UI checks, scope, viewport and failures or explicit `NOT RUN` (do not invent pass results).
+- [ ] If Impeccable CLI was used, its exact version, command, exit status (0/1/2), findings and waivers were documented; if unused, that fact is not a failure.
 - [ ] A production baseline was recorded for important routes after acceptance.
 - [ ] L3 full audit is performed when production data or a major review justifies it.
 - [ ] Search Console AI/multimodal reporting is reviewed when the site has enough relevant data.

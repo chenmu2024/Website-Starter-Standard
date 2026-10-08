@@ -82,7 +82,7 @@ For every meaningful UI change, check:
 - **Regression:** approved keywords, heading structure, important raw HTML, route and navigation integrity, metadata/canonicals/hreflang, image links, structured data, core calculations and analytics remain intact.
 - **Evidence:** record observed before/after route screenshots or visual notes, build/lint/type results, interaction checks, performance checks, and unresolved issues. Mark a check `not run` if no browser or data is available; never invent a pass.
 
-Apply the existing `QA-CHECKLIST.md`, `SEO-GEO-QUALITY-GATE.md`, and `SEO-GEO-RELEASE-EVIDENCE.md` as the final release authority.
+Apply `IMPECCABLE-UI-QUALITY-GATE.md` for structured UX/a11y/responsive/i18n/edge-state/performance verification and record actual observations in `UI-RELEASE-EVIDENCE.md`. The Taste-inspired process guides visual direction; a detector rule is not authority to override brand or approved search architecture. Apply the existing `QA-CHECKLIST.md`, `SEO-GEO-QUALITY-GATE.md`, and `SEO-GEO-RELEASE-EVIDENCE.md` as the final release authority.
 
 ## Upstream references
 

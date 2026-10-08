@@ -26,7 +26,7 @@ The design system must be derived from product context, target users, search int
 
 The design system must define at minimum: visual theme, semantic colors, typography, spacing, grid/layout, radii, core components and states, elevation, responsive behavior, media/icon rules, motion, accessibility, design guardrails, and AI implementation notes.
 
-Read `TASTE-UI-PROTOCOL.md` before UI creation or redesign. Its Taste Skill-derived principles are selective, contextual guidance, **not** a mandate to install a Skill, generate images for every change, add heavy motion, enforce specific fonts, or replace the site's existing stack.
+Read `TASTE-UI-PROTOCOL.md` and `IMPECCABLE-UI-QUALITY-GATE.md` before UI creation or redesign. Its Taste Skill-derived principles are selective, contextual guidance, **not** a mandate to install a Skill, generate images for every change, add heavy motion, enforce specific fonts, or replace the site's existing stack.
 
 ## 3. Design-system enforcement
 
@@ -40,6 +40,16 @@ Read `TASTE-UI-PROTOCOL.md` before UI creation or redesign. Its Taste Skill-deri
 - For existing sites, follow scan → diagnose → preserve → fix → verify. Do not silently alter approved keywords, routes, analytics events, form field names/order, brand, navigation labels, legal text, or working calculations.
 - For generators, converters, calculators, and games, the core interaction and results path take priority over cinematic heroes, scroll effects, and decorative marketing sections.
 - Image-to-code is optional when fidelity matters and real source images/tools exist; never ship fake controls or claim a screenshot was compared unless it was.
+
+## 3A. UI quality gate and verification evidence
+
+- Apply the **review process** in `IMPECCABLE-UI-QUALITY-GATE.md` to meaningful new or modified UI; Impeccable software installation itself is **not** mandatory.
+- Classify the visitor goal **per surface**: Operate (tool/workspace), Read (article/help), Persuade (marketing), Experience (showcase). A tool's landing page and its interactive workspace may have different priorities.
+- For relevant changes, inspect accessibility, functional states, narrow viewports, keyboard/touch, actual long/invalid inputs, Spanish/Portuguese localization and text overflow, visual cohesion, and real measured performance when available.
+- Diagnose before editing; record observed issues and severity. Treat P0/P1 blocking defects as release blockers; a clean heuristic detector output does **not** override a broken user task or SEO regression.
+- Record test evidence in `UI-RELEASE-EVIDENCE.md` for a release, with `PASS`, `FAIL`, `NOT RUN`, or `NOT APPLICABLE`. Never claim scanner, browser, Lighthouse, responsive or manual checks ran when they did not.
+- Optional CLI, downloaded binaries, provider hooks, extension permissions, and Live mode require explicit opt-in after reviewing version, cost, security, and edit behavior. Never silently install, update, enable or invoke an edit-blocking Hook.
+- Validate in a bounded batch rather than looping indefinitely on cosmetic details. Follow existing protected keywords, URLs, canonical/hreflang, analytics, calculations and brand constraints.
 
 ## 4. SEO / GEO quality gate is mandatory
 
@@ -84,7 +94,7 @@ Unless meaningful traffic or revenue is already validated, prefer zero/freemium 
 
 A website is not complete until Visual QA checks hero/first-screen hierarchy, tool clarity, desktop/tablet/mobile layouts, typography/spacing/components, CTA hierarchy, contrast, imagery, generic-template smell, unnecessary effects, real user-task efficiency, and SEO content readability.
 
-Use the redesign and evidence matrix in `TASTE-UI-PROTOCOL.md`: include observed screenshots/comparisons where tools permit, interaction states, mobile and small-laptop behavior, and explicit `not run` notes instead of assumed passes.
+Use the redesign and evidence matrix in `TASTE-UI-PROTOCOL.md` plus the UX/a11y/i18n/performance quality dimensions in `IMPECCABLE-UI-QUALITY-GATE.md`: include observed screenshots/comparisons where tools permit, interaction states, mobile and small-laptop behavior, and explicit `not run` notes instead of assumed passes.
 
 ## 9. Final project QA
 
@@ -95,6 +105,7 @@ Before calling the site complete, verify:
 - All planned important pages exist.
 - Responsive layouts work at representative widths.
 - `SEO-GEO-QUALITY-GATE.md` launch acceptance passes.
+- Applicable UI quality gates in `IMPECCABLE-UI-QUALITY-GATE.md` pass, with P0/P1 blockers closed and actual checks recorded in `UI-RELEASE-EVIDENCE.md`.
 - Internal links and images/assets work.
 - No obvious console/build/runtime errors.
 - Production build succeeds.

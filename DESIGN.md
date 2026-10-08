@@ -17,6 +17,9 @@
 - Critical first-screen action and result path:
 - Existing features/routes/keywords/brand attributes to preserve:
 - One-sentence design read (page kind + audience + visual personality + task constraints):
+- Visitor mode **per surface** (Operate / Read / Persuade / Experience), not just per website:
+- Product truth (approved copy, claims, inputs/outputs, units and behavior) to preserve:
+- First-screen task completion or conversion evidence:
 
 ## 2. Visual theme & atmosphere
 
@@ -30,7 +33,7 @@ Describe the visual language in concrete terms: density, rhythm, level of decora
 - Justification for these values and the user task:
 - Tool-first viewport plan (which inputs/actions/results appear immediately):
 
-Use `TASTE-UI-PROTOCOL.md` for page-type presets and redesign checks. A useful, accessible and fast tool beats a visually dramatic but obstructive landing page.
+Use `TASTE-UI-PROTOCOL.md` for page-type presets and redesign checks, and `IMPECCABLE-UI-QUALITY-GATE.md` for user-task, accessibility, edge-case and performance verification. A useful, accessible and fast tool beats a visually dramatic but obstructive landing page.
 
 ## 3. Color system
 
@@ -149,7 +152,14 @@ Define visual and behavioral rules for:
 - Pagination
 - Footer
 
-For every interactive component define Default, Hover, Active, Focus, Disabled, Loading, Error as applicable.
+For every interactive component define Default, Hover, Active, Focus, Disabled, Loading, Error and Success as applicable. Verify real events, not only screenshots.
+
+### Operate and localization robustness
+
+- Valid/invalid/empty/extreme values and numerical precision/rounding requirements:
+- Unicode/diacritics/emoji and long-string overflow rules, especially for Spanish/Portuguese generators:
+- Keyboard/tab order, accessible naming, text enlargement and touch/gesture fallbacks:
+- Network failure, timeout and offline behavior if network requests exist:
 
 ## 10. Imagery & iconography
 
@@ -223,4 +233,5 @@ Before implementing or changing UI, the coding agent must:
 6. For visually critical tasks with available references, optionally follow reference/image → design-spec → code → rendered desktop/mobile comparison; do not fake screenshots or missing verification.
 7. Ensure meaningful empty/loading/error/focus states, accessible labels, real imagery/assets and reduced-motion support.
 8. Validate real user-task behavior at mobile, tablet, and desktop viewports; check no SEO or performance regression.
-9. Record concrete before/after checks and any `not run` items rather than claiming an untested pass.
+9. Run the UI quality categories from `IMPECCABLE-UI-QUALITY-GATE.md` in scope: Operate/Read/Persuade/Experience intent, accessibility, responsive, localization/edge states, performance and regressions.
+10. Record concrete before/after checks and any `NOT RUN` items in `UI-RELEASE-EVIDENCE.md` rather than claiming an untested pass; do not install an Impeccable CLI or Hook unless expressly approved.
