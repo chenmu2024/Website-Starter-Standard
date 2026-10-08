@@ -13,10 +13,24 @@
 - Design references (2–4):
 - Why each reference is relevant:
 - What must NOT be copied:
+- Page kind(s) (marketing, content, generator, calculator, game, dashboard):
+- Critical first-screen action and result path:
+- Existing features/routes/keywords/brand attributes to preserve:
+- One-sentence design read (page kind + audience + visual personality + task constraints):
 
 ## 2. Visual theme & atmosphere
 
 Describe the visual language in concrete terms: density, rhythm, level of decoration, use of imagery, light/dark balance, technical/editorial/playful tone, and how the design supports the actual user task.
+
+### Contextual design controls (1–10; descriptive, not a scoring system)
+
+- `DESIGN_VARIANCE` (layout novelty):
+- `MOTION_INTENSITY` (animation):
+- `VISUAL_DENSITY` (information density):
+- Justification for these values and the user task:
+- Tool-first viewport plan (which inputs/actions/results appear immediately):
+
+Use `TASTE-UI-PROTOCOL.md` for page-type presets and redesign checks. A useful, accessible and fast tool beats a visually dramatic but obstructive landing page.
 
 ## 3. Color system
 
@@ -42,6 +56,8 @@ Describe the visual language in concrete terms: density, rhythm, level of decora
 - Define where the accent color may and may not be used.
 - Define gradient rules explicitly. Default: no decorative gradients unless justified.
 - Define dark mode only if the product benefits from it.
+- Keep one intentional primary accent family and consistent neutral surfaces across page types; semantic success/warning/error colors remain distinct where necessary.
+- Preserve existing brand colors during redesign unless a change is explicitly approved. No blanket ban on individual hues.
 
 ## 4. Typography
 
@@ -90,6 +106,7 @@ Define section rhythm, card padding, form gaps, dense tool-panel gaps, and mobil
 - Mobile gutters:
 - Standard column patterns:
 - Tool-page layout pattern:
+- First-screen hierarchy (main tool controls, result path, secondary copy):
 - Content-page layout pattern:
 - Marketing-page layout pattern:
 
@@ -143,6 +160,8 @@ For every interactive component define Default, Hover, Active, Focus, Disabled, 
 - Icon stroke/weight:
 - Aspect-ratio rules:
 - Placeholder/fallback rules:
+- Reference-image/source provenance and implementation plan if using an image-to-code process:
+- Desktop/mobile screenshot comparison plan, if browser tooling is available:
 
 Do not use irrelevant stock imagery or logos as decorative filler.
 
@@ -153,6 +172,10 @@ Do not use irrelevant stock imagery or logos as decorative filler.
 - Allowed animation types:
 - Prohibited animation types:
 - Reduced-motion behavior:
+- Purpose of each nontrivial animation (state, hierarchy, or narrative):
+- JS/dependency budget and static fallback:
+
+Default to minimal motion on tool, game, finance and content pages. Respect `prefers-reduced-motion`; never add a large motion runtime just to decorate a static page.
 
 ## 12. Responsive behavior
 
@@ -192,8 +215,12 @@ Explicitly document navigation collapse, tool panel stacking, card/grid changes,
 
 Before implementing or changing UI, the coding agent must:
 
-1. Read this file.
-2. Reuse existing tokens/components.
-3. Check whether the requested change conflicts with the system.
-4. If the design language must change, update this file first.
-5. Validate desktop and mobile behavior after implementation.
+1. Read this file and `TASTE-UI-PROTOCOL.md`.
+2. Classify the page: marketing/content or tool/workspace, then state the design read and contextual design controls.
+3. For redesigns: scan the existing repo, diagnose concrete defects, and record functionality/SEO/brand baselines before changing visual code.
+4. Reuse existing tokens/components; preserve approved keywords, routes, canonical/hreflang, analytics, nav, legal copy, and working user tasks unless expressly approved.
+5. If the design language must change, update this file first; keep the new design consistent across relevant pages.
+6. For visually critical tasks with available references, optionally follow reference/image → design-spec → code → rendered desktop/mobile comparison; do not fake screenshots or missing verification.
+7. Ensure meaningful empty/loading/error/focus states, accessible labels, real imagery/assets and reduced-motion support.
+8. Validate real user-task behavior at mobile, tablet, and desktop viewports; check no SEO or performance regression.
+9. Record concrete before/after checks and any `not run` items rather than claiming an untested pass.

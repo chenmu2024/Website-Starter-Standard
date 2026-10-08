@@ -8,6 +8,8 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 - [ ] New UI reuses existing tokens/components.
 - [ ] Any intentional design-language change was first reflected in `DESIGN.md`.
 - [ ] No arbitrary gradients, glow, glassmorphism, shadows, radii, or colors were introduced.
+- [ ] I applied the page-type and redesign requirements in `TASTE-UI-PROTOCOL.md` when UI changed.
+- [ ] Tool-first interactions were not displaced by decorative heroes, and existing brand/functional/SEO invariants remain intact.
 
 ## Responsive / accessibility
 
@@ -16,6 +18,7 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 - [ ] Desktop checked.
 - [ ] Keyboard/focus behavior checked.
 - [ ] Important contrast and touch targets checked.
+- [ ] Visual checks covered mobile, tablet, small laptop, and desktop where tooling was available; skipped checks are marked `not run`.
 
 ## SEO / GEO change gate
 

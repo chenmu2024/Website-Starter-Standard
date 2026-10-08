@@ -14,7 +14,7 @@ This starter prevents a common failure mode in AI-built websites: development be
 4. Complete the project PRD and full information architecture.
 5. Customize `DESIGN.md` for the project.
 6. Complete `SEO-GEO-PROJECT-BRIEF.md` and the architecture in `SEO-GEO-QUALITY-GATE.md` before mass page production.
-7. Define tokens and reusable components.
+7. Define tokens and reusable components; apply the page-type-aware audit and UI workflow in `TASTE-UI-PROTOCOL.md`.
 8. Implement the complete planned site, including programmatic/international rules where applicable.
 9. Run L1 checks during development and collect concrete evidence in `SEO-GEO-RELEASE-EVIDENCE.md`.
 10. Run the L2 release audit, Visual QA, and `QA-CHECKLIST.md` before launch.
@@ -24,6 +24,7 @@ This starter prevents a common failure mode in AI-built websites: development be
 ## Files
 
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
+- `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
 - `DESIGN.md` — project-specific design-system template.
 - `SEO-GEO.md` — concise search and answer-engine policy.
 - `SEO-GEO-QUALITY-GATE.md` — detailed mandatory SEO/GEO, programmatic SEO, international SEO, audit, and launch gate.
@@ -35,7 +36,7 @@ This starter prevents a common failure mode in AI-built websites: development be
 
 ## Design references
 
-`VoltAgent/awesome-design-md` is a required design-reference source when applicable. Learn and combine appropriate design logic; do not clone a single brand's visual identity.
+`VoltAgent/awesome-design-md` is a required design-reference source when applicable. Taste Skill's design-read, redesign audit, and conditional image-to-code methods are selectively adapted in `TASTE-UI-PROTOCOL.md` (not blindly installed). Learn and combine appropriate design logic; do not clone a single brand's visual identity. For tool-first websites, usability, crawlability, and performance outrank cinematic art direction.
 
 ## Current search / AI-search position
 

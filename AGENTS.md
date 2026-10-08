@@ -11,7 +11,7 @@ Do not start page-level UI implementation until the following are complete:
 3. Search intent mapped to canonical destinations; no unresolved cannibalization plan.
 4. Competitor/reference analysis completed.
 5. Full project PRD and information architecture completed.
-6. Project-specific `DESIGN.md` completed.
+6. Project-specific `DESIGN.md` completed, including a page-type design read and the task-first controls from `TASTE-UI-PROTOCOL.md`.
 7. `SEO-GEO-PROJECT-BRIEF.md` completed with keyword/intent ownership, indexation, sources, entities, schema, and international rules.
 8. Applicable SEO/GEO, programmatic SEO, and international architecture from `SEO-GEO-QUALITY-GATE.md` defined.
 9. Design tokens and reusable base components defined.
@@ -26,6 +26,8 @@ The design system must be derived from product context, target users, search int
 
 The design system must define at minimum: visual theme, semantic colors, typography, spacing, grid/layout, radii, core components and states, elevation, responsive behavior, media/icon rules, motion, accessibility, design guardrails, and AI implementation notes.
 
+Read `TASTE-UI-PROTOCOL.md` before UI creation or redesign. Its Taste Skill-derived principles are selective, contextual guidance, **not** a mandate to install a Skill, generate images for every change, add heavy motion, enforce specific fonts, or replace the site's existing stack.
+
 ## 3. Design-system enforcement
 
 - All pages and components must follow `DESIGN.md`.
@@ -34,6 +36,10 @@ The design system must define at minimum: visual theme, semantic colors, typogra
 - If the visual language must change, update `DESIGN.md` first, then implementation.
 - Marketing, tool, content, and utility pages may differ in density but must share one recognizable system.
 - Avoid generic AI-SaaS aesthetics unless the product genuinely requires them.
+- Apply the `TASTE-UI-PROTOCOL.md` sequence: design read → context-sensitive visual system → implement → multi-viewport visual/user-task review.
+- For existing sites, follow scan → diagnose → preserve → fix → verify. Do not silently alter approved keywords, routes, analytics events, form field names/order, brand, navigation labels, legal text, or working calculations.
+- For generators, converters, calculators, and games, the core interaction and results path take priority over cinematic heroes, scroll effects, and decorative marketing sections.
+- Image-to-code is optional when fidelity matters and real source images/tools exist; never ship fake controls or claim a screenshot was compared unless it was.
 
 ## 4. SEO / GEO quality gate is mandatory
 
@@ -77,6 +83,8 @@ Unless meaningful traffic or revenue is already validated, prefer zero/freemium 
 ## 8. Visual QA is mandatory
 
 A website is not complete until Visual QA checks hero/first-screen hierarchy, tool clarity, desktop/tablet/mobile layouts, typography/spacing/components, CTA hierarchy, contrast, imagery, generic-template smell, unnecessary effects, real user-task efficiency, and SEO content readability.
+
+Use the redesign and evidence matrix in `TASTE-UI-PROTOCOL.md`: include observed screenshots/comparisons where tools permit, interaction states, mobile and small-laptop behavior, and explicit `not run` notes instead of assumed passes.
 
 ## 9. Final project QA
 

@@ -11,6 +11,10 @@
 - [ ] Pages use shared tokens/components.
 - [ ] No unjustified gradients/glow/glass/shadows.
 - [ ] No generic AI-template look.
+- [ ] `TASTE-UI-PROTOCOL.md` was applied for the page type; design read, variance/motion/density choices, and first-screen task hierarchy are justified.
+- [ ] Important fonts/color accents/radii/spacing are consistent; existing brand identity is preserved unless owner-approved.
+- [ ] For redesigns, a concrete scan/diagnosis and before/after functionality + visual + SEO baseline was reviewed.
+- [ ] No needlessly repeated generic card grids, nested containers or stock-image filler; justified exceptions are documented.
 
 ## Responsive
 - [ ] Small mobile checked.
@@ -19,6 +23,8 @@
 - [ ] Desktop checked.
 - [ ] Wide desktop checked.
 - [ ] No horizontal overflow except intentional scrollers.
+- [ ] Representative widths around 360/390/768/1024/1440px were visually checked where browser access exists, or skipped checks are marked `not run`.
+- [ ] Tool controls and results path remain discoverable on small laptop and mobile viewports.
 
 ## SEO / GEO — governance
 - [ ] Approved core keywords were preserved exactly unless owner-approved changes are documented.
@@ -90,6 +96,8 @@
 - [ ] Contrast acceptable.
 - [ ] Touch targets usable.
 - [ ] Reduced-motion respected where applicable.
+- [ ] Dynamic effects justify their performance cost; existing dependencies and lighter CSS alternatives were considered before adding a motion library.
+- [ ] Measurements are recorded when run; unmeasured Web Vitals are explicitly labeled as unverified, not passed.
 
 ## Technical / production
 - [ ] Production build succeeds.
@@ -115,3 +123,6 @@
 - [ ] Mobile hierarchy remains strong.
 - [ ] The site has a distinct brand language.
 - [ ] The site still matches `DESIGN.md`.
+- [ ] Existing functional controls and core calculations behave as before any visual redesign; keyboard, touch, and loading/error/empty states checked.
+- [ ] Browser before/after screenshots or written visual evidence are recorded when available; unavailable captures are labeled `not run`.
+- [ ] If image-to-code was used: major desktop/mobile discrepancies were reviewed, UI controls are implemented (not fake images), and assets are real.
