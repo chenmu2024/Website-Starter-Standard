@@ -1,0 +1,79 @@
+name: Trial Qwen3TTS 0.6B Free CPU Chinese Narration
+on:
+  push:
+    branches: [experiment/free-mandarin-video-20261010]
+    paths: [.github/workflows/trial-qwen3-tts-cpu.yml]
+  workflow_dispatch:
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Environment
+        run: |
+          python --version
+          df -h .
+          free -h
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg libsox-fmt-all
+      - name: Install CPU-only model dependencies
+        run: |
+          python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.8.0 torchaudio==2.8.0
+          python -m pip install --no-cache-dir qwen-tts==0.1.1
+          python -c "import torch; print('Torch',torch.__version__,'CUDA',torch.cuda.is_available())"
+      - name: Generate narrative in one continuous natural voice
+        env:
+          OMP_NUM_THREADS: '4'
+          MKL_NUM_THREADS: '4'
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HOME: /tmp/hf_qwen3tts_cache
+          HF_HUB_DISABLE_XET: '1'
+        run: |
+          mkdir -p voice
+          cat > voice/speak.py <<'PY'
+          import os,time
+          import torch
+          import soundfile as sf
+          from qwen_tts import Qwen3TTSModel
+          torch.set_num_threads(4)
+          start=time.monotonic()
+          print('Loading CPU model...',flush=True)
+          model=Qwen3TTSModel.from_pretrained(
+            "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
+            device_map="cpu",
+            dtype=torch.float32,
+            attn_implementation="eager",
+          )
+          print('Loaded model, s',int(time.monotonic()-start),flush=True)
+          script=(
+            "一家公司明明在赚钱，为什么最后还是倒闭了？"
+            "问题可能不是利润，而是现金流。"
+            "货早就卖出去了，可客户的账款，还要等两个月。"
+            "但是工资要发，房租要交，采购款今天就得付。"
+            "看起来赚了不少钱，实际上，账户里却没钱。"
+            "记住，利润告诉你赚了多少，现金，决定企业能活多久。"
+          )
+          with open('voice/script.txt','w') as f:f.write(script)
+          print('Generating continuous Chinese narration...',flush=True)
+          with torch.inference_mode():
+            wavs,sr=model.generate_custom_voice(
+              text=script,
+              language="Chinese",
+              speaker="Uncle_Fu",
+              max_new_tokens=850,
+            )
+          sf.write('voice/qwen3_zh_narration.wav',wavs[0],sr)
+          print('Generated voice at SR',sr,'duration',len(wavs[0])/sr,'in seconds',int(time.monotonic()-start),flush=True)
+          PY
+          python -u voice/speak.py
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 voice/qwen3_zh_narration.wav
+      - name: Upload results even on partial failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-qwen3-tts-cpu-voice
+          path: |
+            voice/qwen3_zh_narration.wav
+            voice/script.txt
+          retention-days: 3
+          if-no-files-found: warn
