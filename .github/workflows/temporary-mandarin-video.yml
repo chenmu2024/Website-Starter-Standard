@@ -1,0 +1,66 @@
+name: Temporary Free Mandarin Neural Voice
+on:
+  push:
+    branches:
+      - experiment/free-mandarin-video-20261010
+    paths:
+      - .github/workflows/temporary-mandarin-video.yml
+  workflow_dispatch:
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Install speech synthesis
+        run: |
+          python -m pip install --quiet edge-tts gTTS
+      - name: Generate six natural Mandarin narration clips
+        shell: bash
+        run: |
+          mkdir -p voice
+          cat > voice/run.py <<'PY'
+          import asyncio
+          from pathlib import Path
+          sentences = [
+              "为什么越赚钱的公司，反而更容易倒闭？",
+              "利润表好看，不等于公司手里有钱。",
+              "货卖出去了，可客户的钱还没到账。",
+              "采购、工资和房租，却得马上付钱。",
+              "现金流一断，再高的利润也救不了公司。",
+              "利润决定赚不赚钱。现金，决定能不能活。",
+          ]
+          async def main():
+              import edge_tts
+              for i,s in enumerate(sentences):
+                  out=Path('voice')/f'vo_{i+1:02}.mp3'
+                  try:
+                      for attempt in range(3):
+                          try:
+                              await edge_tts.Communicate(text=s, voice='zh-CN-YunyangNeural', rate='-4%',pitch='-2Hz').save(str(out))
+                              if out.stat().st_size < 2000: raise RuntimeError('empty audio')
+                              print('NEURAL',i+1,out.stat().st_size,flush=True)
+                              break
+                          except Exception as e:
+                              print('Neural try',i+1,attempt+1,str(e),flush=True)
+                              if attempt==2: raise
+                  except Exception as e:
+                      print('Fallback to Google Mandarin',i+1,str(e),flush=True)
+                      from gtts import gTTS
+                      gTTS(text=s, lang='zh-CN').save(str(out))
+                      print('GOOGLE',i+1,out.stat().st_size,flush=True)
+          asyncio.run(main())
+          PY
+          python voice/run.py
+      - name: Validate non-empty speech audio
+        run: |
+          for n in 01 02 03 04 05 06; do
+            test -s "voice/vo_${n}.mp3"
+            ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 "voice/vo_${n}.mp3"
+          done
+      - name: Upload Mandarin audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-mandarin-narration
+          path: voice/vo_*.mp3
+          if-no-files-found: error
+          retention-days: 3
