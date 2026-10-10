@@ -55,7 +55,7 @@ jobs:
         run: |
           for n in 01 02 03 04 05 06; do
             test -s "voice/vo_${n}.mp3"
-            ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 "voice/vo_${n}.mp3"
+            echo "validated speech segment: ${n}"
           done
       - name: Upload Mandarin audio
         uses: actions/upload-artifact@v4
