@@ -1,0 +1,95 @@
+name: Temporary Text-to-Video Core Engine Trial
+on:
+  push:
+    branches: [experiment/text-to-video-trial-20261010]
+    paths: [.github/workflows/temporary-video-trial.yml]
+  workflow_dispatch:
+jobs:
+  text-to-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    env:
+      TTS_PROVIDER: edge-tts
+      VIDEO_ORIENTATION: portrait
+      VIDEO_RESOLUTION: portrait_720
+      VIDEO_VOICE: zh-CN-YunyangNeural
+      OPENVERSE_ENABLED: 'true'
+      MEDIA_VERIFICATION_ENABLED: 'false'
+      AUTO_FREE_MUSIC: 'true'
+      AI_PROVIDER: none
+      PEXELS_API_KEY: ''
+      PIXABAY_API_KEY: ''
+      UPLOAD_POST_ENABLED: 'false'
+    steps:
+      - name: Checkout sandbox branch
+        uses: actions/checkout@v4
+      - name: Clone primary upstream video engine
+        run: git clone --depth 1 https://github.com/itsPremkumar/Automated-Video-Generator.git avg
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install video and TTS dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --quiet --break-system-packages edge-tts || (python -m venv /tmp/voice-venv && /tmp/voice-venv/bin/pip install edge-tts)
+          cd avg
+          npm ci --no-audit --no-fund --silent
+      - name: Create real Chinese article-to-video input
+        run: |
+          cd avg
+          mkdir -p input/scripts
+          python - <<'PY'
+          import json
+          text = [
+            "为什么一家公司明明赚钱，却突然倒闭？ [Visual: worried small business owner reviewing company finances at night]",
+            "因为利润表上的数字，和银行账户里的现金，不是一回事。 [Visual: corporate finance dashboard bar chart and falling cash line]",
+            "商品卖掉了，客户可能三个月后才付款。 [Visual: logistics packages with invoice and unpaid bills]",
+            "可是员工工资、房租、采购款，每个月都得准时付。 [Visual: office payroll desk rent contracts and expenses]",
+            "如果现金流断了，账面利润再漂亮，公司也会撑不住。 [Visual: empty corporate office after business closed]",
+            "所以记住，利润决定赚不赚钱，现金决定能不能活下去。 [Visual: entrepreneur planning cash flow budget in office]",
+          ]
+          job=[{"id":"cashflow_trial_20261010","title":"Cashflow text to video trial",
+          "script":"\n".join(text),"orientation":"portrait","voice":"zh-CN-YunyangNeural",
+          "language":"chinese","showText":True,"musicVolume":0.12}]
+          open('input/scripts/input-scripts.json','w',encoding='utf8').write(json.dumps(job,ensure_ascii=False,indent=2))
+          PY
+      - name: Run actual upstream text-to-video pipeline
+        shell: bash
+        run: |
+          cd avg
+          set +e
+          timeout 550 npm run generate > /tmp/trial.log 2>&1
+          code=$?
+          echo "pipeline_exit_code=$code" > /tmp/trial-status.txt
+          find output -type f -printf "%p %s bytes\n" | head -80 >> /tmp/trial-status.txt || true
+          tail -c 45000 /tmp/trial.log
+          exit 0
+      - name: Verify exported MP4
+        shell: bash
+        run: |
+          cd avg
+          python - <<'PY'
+          import glob,subprocess,json,os
+          files=glob.glob('output/**/*.mp4',recursive=True)
+          report={'mp4_count':len(files),'files':[]}
+          for f in files:
+              p=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration,size:stream=codec_type,codec_name,width,height','-of','json',f],capture_output=True,text=True)
+              info=json.loads(p.stdout) if p.stdout else {'error':p.stderr}
+              report['files'].append({'path':f,'ffprobe':info})
+          open('trial-quality-report.json','w').write(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Upload outputs and diagnostic files even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: text-to-video-trial-results
+          path: |
+            avg/output/
+            avg/trial-quality-report.json
+            /tmp/trial.log
+            /tmp/trial-status.txt
+          if-no-files-found: warn
+          retention-days: 3
