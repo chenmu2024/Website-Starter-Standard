@@ -1,0 +1,89 @@
+name: Three Minute Atomic Habits Book Video Free Assets and TTS
+on:
+  push:
+    branches: [experiment/free-mandarin-video-20261010]
+    paths: [.github/workflows/atomic-habits-3min-20261010.yml]
+  workflow_dispatch:
+jobs:
+  narration:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        part: [0,1,2,3,4,5,6,7]
+    timeout-minutes: 25
+    steps:
+      - name: Install free CPU TTS
+        run: |
+          python -m pip install -q --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.8.0 torchaudio==2.8.0
+          python -m pip install -q --no-cache-dir qwen-tts==0.1.1
+      - name: Generate Chinese audiobook narration
+        env:
+          PART: ${{ matrix.part }}
+          OMP_NUM_THREADS: '4'
+          MKL_NUM_THREADS: '4'
+          HF_HOME: /tmp/qwen-book
+          HF_HUB_DISABLE_XET: '1'
+        run: |
+          cat > narration.py <<'PY'
+          import json,os,time,torch,soundfile as sf
+          from qwen_tts import Qwen3TTSModel
+          parts=["你是不是也这样？每年都说要早起、运动、读书，可坚持几天，又回到了原点。问题真的是不够自律吗？今天三分钟读懂《原子习惯》。改变自己，不必总靠咬牙硬撑。","作者詹姆斯·克利尔提醒我们：目标决定方向，系统决定每天怎么走。一年读二十本书是目标；每天睡前读两页，才是系统。别等某一天突然逆袭，先设计今天能做的小动作。","习惯的效果，往往不会立刻出现。今天读两页书，看不出什么变化；跑步五分钟，也不会马上变强。但当这些小行动不断积累，时间就会放大差距。别急着要结果，先让自己持续行动。","比目标更深一层的，是身份认同。别只说我要多读书，试着想：我要成为一个爱读书的人。即使今天很忙，你也可以翻开一页。每一次小行动，都在证明自己正在成为那样的人。","好习惯有四个设计方法：让提示明显，让行动有吸引力，让开始足够简单，再让完成令人满足。想运动，就把鞋放门口；想少刷手机，就别把手机放枕边。环境，往往比意志力可靠。","我最推荐两分钟法则。想跑步，先穿鞋出门走两分钟；想读书，先打开书读一页。看起来太简单？这恰恰是它的作用。先跨过最难的一步：开始。等开始成为习惯，再慢慢提高难度。","还有一个方法，叫习惯叠加。把新动作接在熟悉的事情后面：刷完牙，读一页书；泡好咖啡，写三行日记。老习惯会提醒你做新动作，比每天依靠记性和临时兴起，更容易坚持。","习惯也会中断，偶尔错过一次，不代表前功尽弃。第二天重新开始就好。《原子习惯》最想教我们的，是把改变放回普通的每一天。找到你想成为的人，把行动变小，然后重复。今天，你从哪两分钟开始？"]
+          idx=int(os.environ["PART"])
+          torch.set_num_threads(4)
+          model=Qwen3TTSModel.from_pretrained("Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",device_map="cpu",dtype=torch.float32,attn_implementation="eager")
+          print("Start part",idx, "chars", len(parts[idx]),flush=True)
+          with torch.inference_mode():
+            wavs,sr=model.generate_custom_voice(text=parts[idx],language="Chinese",speaker="Uncle_Fu",instruct="请以自然温暖、娓娓道来的中文读书解说语气讲述，不要新闻播报腔。",max_new_tokens=850)
+          os.makedirs("voice",exist_ok=True)
+          sf.write(f"voice/part_{idx:02}.wav",wavs[0],sr)
+          with open(f"voice/part_{idx:02}.txt","w") as f:f.write(parts[idx])
+          print("COMPLETE",idx, "seconds",len(wavs[0])/sr,flush=True)
+          
+          PY
+          python -u narration.py
+          test -s "voice/part_$(printf '%02d' ${PART}).wav"
+      - name: Upload Mandarin narration
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atomic-habits-voice-${{ matrix.part }}
+          path: voice/
+          retention-days: 3
+          if-no-files-found: warn
+  stock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Fetch permitted free Unsplash photography
+        run: |
+          cat > photos.py <<'PY'
+          import os,urllib.request,json,time
+          photos=["1497633762265-9d179a990aa6","1507842217343-583bb7270b66","1495446815901-a7297e633e8d","1456513080510-7bf3a84b82f8","1481627834876-b7833e8f5570","1543002588-bfa74002ed7e","1434030216411-0b793f4b4173","1506784983877-45594efa4cbe","1513258496099-48168024aec0","1441974231531-c6227db76b6e","1500534623283-312aade485b7","1534438327276-14e5300c3a48","1519682337058-a94d519337bc","1516979187457-637abb4f9353","1522202176988-66273c2fd55f","1544947950-fa07a98d237f"]
+          os.makedirs('photos',exist_ok=True)
+          manifest=[]
+          for i,p in enumerate(photos):
+            url=f'https://images.unsplash.com/photo-{p}?auto=format&fit=crop&w=1400&q=78'
+            try:
+              r=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(r,timeout=25) as resp: data=resp.read()
+              if len(data)<14000: raise ValueError('image too small')
+              with open(f'photos/photo_{i:02}.jpg','wb') as f:f.write(data)
+              manifest.append({'id':i,'photo_id':p,'url':url,'bytes':len(data),'status':'ok'})
+              print('OK',i,len(data),flush=True)
+            except Exception as e:
+              manifest.append({'id':i,'photo_id':p,'url':url,'status':'failed','error':str(e)})
+              print('FAILED',i,str(e),flush=True)
+          with open('photos/manifest.json','w') as f:json.dump(manifest,f,ensure_ascii=False,indent=2)
+          
+          PY
+          python -u photos.py
+      - name: Upload original photographs and attribution manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atomic-habits-free-photo-assets
+          path: photos/
+          retention-days: 3
+          if-no-files-found: warn
