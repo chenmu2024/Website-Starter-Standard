@@ -1,0 +1,49 @@
+name: Animated Book Video Natural Fast Voice Full Length
+on:
+  push:
+    branches: [experiment/free-mandarin-video-20261010]
+    paths: [.github/workflows/animated-book-full-voice.yml]
+  workflow_dispatch:
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [0,1,2,3]
+    steps:
+      - name: Install free neural Mandarin voice
+        run: python -m pip install --quiet edge-tts
+      - name: Produce two full chapter narrations
+        env:
+          BATCH: ${{matrix.batch}}
+        run: |
+          mkdir -p voice
+          cat > speak.py <<'PY'
+          import asyncio,os
+          from pathlib import Path
+          import edge_tts
+          parts=["你是不是也这样？每年都说要早起、运动、读书，可坚持几天，又回到了原点。为什么有的人改变起来很轻松，而你总在重复失败？也许问题根本不是不够自律。今天三分钟，读懂詹姆斯·克利尔的《原子习惯》。这本书不是教你如何逼自己坚持，而是教你设计一个更容易坚持的生活。","作者提醒我们，目标告诉你想去哪里，系统决定你今天会做什么。比如一年读二十本书，是目标；每天睡前固定读两页，才是系统。很多人总想着等工作不忙了再开始，可真正有效的方法，是把习惯放进今天的日程。与其每天盯着终点焦虑，不如认真做好眼前那一小步。","习惯最难的一点，是刚开始往往看不到效果。今天读两页书，你不会突然变博学；今天走路十分钟，体能也不会立刻提高。于是很多人觉得没用，就放弃了。但微小的行动会不断积累，就像种下一颗种子，最初看不见变化，后来却会生根发芽。别只看今天改变了多少，也要看自己能不能一直做下去。","还有一个非常重要的观点：真正持久的习惯，和你怎么看待自己有关。不要只说我要多读书，试着想，我是一个会主动阅读的人。即使今天很忙，只读完一页，你也完成了一次证明。一次行动可能微不足道，但当这些证据越来越多，你对自己的认识也会改变。先行动，再一点点成为自己想成为的人。","作者总结了培养好习惯的四条法则。第一，让提示明显，比如把书放在枕边。第二，让行动有吸引力，把它和喜欢的事放在一起。第三，让开始足够简单，读一页也算完成。第四，让完成有满足感，可以在日历上画个勾。想少玩手机，也可以反过来做：把手机放远一点，减少随手拿起来的机会。改变环境，通常比每天跟自己较劲更有效。","我最推荐的是两分钟法则。想养成跑步习惯，先把目标改成穿上跑鞋，走出家门。想开始读书，就先打开书，读一页。听起来是不是简单得有点可笑？但关键不在两分钟能做多少，而在你能否轻松开始。很多事情，最困难的其实是启动。一旦开始变得顺手，再逐渐增加时间和难度，就没那么痛苦了。","还有一个实用方法，叫习惯叠加。把你想培养的新习惯，接在每天已经会做的事情后面。比如刷完牙，读一页书；泡好咖啡，写三行日记；吃完晚饭，出去散步两分钟。关键是把动作写得具体，而不是模糊地说有空再做。当旧习惯已经稳定，新动作就更容易被提醒。慢慢地，一件小事就会连起另一件小事。","当然，谁都会有中断的时候。今天太忙，忘记打卡；周末出门，没能运动，这都不代表前功尽弃。真正重要的是，下次还能回来继续。不要因为一次失误，就把整套计划放弃。《原子习惯》最想告诉我们的，是改变并不一定轰轰烈烈。选一个你想成为的样子，把行动变得足够小，然后一遍遍重复。看完这条视频，你愿意从哪两分钟开始？"]
+          async def main():
+            for i in (int(os.environ['BATCH'])*2,int(os.environ['BATCH'])*2+1):
+              output=Path('voice')/f'voice_{i:02d}.mp3'
+              for attempt in range(3):
+                try:
+                  await edge_tts.Communicate(text=parts[i],voice='zh-CN-XiaoxiaoNeural',rate='+17%',pitch='-1Hz').save(str(output))
+                  assert output.stat().st_size>3500
+                  print('SPOKEN',i,output.stat().st_size,flush=True)
+                  break
+                except Exception as exc:
+                  print('retry',exc,flush=True)
+                  if attempt==2: raise
+          asyncio.run(main())
+          PY
+          python speak.py
+      - name: Upload generated audiobook parts
+        uses: actions/upload-artifact@v4
+        with:
+          name: animated-book-natural-voice-${{matrix.batch}}
+          path: voice/
+          retention-days: 3
