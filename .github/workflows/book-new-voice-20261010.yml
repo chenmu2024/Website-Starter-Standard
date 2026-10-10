@@ -1,0 +1,59 @@
+name: Natural Fast Book Voice A-B Trial
+on:
+  push:
+    branches: [experiment/free-mandarin-video-20261010]
+    paths: [.github/workflows/book-new-voice-20261010.yml]
+  workflow_dispatch:
+jobs:
+  narration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        voice: [zh-CN-XiaoxiaoNeural, zh-CN-YunxiNeural]
+        batch: [0,1,2,3]
+    steps:
+      - name: Install free neural TTS
+        run: python -m pip install -q edge-tts
+      - name: Generate naturally paced Mandarin narration
+        env:
+          VOICE: ${{ matrix.voice }}
+          BATCH: ${{ matrix.batch }}
+        run: |
+          mkdir -p spoken
+          cat > speak.py <<'PY'
+          import asyncio,os
+          from pathlib import Path
+          import edge_tts
+          lines=["你是不是也这样？每年都说要早起、运动、读书，可坚持几天，又回到了原点。问题真的是不够自律吗？今天三分钟读懂《原子习惯》。改变自己，不必总靠咬牙硬撑。","作者詹姆斯·克利尔提醒我们：目标决定方向，系统决定每天怎么走。一年读二十本书是目标；每天睡前读两页，才是系统。别等某一天突然逆袭，先设计今天能做的小动作。","习惯的效果，往往不会立刻出现。今天读两页书，看不出什么变化；跑步五分钟，也不会马上变强。但当这些小行动不断积累，时间就会放大差距。别急着要结果，先让自己持续行动。","比目标更深一层的，是身份认同。别只说我要多读书，试着想：我要成为一个爱读书的人。即使今天很忙，你也可以翻开一页。每一次小行动，都在证明自己正在成为那样的人。","好习惯有四个设计方法：让提示明显，让行动有吸引力，让开始足够简单，再让完成令人满足。想运动，就把鞋放门口；想少刷手机，就别把手机放枕边。环境，往往比意志力可靠。","我最推荐两分钟法则。想跑步，先穿鞋出门走两分钟；想读书，先打开书读一页。看起来太简单？这恰恰是它的作用。先跨过最难的一步：开始。等开始成为习惯，再慢慢提高难度。","还有一个方法，叫习惯叠加。把新动作接在熟悉的事情后面：刷完牙，读一页书；泡好咖啡，写三行日记。老习惯会提醒你做新动作，比每天依靠记性和临时兴起，更容易坚持。","习惯也会中断，偶尔错过一次，不代表前功尽弃。第二天重新开始就好。《原子习惯》最想教我们的，是把改变放回普通的每一天。找到你想成为的人，把行动变小，然后重复。今天，你从哪两分钟开始？"]
+          async def run():
+              batch=int(os.environ['BATCH']);voice=os.environ['VOICE']
+              for i in [batch*2,batch*2+1]:
+                  path=Path('spoken')/f'{voice}_{i:02d}.mp3'
+                  for attempt in range(3):
+                      try:
+                          await edge_tts.Communicate(text=lines[i],voice=voice,rate='+17%',pitch='-1Hz',volume='+0%').save(str(path))
+                          if path.stat().st_size<3000: raise RuntimeError('empty speech')
+                          print('VOICE',voice,'SECTION',i,'BYTES',path.stat().st_size,flush=True)
+                          break
+                      except Exception as e:
+                          print('RETRY',attempt+1,str(e),flush=True)
+                          if attempt==2:raise
+          asyncio.run(run())
+          PY
+          python speak.py
+      - name: Validate output
+        run: |
+          test "$(find spoken -name '*.mp3' -type f | wc -l)" = 2
+          python - <<'PY'
+          import os
+          for f in os.listdir('spoken'): print(f,os.path.getsize('spoken/'+f))
+          PY
+      - name: Upload free audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: bookvoice-${{ matrix.voice }}-${{ matrix.batch }}
+          path: spoken/
+          retention-days: 3
