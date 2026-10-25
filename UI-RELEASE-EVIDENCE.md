@@ -30,6 +30,11 @@ Use `PASS`, `FAIL`, `NOT RUN`, or `NOT APPLICABLE`. For PASS/FAIL, include a rep
 | Touch/custom interaction where relevant | NOT RUN | | |
 | Spanish/Portuguese Unicode and overflow, if relevant | NOT RUN | | |
 | Design tokens/components and content fidelity | NOT RUN | | |
+| Matched reference/render desktop+mobile (when approved reference exists) | NOT APPLICABLE | | |
+| Working primary CTA and truthful claims/offer proof (Persuade/ad/comparison) | NOT APPLICABLE | | |
+| Purposeful motion and repeated/interrupted interactions (changed UI) | NOT RUN | | |
+| Reduced-motion and visible no-JS fallback (applicable animations) | NOT RUN | | |
+| Offscreen/hidden-tab pause for continuous motion | NOT APPLICABLE | | |
 | Build/type/lint/tests applicable | NOT RUN | | |
 | Asset/link/navigation integrity | NOT RUN | | |
 | LCP/INP/CLS lab measurements (label field separately) | NOT RUN | | |
@@ -49,6 +54,18 @@ Use `PASS`, `FAIL`, `NOT RUN`, or `NOT APPLICABLE`. For PASS/FAIL, include a rep
 - Browser/extension/Live used? If so where, permissions, capture evidence:
 - Performance tool/environment, lab vs field data, tested device and viewport:
 - Commands not executed and why:
+
+## Optional conversion, reference and motion details
+
+- Page source/intent, primary CTA or tool outcome and actual user flow:
+- Material claims/price/guarantees/testimonials/client logo/comparisons, owner/source, checked date or `UNVERIFIED`:
+- Source/reference capture, permission, viewport, device scale, browser, font/theme/state:
+- Desktop/mobile rendered comparison, actual observed discrepancies, optional overlay/SSIM/PSNR:
+- Motion purpose/implementation, animation states, accessibility, reduced-motion/no-JS result:
+- Continuous loop visibility/background pause, repeated/interrupted input tests:
+- Baseline and new actual mobile performance data (lab/field separately) or `NOT RUN`:
+- Optional requested exports only: real MP4/GIF path, duration, frame rate, dimensions, command and seam/overflow checks:
+- Waivers, remaining P0/P1 issues and decision:
 
 ## Findings and disposition
 

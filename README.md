@@ -14,8 +14,8 @@ This starter prevents a common failure mode in AI-built websites: development be
 4. Complete the project PRD and full information architecture.
 5. Customize `DESIGN.md` for the project.
 6. Complete `SEO-GEO-PROJECT-BRIEF.md` and the architecture in `SEO-GEO-QUALITY-GATE.md` before mass page production.
-7. Define tokens and reusable components; apply the page-type-aware design workflow in `TASTE-UI-PROTOCOL.md` and the UI evaluation gate in `IMPECCABLE-UI-QUALITY-GATE.md`.
-8. Implement the complete planned site, including programmatic/international rules where applicable.
+7. Define project-specific tokens/components, select intent-aware landing/conversion layout and apply `TASTE-UI-PROTOCOL.md` and `IMPECCABLE-UI-QUALITY-GATE.md`.
+8. Implement the complete planned site, including programmatic/international rules where applicable; proactively use purposeful high-quality motion wherever performance allows, with optional showcase/export governed by `MOTION-SHOWCASE-PROTOCOL.md`.
 9. Run L1 checks during development and collect concrete evidence in `SEO-GEO-RELEASE-EVIDENCE.md`.
 10. Run the L2 release audit, Visual QA, `IMPECCABLE-UI-QUALITY-GATE.md` and `QA-CHECKLIST.md` before launch; record actual UI checks in `UI-RELEASE-EVIDENCE.md`.
 11. Deploy and verify the real production site.
@@ -27,6 +27,8 @@ This starter prevents a common failure mode in AI-built websites: development be
 - `OPC-BUSINESS-GATE.md` — evidence-first opportunity, monetization, MVP and operating-review policy for new ventures and pivots.
 - `OPC-BUSINESS-EVIDENCE.md` — per-project source/date decision record, including unverified inputs and post-launch scorecard.
 - `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
+
+- `MOTION-SHOWCASE-PROTOCOL.md` — purposeful motion-first/performance-protected behavior, and optional Figma fidelity, MP4/GIF production and export QA.
 - `IMPECCABLE-UI-QUALITY-GATE.md` — mandatory UX/a11y/responsive/i18n/performance review derived from Impeccable; optional CLI, hooks and Live mode remain opt-in.
 - `UI-RELEASE-EVIDENCE.md` — per-project evidence template for real UI checks, missing checks and P0/P1 release blockers.
 - `DESIGN.md` — project-specific design-system template.
@@ -41,6 +43,12 @@ This starter prevents a common failure mode in AI-built websites: development be
 ## Design references
 
 `VoltAgent/awesome-design-md` is a required design-reference source when applicable. Taste Skill's design-read, redesign audit, and conditional image-to-code methods are selectively adapted in `TASTE-UI-PROTOCOL.md` (not blindly installed). Learn and combine appropriate design logic; do not clone a single brand's visual identity. For tool-first websites, usability, crawlability, and performance outrank cinematic art direction.
+
+## AI Design Skills: selective reference and animation principle
+
+[elayadesign/ai-design-skills](https://github.com/elayadesign/ai-design-skills) informed the conversion architecture, optional visual token defaults, reference-to-render fidelity workflow and product motion design. This standard **does not** adopt categorical font/gradient bans, fabricated "real-looking" numbers, compulsory animated taglines or forced SaaS marketing sections on SEO tools.
+
+**Motion-first, performance-protected:** use lightweight effective animation on task surfaces, games, products and marketing pages without asking permission for every effect. Keep mobile user-task latency, Core Web Vitals, crawlability, accessibility and reduced-motion/static fallback as hard constraints. Full promotional MP4/GIF showcase is an optional deliverable, not a default website step.
 
 ## UI quality reference model
 

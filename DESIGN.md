@@ -21,6 +21,19 @@
 - Product truth (approved copy, claims, inputs/outputs, units and behavior) to preserve:
 - First-screen task completion or conversion evidence:
 
+### Intent, conversion and claim brief (complete where applicable)
+
+- Acquisition channel / landing search intent (organic, ads, social, referral or direct):
+- Primary goal and one clear action per page/surface; actual CTA destination or tool result:
+- Evidence-supported value proposition and product screenshot/demo:
+- Main visitor objections and how the page answers them:
+- Source-backed offer/prices/trials/guarantees/performance claims/comparisons/customer proof with owner and checked date; unsupported items: `UNVERIFIED`.
+- Chosen structure: tool-first / editorial / SaaS marketing / ad landing / comparison:
+- Mobile first-screen user outcome, action and information hierarchy:
+- Approved brand, keyword, route, analytics and working task invariants to retain:
+
+Never turn a tool-first SEO page into a compulsory marketing funnel. `TASTE-UI-PROTOCOL.md` defines optional conversion sequences.
+
 ## 2. Visual theme & atmosphere
 
 Describe the visual language in concrete terms: density, rhythm, level of decoration, use of imagery, light/dark balance, technical/editorial/playful tone, and how the design supports the actual user task.
@@ -100,6 +113,23 @@ Base unit: TBD
 
 Define section rhythm, card padding, form gaps, dense tool-panel gaps, and mobile reductions.
 
+### Optional fallback design-token starting values
+
+These are **not mandatory** site-wide standards or verified accessibility results. Approved branding, existing design tokens and actual user testing take priority. Resolve final chosen values in the project-specific tables above.
+
+| Topic | Optional starting point | Considerations |
+|---|---|---|
+| Body | 16px; line height roughly 1.5–1.7 | Spanish/Portuguese, zoom |
+| Spacing | 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64px | density and mobile |
+| Button height | roughly 40–48px | touch-target usability |
+| Card radius | roughly 8–16px | nested geometry and brand |
+| Main wide container | roughly 1120–1280px | wider tool workspace if needed |
+| Reading line width | roughly 65–75ch | font and script dependent |
+| Microinteraction | often 120–250ms | adjust to actual action and context |
+| Icons | one coherent existing/licensed family | avoid new packages unnecessarily |
+
+Do not import external blanket bans on Inter, Arial, gradients, rounded cards, italics or specific color families.
+
 ## 6. Grid & layout
 
 - Max content width:
@@ -175,17 +205,22 @@ For every interactive component define Default, Hover, Active, Focus, Disabled, 
 
 Do not use irrelevant stock imagery or logos as decorative filler.
 
-## 11. Motion
+## 11. Motion — motion-first, performance-protected
 
-- Default transition duration:
-- Easing:
-- Allowed animation types:
-- Prohibited animation types:
-- Reduced-motion behavior:
-- Purpose of each nontrivial animation (state, hierarchy, or narrative):
-- JS/dependency budget and static fallback:
+**Default:** proactively apply polished, purposeful animations to suitable elements on **all** page types, including calculators, generators, games and marketing sites, as long as they do not compromise the primary task, performance, SEO or accessibility. No fixed animation count and no repeated approval needed for routine microinteractions.
 
-Default to minimal motion on tool, game, finance and content pages. Respect `prefers-reduced-motion`; never add a large motion runtime just to decorate a static page.
+- Purpose of each significant animation (feedback, comprehension, continuity or story):
+- Shared timing/easing/stagger/loop motion tokens:
+- Allowed native implementation (CSS / SVG / Canvas / JS / Web Animations API):
+- Trigger (input, page load, in-viewport) and offscreen/background pause:
+- Static/no-JS visible and operable default state:
+- `prefers-reduced-motion: reduce` final-state behavior:
+- Rapid/repeated/interrupted interaction and keyboard/focus/touch tests:
+- JS/package and performance budget; mobile downgrade plan:
+- Real before/after LCP/INP/CLS and costly paint evidence, or `NOT RUN`:
+- Special product showcase/MP4/GIF needed? (only if explicitly scoped; see `MOTION-SHOWCASE-PROTOCOL.md`):
+
+Prefer efficient `transform`/`opacity` for small motion; large blur/filter/clip masks need profiling, not assumptions. Never hide core controls behind animations, introduce CLS or sacrifice responsiveness. No paid runtime animation API is needed.
 
 ## 12. Responsive behavior
 
@@ -226,12 +261,12 @@ Explicitly document navigation collapse, tool panel stacking, card/grid changes,
 Before implementing or changing UI, the coding agent must:
 
 1. Read this file and `TASTE-UI-PROTOCOL.md`.
-2. Classify the page: marketing/content or tool/workspace, then state the design read and contextual design controls.
+2. Classify the affected surface (Operate / Read / Persuade / Experience), identify the relevant task or conversion journey, then state design direction and controls.
 3. For redesigns: scan the existing repo, diagnose concrete defects, and record functionality/SEO/brand baselines before changing visual code.
 4. Reuse existing tokens/components; preserve approved keywords, routes, canonical/hreflang, analytics, nav, legal copy, and working user tasks unless expressly approved.
 5. If the design language must change, update this file first; keep the new design consistent across relevant pages.
 6. For visually critical tasks with available references, optionally follow reference/image → design-spec → code → rendered desktop/mobile comparison; do not fake screenshots or missing verification.
-7. Ensure meaningful empty/loading/error/focus states, accessible labels, real imagery/assets and reduced-motion support.
+7. Add purposeful animation where useful while preserving reduced-motion/static/no-JS fallbacks. Ensure meaningful empty/loading/error/focus states, accessible labels and authentic assets; use the optional showcase protocol only for complex media.
 8. Validate real user-task behavior at mobile, tablet, and desktop viewports; check no SEO or performance regression.
 9. Run the UI quality categories from `IMPECCABLE-UI-QUALITY-GATE.md` in scope: Operate/Read/Persuade/Experience intent, accessibility, responsive, localization/edge states, performance and regressions.
 10. Record concrete before/after checks and any `NOT RUN` items in `UI-RELEASE-EVIDENCE.md` rather than claiming an untested pass; do not install an Impeccable CLI or Hook unless expressly approved.

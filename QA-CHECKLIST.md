@@ -88,7 +88,8 @@
 - [ ] No broken external assets.
 - [ ] Image dimensions/aspect ratio prevent obvious layout shift.
 - [ ] Alt text is meaningful and not keyword-stuffed.
-- [ ] Calls to action match user intent.
+- [ ] Calls to action match user intent and their destinations work; ad/SaaS/comparison pages have an appropriate primary conversion path.
+- [ ] Commercial proof (prices, offers, customer names/logos, guarantees, outcomes and comparisons) is verified with a dated source; unknowns stay `UNVERIFIED` and are not published as fact.
 
 ## Performance / accessibility
 - [ ] Images optimized.
@@ -99,7 +100,10 @@
 - [ ] Contrast acceptable.
 - [ ] Touch targets usable.
 - [ ] Reduced-motion respected where applicable.
-- [ ] Dynamic effects justify their performance cost; existing dependencies and lighter CSS alternatives were considered before adding a motion library.
+- [ ] Purposeful animation was considered and used where beneficial, including on task-focused interfaces, without delaying the task.
+- [ ] Added motion handles reduced-motion, static/no-JS content, keyboard/touch, repeated actions and loop pausing where relevant.
+- [ ] Dynamic effects justify measured performance cost; native CSS/SVG/JS or existing libraries were considered first.
+- [ ] Approved visual references were compared with matched-viewport screenshots where available, otherwise marked `NOT RUN`/`NOT APPLICABLE`.
 - [ ] Measurements are recorded when run; unmeasured Web Vitals are explicitly labeled as unverified, not passed.
 - [ ] Form labels, accessible errors and complete empty/loading/invalid/disabled/success state behavior were exercised where applicable.
 - [ ] P0/P1 interaction, accessibility, layout, SEO or functionality blockers are closed before release acceptance.
@@ -133,3 +137,4 @@
 - [ ] Existing functional controls and core calculations behave as before any visual redesign; keyboard, touch, and loading/error/empty states checked.
 - [ ] Browser before/after screenshots or written visual evidence are recorded when available; unavailable captures are labeled `not run`.
 - [ ] If image-to-code was used: major desktop/mobile discrepancies were reviewed, UI controls are implemented (not fake images), and assets are real.
+- [ ] If optional animation showcase/export was explicitly required, its actual media capture/output and loop/fidelity checks were recorded; otherwise exports are not required.

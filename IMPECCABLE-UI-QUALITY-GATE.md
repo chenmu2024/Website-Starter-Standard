@@ -42,7 +42,7 @@ For small, non-visual content fixes, scope this process proportionately; still p
 
 - Semantics/heading landmarks; reachable controls; keyboard navigation and visible focus; accessible names; form labels and correct error association.
 - Actual text/input/control contrast, including against images and in supported themes; readable zoom/text resizing; touch targets usable; avoid keyboard traps.
-- Prefer reduced-motion handling and avoid motion that blocks the task.
+- Encourage purposeful performance-safe animation, preserve reduced-motion behavior, and never let an effect block the task or hide essential content.
 - Check real initial, loading, empty, invalid, error, disabled, active and success states as applicable. A detector cannot prove these scenarios work.
 
 ### B. Responsive and localization hardening
@@ -65,7 +65,7 @@ For small, non-visual content fixes, scope this process proportionately; still p
 
 - Check LCP, INP and CLS with appropriate tools and label lab vs field evidence accurately. Reference good-threshold targets: LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1, not assumed test results.
 - Inspect JS/CSS bundles, render work, main-thread blocking, fonts, images, hydration, network load, CLS reservation and unnecessary third-party scripts.
-- Optimize only demonstrated bottlenecks; compare before/after when possible. Add no animation package just to decorate a tool.
+- Optimize demonstrated bottlenecks and compare before/after where possible; allow useful native motion by default and additional libraries only with justified benefits, compatible licensing and acceptable bundle impact.
 - Confirm offline/static fallbacks and responsive layout behavior when relevant. Avoid dependencies that create ongoing costs.
 
 ### E. Implementation integrity and regression
@@ -74,6 +74,20 @@ For small, non-visual content fixes, scope this process proportionately; still p
 - Verify approved keywords, content, H1/H2, raw HTML visibility, title/description, canonical/hreflang, structured data, sitemap, robots, analytics and tool logic against the pre-change baseline.
 - AI-generated visuals must not stand in for actual form fields or functioning tool controls.
 - When a check is impossible, document the blocking environment/tool condition and do not claim that it passed.
+
+## 3A. Matched-reference fidelity (conditional)
+
+When an approved Figma or image reference exists, compare actual rendered desktop and mobile images at the **same** viewport, device scale, browser, font-ready state, theme and content state. Inspect alignment, typography, crop, stacking, radii, clipping and first-screen tool/CTA visibility. Optional diff overlays, SSIM or PSNR are debugging evidence, **not** a single universal PASS threshold or proof of functioning UI.
+
+If no reference exists, mark `NOT APPLICABLE`; if browser comparison did not run, mark `NOT RUN`. Do not claim screenshot fidelity from code inspection alone.
+
+## 3B. Conversion truth and motion verification
+
+- For Persuade/ad/comparison pages, verify the actual CTA path and the origin/verification date of pricing, guarantees, outcomes, product demonstrations, client logos, testimonials and competitor comparisons. Unsupported factual claims must not appear as verified proof.
+- **Motion-first, performance-protected:** positively consider quality animation for changed UI, including games and tool results; do not force every visual to animate or arbitrarily ban motion.
+- Test animation start/rest and repeated/interrupted interaction, keyboard/touch focus, reduced motion, initial visible content when animation JS fails, and pause of ongoing offscreen/hidden-tab loops when relevant.
+- Check real mobile task responsiveness and measured LCP/INP/CLS when tools are available; distinguish lab vs field. Downgrade high-cost filters/masks/continuous motion rather than sacrificing user tasks.
+- Specialized promotional showcase or MP4/GIF export is optional under `MOTION-SHOWCASE-PROTOCOL.md`, not a generic release requirement.
 
 ## 4. Severity and acceptance
 

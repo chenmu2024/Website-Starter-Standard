@@ -30,6 +30,25 @@ Suggested starting points (tune per site rather than treating as mandates):
 | Marketing landing | 7 | 5 | 4 | Message, authentic proof, CTA |
 | Editorial / content hub | 6 | 3 | 4 | Reading, navigation, links |
 
+## 2A. Conversion page structure (choose according to intent)
+
+Use this for Persuade pages after classifying acquisition source, visitor, offer, primary action, objections, proof and mobile constraints in `DESIGN.md`.
+
+| Page purpose | First-screen priority | Subsequent evidence/structure |
+|---|---|---|
+| Organic SEO tool | visible H1, usable core inputs, result/action path | useful steps, examples, constraints, distinct FAQ and relevant internal links |
+| SaaS marketing | clear outcome and audience, authentic product preview, primary CTA | differentiated benefits, how-it-works, supported proof, objection handling, final CTA as needed |
+| Paid-ad landing | credible consistency with ad promise and next step | real proof, friction reduction, necessary disclosures |
+| Comparison/alternatives | visitor decision criteria and real product differences | sourced feature/price/limitation table, fair suitability explanation |
+| Editorial/read | answer and readable information hierarchy | context, sources, navigation, genuinely useful links |
+
+Rules:
+1. Do **not** force a large animated brand hero, 6–12 FAQs, testimonial strip or repeated conversion CTA onto an Operate or Read page. Make page sections earn their place.
+2. One primary CTA per decision region; supporting navigation stays available and functional. Every CTA must lead to a real destination.
+3. Product capabilities, price, terms, guarantees, discounts, user numbers, case studies, logos, testimonials and competitor statistics require a source and checked date. Missing facts remain `UNVERIFIED` and should not appear as verified claims.
+4. Use specific benefit copy only when the promise is demonstrable. Avoid manufactured numerical precision and fictional clients.
+5. Verify mobile conversion/task journeys and existing SEO-leading keywords, URLs, canonical/hreflang and working controls. Claims of higher conversion require observed results, not just visual opinion.
+
 ## 3. Anti-generic visual discipline
 
 - Create hierarchy with content, type scale, whitespace, and meaningful grouping first; avoid reflexive purple glows, all-equal three-card grids, over-rounded nested cards, and heavy shadows **unless justified by the brand**.
@@ -65,11 +84,11 @@ Use when visual fidelity is central **and** real reference images or an image-ge
 
 ## 6. Motion/performance budget
 
-- Tool pages default to simple CSS hover/focus/active feedback; avoid scroll-jacking, autoplay hero loops, giant particle systems, magnetic pointer tracking, or GSAP unless they enable a demonstrated user task.
-- Marketing animations must communicate state, hierarchy, or storytelling. If an animation cannot be justified, remove it.
-- Prefer CSS `transform`/`opacity` for small transitions; avoid React state updates on every scroll/pointer frame. Respect `prefers-reduced-motion`.
-- Do not install Motion, GSAP, Three.js, extra icon packs, font CDNs, or paid assets without checking existing dependencies and the performance/cost benefit.
-- Measure or explicitly mark as unverified: mobile LCP, INP, CLS, JS transfer/long tasks, images/font loading, and interaction responsiveness. Web Vitals reference targets: LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1; never state these as passed without evidence.
+- **Motion-first, performance-protected:** add purposeful, visually polished animation to tools, games and marketing surfaces whenever it improves the visitor's task or experience and performance permits. Avoid heavy scroll-jacking, unnecessary autoplay or focus-disrupting effects.
+- Marketing pages may use expressive hero/product demos and feature-card storytelling. Animation needs a user benefit, but does not need separate owner approval. Optional showcase exports use `MOTION-SHOWCASE-PROTOCOL.md`.
+- Prefer CSS `transform`/`opacity` for small motion; avoid re-rendering on every scroll/pointer frame, start costly effects only when helpful and visible, pause continuous offscreen loops, and respect `prefers-reduced-motion` with a visible static/no-JS fallback.
+- Native CSS/SVG/Canvas/JavaScript/Web Animations API typically need no paid runtime API. Add Motion, GSAP, Three.js, new icon packs or assets only when licensing, task benefit, bundle size, operating cost and measured performance justify them.
+- Measure or explicitly mark unverified mobile LCP, INP, CLS, JS transfer/long tasks, image/font loads, motion paint/CPU cost and core task responsiveness when relevant. Reference good Web Vitals: LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1; never assert PASS without evidence. Reduce costly effects if measurements regress.
 
 ## 7. Visual acceptance and evidence
 
@@ -80,7 +99,7 @@ For every meaningful UI change, check:
 - **Viewport coverage:** small mobile (~360px), typical mobile (~390px), tablet (~768px), small laptop (~1024px), wide desktop (~1440px); adjust for actual audience/device testing.
 - **States:** initial, focus, hover, active, disabled, empty, loading, invalid/error, and success where applicable.
 - **Regression:** approved keywords, heading structure, important raw HTML, route and navigation integrity, metadata/canonicals/hreflang, image links, structured data, core calculations and analytics remain intact.
-- **Evidence:** record observed before/after route screenshots or visual notes, build/lint/type results, interaction checks, performance checks, and unresolved issues. Mark a check `not run` if no browser or data is available; never invent a pass.
+- **Evidence:** record actual before/after route screenshots or visual observations, optional matched-reference overlays/SSIM/PSNR diagnostics, build/lint/type results, claim/CTA checks, interactive and reduced-motion states, performance data and outstanding issues. Mark missing measurements `NOT RUN`; never invent PASS.
 
 Apply `IMPECCABLE-UI-QUALITY-GATE.md` for structured UX/a11y/responsive/i18n/edge-state/performance verification and record actual observations in `UI-RELEASE-EVIDENCE.md`. The Taste-inspired process guides visual direction; a detector rule is not authority to override brand or approved search architecture. Apply the existing `QA-CHECKLIST.md`, `SEO-GEO-QUALITY-GATE.md`, and `SEO-GEO-RELEASE-EVIDENCE.md` as the final release authority.
 

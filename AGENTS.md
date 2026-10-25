@@ -51,6 +51,17 @@ Read `TASTE-UI-PROTOCOL.md` and `IMPECCABLE-UI-QUALITY-GATE.md` before UI creati
 - Optional CLI, downloaded binaries, provider hooks, extension permissions, and Live mode require explicit opt-in after reviewing version, cost, security, and edit behavior. Never silently install, update, enable or invoke an edit-blocking Hook.
 - Validate in a bounded batch rather than looping indefinitely on cosmetic details. Follow existing protected keywords, URLs, canonical/hreflang, analytics, calculations and brand constraints.
 
+## 3B. Conversion, motion-first and reference fidelity
+
+- Classify each page/surface as Operate, Read, Persuade or Experience. Use intent-specific conversion design on SaaS/marketing/ad/comparison pages; **do not** force a marketing funnel onto an SEO tool page.
+- For Persuade pages, map traffic source, approved offer, primary CTA and destination, user objections, real product demonstration and verifiable proof before producing polished copy. Price, trial, guarantee, performance, testimonial, logo and competitor claims require source/owner/date. Unsupported claims are `UNVERIFIED`, never invented or published as established facts.
+- **Motion-first, performance-protected:** proactively implement purposeful, refined motion whenever it improves interaction, comprehension, visual hierarchy or the product experience **without** harming the main task, accessibility, crawlability or measured performance. Tools and games are not motion-free by default; ordinary native animation does not require separate owner approval.
+- Prefer CSS, SVG, Canvas, JavaScript and browser Web Animations API. Use third-party animation packages only when justified by licensing, already installed stack and performance. No paid API, server or database is required for ordinary animation.
+- Use static/no-JS and `prefers-reduced-motion` fallbacks; no essential text/control hidden until JavaScript fires. Pause ongoing offscreen/hidden-tab motion, avoid layout shifts, degraded input responsiveness and unstable focus. Profile performance-intensive filters.
+- `MOTION-SHOWCASE-PROTOCOL.md` covers **optional** complex Figma animation, promotional loops and explicitly requested MP4/GIF export. Regular animated sites do not require videos.
+- If there is an approved visual reference, capture matched desktop/mobile reference and rendered images; optional overlay/SSIM/PSNR are diagnostics, never a substitute for functional QA. Record `NOT RUN` for unperformed verification.
+- Source of truth remains explicit owner constraints, existing `DESIGN.md`, SEO/GEO gates and protected keywords/URLs/tool logic. Never blindly follow a third-party Skill's absolute design bans.
+
 ## 4. SEO / GEO quality gate is mandatory
 
 Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, metadata, structured data, multilingual architecture, programmatic pages, or indexation behavior.
@@ -86,10 +97,10 @@ Do not spend full-audit model/API cost on every trivial commit. Prefer determini
 ## 6. Performance and accessibility
 
 - Mobile-first behavior must be validated, not assumed.
-- Avoid unnecessary dependencies and heavy client-side JavaScript.
+- Avoid unnecessary dependencies and heavy client-side JavaScript; add lightweight motion where it benefits the task and measured performance permits.
 - Prefer SSG/SSR for public SEO content; do not let CSR hide the only copy of indexable content.
 - Optimize images and fonts.
-- Preserve keyboard navigation, visible focus, semantic HTML, usable touch targets, readable contrast, and reduced-motion behavior.
+- Preserve keyboard navigation, visible focus, semantic HTML, usable touch targets, readable contrast, reduced-motion behavior and a functional visible no-JS fallback.
 
 ## 7. Cost discipline
 
