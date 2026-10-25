@@ -24,11 +24,11 @@ Suggested starting points (tune per site rather than treating as mandates):
 
 | Page kind | Variance | Motion | Density | Non-negotiable priority |
 |---|---:|---:|---:|---|
-| Calculator / generator / converter | 5 | 2 | 6 | Inputs + output path immediately clear |
-| Game / clicker / simulator | 7 | 3 | 5 | Primary interaction visible and responsive |
-| B2B finance / tax workflow | 4 | 2 | 6 | Trust, accuracy, labels, errors |
-| Marketing landing | 7 | 5 | 4 | Message, authentic proof, CTA |
-| Editorial / content hub | 6 | 3 | 4 | Reading, navigation, links |
+| Calculator / generator / converter | 5 | 4 | 6 | Inputs + output path immediately clear |
+| Game / clicker / simulator | 7 | 6 | 5 | Primary interaction visible and responsive |
+| B2B finance / tax workflow | 4 | 3 | 6 | Trust, accuracy, labels, errors |
+| Marketing landing | 7 | 6 | 4 | Message, authentic proof, CTA |
+| Editorial / content hub | 6 | 4 | 4 | Reading, navigation, links |
 
 ## 2A. Conversion page structure (choose according to intent)
 
@@ -48,6 +48,8 @@ Rules:
 3. Product capabilities, price, terms, guarantees, discounts, user numbers, case studies, logos, testimonials and competitor statistics require a source and checked date. Missing facts remain `UNVERIFIED` and should not appear as verified claims.
 4. Use specific benefit copy only when the promise is demonstrable. Avoid manufactured numerical precision and fictional clients.
 5. Verify mobile conversion/task journeys and existing SEO-leading keywords, URLs, canonical/hreflang and working controls. Claims of higher conversion require observed results, not just visual opinion.
+
+**MOTION_INTENSITY describes the expressive role of motion, not the number of animations.** A lower illustrative value does not prohibit rich functional transitions if they remain accessible and performant. Prefer actual tested behavior over these starting numbers.
 
 ## 3. Anti-generic visual discipline
 
