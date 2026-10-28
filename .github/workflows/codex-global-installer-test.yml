@@ -1,0 +1,22 @@
+name: Windows Codex global installer tests
+on:
+  push:
+    paths:
+      - 'tools/install-codex-global.ps1'
+      - 'tests/test-codex-global-installer.ps1'
+      - '.github/workflows/codex-global-installer-test.yml'
+  pull_request:
+    paths:
+      - 'tools/install-codex-global.ps1'
+      - 'tests/test-codex-global-installer.ps1'
+      - '.github/workflows/codex-global-installer-test.yml'
+permissions:
+  contents: read
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate installer (no network or account changes)
+        shell: powershell
+        run: .\tests\test-codex-global-installer.ps1
