@@ -26,6 +26,8 @@ This starter prevents a common failure mode in AI-built websites: development be
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
 - `BUILD-INTAKE-CONTRACT.md` — the research-to-implementation intake, source-of-truth ownership and approval gate.
 - `TECHNICAL-SEO-IMPLEMENTATION.md` — framework-aware SEO implementation, testing and performance safeguards.
+- `tools/seo_audit.py` — zero-dependency, **offline static-build** SEO audit (title, H1, canonical, internal links, missing local assets, JSON-LD syntax and Sitemap); not a live Google crawl.
+- `tests/test_seo_audit.py` — standard-library test cases; `.github/workflows/seo-audit-tests.yml` runs them for script changes.
 - `OPC-BUSINESS-GATE.md` / `OPC-BUSINESS-EVIDENCE.md` — **legacy compatibility pointers**; all new opportunity decisions belong to `gefei-seo`.
 - `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
 
