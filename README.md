@@ -2,6 +2,10 @@
 
 A reusable **implementation and release standard** for AI-assisted websites: architecture, UI, mobile performance, page quality, technical SEO, accessibility, deployment and verification. **Demand research, keyword selection, SERP competition and business feasibility belong to [gefei-seo](https://github.com/chenmu2024/gefei-seo).**
 
+## Windows Codex global setup
+
+To apply this repository automatically across **local Windows Codex** website projects, use the one-time [global installer](tools/install-codex-global.ps1) and [installation/verification guide](docs/CODEX-GLOBAL-SETUP.md). It preserves existing Codex user instructions; the private gefei-seo clone requires GitHub authorization. No change occurs on your computer until you run the installer locally.
+
 ## Purpose
 
 This starter prevents a common failure mode in AI-built websites: development begins before the product, keyword architecture, visual system, SEO/GEO architecture, and QA rules are fixed, so later iterations become inconsistent and expensive.
