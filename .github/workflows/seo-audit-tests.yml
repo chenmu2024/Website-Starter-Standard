@@ -1,0 +1,23 @@
+name: SEO audit script tests
+on:
+  push:
+    paths:
+      - 'tools/seo_audit.py'
+      - 'tests/test_seo_audit.py'
+      - '.github/workflows/seo-audit-tests.yml'
+  pull_request:
+    paths:
+      - 'tools/seo_audit.py'
+      - 'tests/test_seo_audit.py'
+      - '.github/workflows/seo-audit-tests.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -v

@@ -46,3 +46,16 @@ The checker has no network, paid API or third-party dependencies. It analyzes on
 6. **L3**: after real data exists, review GSC query/page changes, indexation, CWV and traffic anomalies; send newly discovered market/keyword opportunities back to gefei-seo, not self-authorize an expansion.
 
 Stop a release on actual P0/P1 blockers. No tool/CI access means mark check `NOT RUN`, not `PASS`.
+
+
+## Optional local automated audit (zero paid dependencies)
+
+After building the target project to static HTML (e.g. dist/), copy or invoke the script with:
+
+`python tools/seo_audit.py --site-dir dist --base-url https://your-real-site.example --output seo-audit.json --fail-on error`
+
+Run script tests in this repository with:
+
+`python -m unittest discover -s tests -v`
+
+This script checks built HTML, does **not** fetch remote pages or render JavaScript and cannot prove HTTP 200/404, hreflang reciprocity, field Core Web Vitals, schema eligibility or actual Google indexation. Treat findings as review signals and verify production routes separately. Warning-level noindex, non-self canonical and missing sitemap entries can be intentional. If the project uses SPA-only HTML, the tool will report the lack of static SEO content rather than simulate rendered DOM. `--fail-on error` blocks on errors only; `--fail-on warning` is a stricter opt-in; unknown findings are never silent passes.
