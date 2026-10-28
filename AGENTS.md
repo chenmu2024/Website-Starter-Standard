@@ -2,13 +2,15 @@
 
 These rules are mandatory for every website created from this starter.
 
+**Role boundary:** this repository implements and validates websites. The external [gefei-seo](https://github.com/chenmu2024/gefei-seo) repository owns market research, keyword selection, SERP competitiveness, non-brand traffic opportunities and commercial GO/TEST/HOLD/REJECT decisions. Always read `BUILD-INTAKE-CONTRACT.md` for new projects and major expansions. Do not treat a guessed keyword or unverified SEO metric as an approved build requirement. An existing site's urgent repair is not blocked by missing research paperwork.
+
 ## 1. Required build order
 
 Do not start page-level UI implementation until the following are complete:
 
-1. User intent, site goal, monetization model, and cost constraints understood; for new opportunities and major pivots, complete the evidence-first business decision in `OPC-BUSINESS-GATE.md` and record observed evidence in `OPC-BUSINESS-EVIDENCE.md`.
-2. Keyword research reviewed and explicitly approved keywords locked.
-3. Search intent mapped to canonical destinations; no unresolved cannibalization plan.
+1. User task, site goal, permitted cost and implementation scope understood; for new opportunities and pivots, obtain the approved `gefei-seo` research handoff rather than performing independent business screening here.
+2. Read `BUILD-INTAKE-CONTRACT.md`; lock explicitly approved keywords, site scope, existing traffic-critical routes and non-negotiable behaviors. Mark unknown metrics as UNVERIFIED; do not imply research approval.
+3. Implement the approved search intent→canonical-page map; resolve any implementation conflict through the owner rather than silently creating competing SEO pages.
 4. Competitor/reference analysis completed.
 5. Full project PRD and information architecture completed.
 6. Project-specific `DESIGN.md` completed, including a page-type design read and the task-first controls from `TASTE-UI-PROTOCOL.md`.
@@ -77,14 +79,15 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 - `Google-Extended` is a model-training/product control, not a Google Search indexing/ranking control. Do not confuse crawler/training permissions with search visibility.
 - Treat third-party thresholds as internal heuristics, not search-engine rules.
 
-## 4B. Commercial opportunity gate (OPC-inspired)
+## 4B. Research-to-development contract
 
-- Read `OPC-BUSINESS-GATE.md` for new projects, significant expansions, business pivots and periodic post-launch business review.
-- On new opportunities, complete the project-specific `OPC-BUSINESS-EVIDENCE.md` **before material development**, with sourced and dated search demand, SERP, comparable traffic, business model and validation plan. Unknown data stays `UNVERIFIED`; neither Google Trends relative values nor CPC imply proven demand/revenue.
-- Use the evidence-first six-dimension priority screen and owner-reviewed GO / TEST / HOLD / STOP. Never auto-build or auto-delete based on the heuristic score.
-- For existing sites, do not block urgent SEO/UI/function fixes pending a new commercial evaluation; never silently change already-approved keywords, primary routes, content, brand or the agreed full project scope.
-- Before declaring commercial success, collect real GSC/user/revenue/cost data. Prefer free sources and require explicit approval for paid APIs or fixed recurring charges.
-- The `easychen/opc-methodology` project is an attributed conceptual reference. Do not copy or redistribute its CC BY-NC-SA Skill content for commercial use.
+- For **new website / major pivot / independent tool page**, consume the `gefei-seo` owner-approved handoff, check `BUILD-INTAKE-CONTRACT.md`, and copy approved keyword/intent ownership into `SEO-GEO-PROJECT-BRIEF.md`.
+- A `HOLD` or `REJECT` research result cannot authorize a production build; `TEST` is limited to the explicitly approved experiment. Do not infer GO from missing fields or a successful build.
+- For an already approved project, preserve approved scope: do not force fresh business validation for each UI/technical SEO change, and do not silently phase out planned pages.
+- If research and technical feasibility conflict (data/privacy, API cost, unsupported feature), report exact trade-offs for owner decision; do not secretly substitute keywords, change target market or introduce recurring charges.
+- Do not copy public source material or another repository's business screening rules into the codebase. For implemented SEO, use `TECHNICAL-SEO-IMPLEMENTATION.md` and `SEO-GEO-QUALITY-GATE.md`.
+- The old `OPC-BUSINESS-*.md` files are retained as compatibility pointers only; research truth belongs to `gefei-seo`.
+
 
 ## 5. Audit levels
 

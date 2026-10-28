@@ -1,6 +1,6 @@
 # Website Starter Standard
 
-A reusable baseline for AI-assisted website projects.
+A reusable **implementation and release standard** for AI-assisted websites: architecture, UI, mobile performance, page quality, technical SEO, accessibility, deployment and verification. **Demand research, keyword selection, SERP competition and business feasibility belong to [gefei-seo](https://github.com/chenmu2024/gefei-seo).**
 
 ## Purpose
 
@@ -8,8 +8,8 @@ This starter prevents a common failure mode in AI-built websites: development be
 
 ## Mandatory workflow
 
-1. For a new opportunity or major business pivot, review real demand, competitive evidence, monetization, costs and validation risks in `OPC-BUSINESS-GATE.md`; record the verified inputs and an explicit owner decision in `OPC-BUSINESS-EVIDENCE.md`.
-2. Lock approved core keywords and map one primary intent to one canonical destination.
+1. For a new opportunity, new paid feature or major pivot, read the owner-approved research handoff produced under [gefei-seo](https://github.com/chenmu2024/gefei-seo). Do **not** independently fabricate or redo demand/KD/SERP research. Existing-site repairs do not require reapproval of the business case.
+2. Check the approved handoff against `BUILD-INTAKE-CONTRACT.md`; freeze approved core keywords, key user tasks and existing high-traffic routes. Map one primary intent to one canonical destination in the implementation brief.
 3. Analyze 2–4 high-quality design references.
 4. Complete the project PRD and full information architecture.
 5. Customize `DESIGN.md` for the project.
@@ -24,8 +24,9 @@ This starter prevents a common failure mode in AI-built websites: development be
 ## Files
 
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
-- `OPC-BUSINESS-GATE.md` — evidence-first opportunity, monetization, MVP and operating-review policy for new ventures and pivots.
-- `OPC-BUSINESS-EVIDENCE.md` — per-project source/date decision record, including unverified inputs and post-launch scorecard.
+- `BUILD-INTAKE-CONTRACT.md` — the research-to-implementation intake, source-of-truth ownership and approval gate.
+- `TECHNICAL-SEO-IMPLEMENTATION.md` — framework-aware SEO implementation, testing and performance safeguards.
+- `OPC-BUSINESS-GATE.md` / `OPC-BUSINESS-EVIDENCE.md` — **legacy compatibility pointers**; all new opportunity decisions belong to `gefei-seo`.
 - `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
 
 - `MOTION-SHOWCASE-PROTOCOL.md` — purposeful motion-first/performance-protected behavior, and optional Figma fidelity, MP4/GIF production and export QA.
@@ -66,11 +67,12 @@ Rules from third-party projects are not automatically treated as Google requirem
 
 ## Business strategy reference
 
-The [easychen/opc-methodology](https://github.com/easychen/opc-methodology) framework informs our original evidence-screening checklist (niche, monetization, MVP, conversion, asset reuse and business review). We do not vendor or install its CC BY-NC-SA Skill text. This adds no paid APIs and does not change existing SEO/GEO, UI, keyword-lock or Cloudflare requirements.
+Historical OPC-inspired screening material has moved out of the implementation gate. The original documents remain available through Git history, while new research lives in [gefei-seo](https://github.com/chenmu2024/gefei-seo). This repository only consumes the approved decision and enforces production quality; it does not claim access to paid keyword data.
 
 ## Owner defaults
 
-- Approved keywords must not be silently changed.
+- Approved keywords, search intent and committed functionality from the research handoff must not be silently changed.
+- Do not add pages for unapproved demand assumptions; send new opportunity questions back to `gefei-seo`.
 - Prefer zero/freemium infrastructure until traffic or revenue validates paid services.
 - Multilingual sites require market-specific keyword validation and international SEO QA.
 - Build the complete agreed site rather than using unfinished "V1/V2 later" as a substitute for required scope.

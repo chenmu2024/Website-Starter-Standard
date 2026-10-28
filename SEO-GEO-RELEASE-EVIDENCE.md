@@ -1,5 +1,7 @@
 # SEO / GEO Release Evidence
 
+> Implementation evidence only. Record research/approved keywords origin under `BUILD-INTAKE-CONTRACT.md` and `SEO-GEO-PROJECT-BRIEF.md`; no independent demand or revenue claim belongs here.
+
 > Fill this for an SEO-sensitive release. Record evidence, not assumptions. Use N/A when a category truly does not apply.
 
 ## Release
