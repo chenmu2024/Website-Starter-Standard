@@ -27,6 +27,15 @@ This is **Website-Starter-Standard engineering**, not an opportunity or keyword 
 | Assets | Images load, reserved intrinsic dimensions, sensible lazy loading, readable alt text and performant fonts |
 | Evidence | Record commands, test outputs, URLs, dates and NOT RUN/FAIL states; never call a successful build an SEO success |
 
+## Offline audit (optional L1 helper)
+
+```bash
+python scripts/seo_static_audit.py --site-dir dist --base-url https://example.com --output seo-audit.json
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+The checker has no network, paid API or third-party dependencies. It analyzes only built HTML and simple internal links; it cannot verify JavaScript-rendered pages, live HTTP status, canonical targets on the network, actual Google indexing, ranking or Core Web Vitals. False positives require manual review.
+
 ## Mandatory workflow
 
 1. **Intake**: establish source of approved keywords/intent and existing site baseline.
