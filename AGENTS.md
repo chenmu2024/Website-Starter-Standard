@@ -91,6 +91,9 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 
 ## 5. Audit levels
 
+- Where static built HTML is available, optionally run `tools/seo_audit.py` from this standard against that build and inspect the JSON report. Run `python -m unittest discover -s tests -v` when changing the audit tool. Treat the tool as a *partial offline audit*, not a substitute for live crawl, browser QA, field CWV or GSC.
+
+
 - L1 change/commit audit after SEO-sensitive changes.
 - L2 release audit before production launch/major release, with evidence recorded in `SEO-GEO-RELEASE-EVIDENCE.md`.
 - L3 periodic full audit only when production data or a major review justifies it.
