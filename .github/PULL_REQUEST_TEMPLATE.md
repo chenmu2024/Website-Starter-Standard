@@ -35,13 +35,14 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 - [ ] Applicable P0/P1 UI blockers were fixed before declaring the release ready.
 - [ ] `UI-RELEASE-EVIDENCE.md` (or equivalent linked PR evidence) records actual executed checks, reproducible results and explicit `NOT RUN` items; Impeccable detector findings are not treated as proof of full quality.
 
-## OPC business evidence (new project, major expansion or pivot only)
+## Research intake / scope protection
 
-- [ ] Where applicable, I reviewed `OPC-BUSINESS-GATE.md` and linked/updated the project `OPC-BUSINESS-EVIDENCE.md`.
-- [ ] Demand, Volume/KD/CPC, competitor traffic, business claims and six-dimension judgments use actual source/date, or explicitly say UNVERIFIED.
-- [ ] Monetization, fixed-cost cap, main validation risk and explicit human GO / TEST / HOLD / STOP decision are recorded if a new business direction is proposed.
-- [ ] Existing-site repairs are not blocked by a new business study; owner-approved keywords and route intents were not silently changed.
-- [ ] No paid dependencies or third-party non-commercial Skill text were silently adopted.
+- [ ] If new site/major feature/pivot: I linked the approved gefei-seo handoff (repo/commit or document), or explicitly documented owner-approved exception.
+- [ ] Approved target keywords, primary intents, markets, monetization goals and required product features remain unchanged unless owner-approved.
+- [ ] The intended route map follows `BUILD-INTAKE-CONTRACT.md`; research-unknown items are not claimed verified.
+- [ ] Existing-site technical/UI repairs did not start a speculative keyword or product pivot.
+- [ ] No paid recurring APIs/servers/services were silently introduced.
+
 
 ## SEO / GEO change gate
 

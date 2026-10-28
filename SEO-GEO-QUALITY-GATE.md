@@ -1,3 +1,5 @@
+> **Engineering scope (2026-10):** this document governs technical implementation, indexability, page content quality, international SEO and release checks. Deciding *whether* to build and selecting target keywords belongs to [gefei-seo](https://github.com/chenmu2024/gefei-seo). For a new build, read `BUILD-INTAKE-CONTRACT.md` before applying this gate. Existing-site fixes are not forced to repeat opportunity research.
+
 # SEO / GEO Quality Gate
 
 > Mandatory execution standard for every website built from this starter. This document is the detailed gate; `SEO-GEO.md` is the concise policy summary.

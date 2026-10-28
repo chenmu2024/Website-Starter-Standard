@@ -1,6 +1,6 @@
 # SEO / GEO Standard
 
-`SEO-GEO-QUALITY-GATE.md` is the mandatory detailed execution standard. This file is the concise policy summary.
+`SEO-GEO-QUALITY-GATE.md` is the mandatory detailed **engineering** execution standard. This file is the concise policy summary. Opportunity selection and target keyword validation come from the approved [gefei-seo](https://github.com/chenmu2024/gefei-seo) handoff; see `BUILD-INTAKE-CONTRACT.md`.
 
 ## Non-negotiable rules
 

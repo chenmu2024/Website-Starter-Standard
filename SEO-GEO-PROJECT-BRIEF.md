@@ -1,6 +1,6 @@
 # SEO / GEO Project Brief
 
-> Complete this file for each website before mass page production. It converts the generic standard into a project-specific search architecture.
+> Complete this file for each website before mass page production. It converts **owner-approved `gefei-seo` research handoff** into a project-specific technical search architecture. See `BUILD-INTAKE-CONTRACT.md`. Do not use this engineering brief to invent keyword demand.
 
 ## 1. Project identity
 
@@ -16,7 +16,12 @@
 
 ## 2. Approved keyword source
 
-Document the exact owner-approved keyword set and where the metrics came from.
+- Research origin (repo/commit or signed document):
+- Research decision (GO/TEST/HOLD/REJECT) and approved scope:
+- Owner approval/date:
+- Unverified research inputs and safeguards:
+
+Copy the **exact owner-approved** keyword set and source data from the research handoff. Engineering can select URL implementation details, but never silently revise the target keyword, market, intent or product scope.
 
 | Keyword | Language/market | Volume | KD | CPC | Data source | Checked date | Owner-approved? |
 |---|---|---:|---:|---:|---|---|---|

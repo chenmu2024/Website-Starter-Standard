@@ -1,5 +1,11 @@
 # Website Final QA Checklist
 
+## Research intake and implementation boundary
+- [ ] For a new site/major expansion, the owner-approved gefei-seo research-to-build handoff exists, or the documented owner override is explicit.
+- [ ] The implemented page/keyword/intent map matches the approved input; unresolved research assumptions are labeled UNVERIFIED.
+- [ ] New unrelated keywords and commercial hypotheses were not silently introduced during development.
+- [ ] Existing website repairs did not unnecessarily trigger new commercial research or damage approved URLs/functional behavior.
+
 ## Product
 - [ ] Core user task works end-to-end.
 - [ ] Main outputs/results are useful and understandable.
