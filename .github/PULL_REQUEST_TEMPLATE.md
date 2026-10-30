@@ -44,6 +44,13 @@ Describe the product, design, SEO/GEO, content, route/template, or technical cha
 - [ ] No paid recurring APIs/servers/services were silently introduced.
 
 
+## Trust / third-party GEO report (when applicable)
+
+- [ ] Reviewed `TRUST-AND-STRUCTURED-DATA-GATE.md`; any scanner finding judged by real page type, impact and observed evidence, not an arbitrary score.
+- [ ] No fabricated operator, author, organization, `sameAs`, freshness dates, awards or testimonials.
+- [ ] Relevant formulas, sample outputs, date-/country-sensitive rules, privacy/network/storage/ads behavior verified or NOT RUN/N/A.
+- [ ] Truthful About/Contact/Privacy and applicable Terms are reviewed. Inapplicable `llms.txt`, author markup and forced citations marked N/A.
+
 ## SEO / GEO change gate
 
 - [ ] I reviewed the applicable rules in `SEO-GEO-QUALITY-GATE.md` and the project brief.

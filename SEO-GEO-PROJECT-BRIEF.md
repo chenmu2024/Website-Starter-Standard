@@ -98,6 +98,20 @@ Never cite a source that does not actually support the visible claim.
 
 Keep entity naming consistent in visible content, metadata and JSON-LD.
 
+## 8A. Trust, tool formulas, privacy and transparency
+
+Use `TRUST-AND-STRUCTURED-DATA-GATE.md` based on actual page type and risk; do not chase third-party GEO scores.
+
+- Applicable page types and trust requirements (tools / landing / editorial / financial or legal):
+- Real site brand and operator (Person / Organization if actually applicable):
+- Appropriate schema and verified profiles; N/A reasons for irrelevant types:
+- Calculator inputs, units, rounding, formula, expected sample and edge cases (or N/A):
+- Changing factual rules, official sources and jurisdiction/effective date (or N/A):
+- Actual browser/server/storage/file/ads/analytics requests and privacy disclosure plan:
+- About/Contact/Privacy/Terms/disclaimer applicability and owner:
+- Real authorship and significant modification-date strategy for editorial pages (or N/A):
+- Third-party GEO findings, if any, to classify; never score target:
+
 ## 9. Structured-data plan
 
 | Route/template | Schema type | Visible content represented | Google feature eligibility checked? | Validation method |

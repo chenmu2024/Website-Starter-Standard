@@ -41,6 +41,7 @@ This starter prevents a common failure mode in AI-built websites: development be
 - `DESIGN.md` — project-specific design-system template.
 - `SEO-GEO.md` — concise search and answer-engine policy.
 - `SEO-GEO-QUALITY-GATE.md` — detailed mandatory SEO/GEO, programmatic SEO, international SEO, audit, and launch gate.
+- `TRUST-AND-STRUCTURED-DATA-GATE.md` — page-aware trust, calculator accuracy, privacy, relevant schema, evidence, and third-party GEO-scanner triage.
 - `SEO-GEO-PROJECT-BRIEF.md` — project-level keyword, intent, indexation, source, entity, schema, and AI-search plan.
 - `SEO-GEO-RELEASE-EVIDENCE.md` — release proof template for route checks, raw HTML, schema, crawlability, performance, and production verification.
 - `CLOUDFLARE.md` — Cloudflare deployment record and checks.
@@ -60,6 +61,10 @@ This starter prevents a common failure mode in AI-built websites: development be
 ## UI quality reference model
 
 [pbakaus/impeccable](https://github.com/pbakaus/impeccable) informs the review categories and optional deterministic UI detector described in `IMPECCABLE-UI-QUALITY-GATE.md`. For every site, perform the **process and checks** with available tools; installing Impeccable is not required. Do not auto-install its binary, edit hooks, browser extension, or Live server into this starter or downstream projects. If explicitly approved for a trusted project, review/pin its version, start with project-scoped **no-hooks** installation, record actual scan outputs, and treat heuristic findings as diagnostic evidence rather than an automatic redesign mandate.
+
+## Trustworthy tool pages and GEO score reports
+
+Third-party GEO scores are diagnostic, **not** Google ranking scores or required release thresholds. Apply `TRUST-AND-STRUCTURED-DATA-GATE.md` to check truthful entity/schema declarations, verifiable calculation methods, genuine source/update dates, actual privacy behavior and appropriate About/Contact/Terms information by page type. Do not add imaginary author profiles, social accounts, daily date changes or `llms.txt` solely for a high score.
 
 ## Current search / AI-search position
 

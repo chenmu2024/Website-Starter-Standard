@@ -66,7 +66,7 @@ Read `TASTE-UI-PROTOCOL.md` and `IMPECCABLE-UI-QUALITY-GATE.md` before UI creati
 
 ## 4. SEO / GEO quality gate is mandatory
 
-Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, metadata, structured data, multilingual architecture, programmatic pages, or indexation behavior.
+Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, metadata, structured data, multilingual architecture, programmatic pages, or indexation behavior. Apply `TRUST-AND-STRUCTURED-DATA-GATE.md` when building or editing calculators, tool explanations, entity/schema data, privacy/terms/author pages, and when reviewing third-party GEO reports. Assess actual page type and evidence, not a vendor score.
 
 - Preserve explicitly approved core keywords. Do not silently replace, merge, translate, or rewrite them.
 - Never fabricate keyword metrics, SERP data, traffic, backlinks, citations, or indexation status.
@@ -76,6 +76,9 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 - Multilingual sites must pass canonical/hreflang and localization checks.
 - GEO work must improve extractability, evidence, clarity, originality, and usefulness; it must not create near-duplicate "AI keyword" pages.
 - Do not add AI-only files/markup solely because a GEO checklist says so. Google states that its generative-AI Search features use normal Search foundations and do not require special AI markup.
+- For calculators, verify the actual formula, units, precision, examples and edge cases. For externally changing payroll/tax/labor rules, cite authoritative local sources and effective dates.
+- Verify privacy and data-flow claims against the implementation, including analytics, advertising and local/network storage. Do not fabricate authors, organization status, credentials, social profiles, or modification dates.
+- `llms.txt`, Article/author schema on a calculator, `sameAs`, and a third-party GEO-score threshold are not default release blockers; use N/A with reason.
 - `Google-Extended` is a model-training/product control, not a Google Search indexing/ranking control. Do not confuse crawler/training permissions with search visibility.
 - Treat third-party thresholds as internal heuristics, not search-engine rules.
 

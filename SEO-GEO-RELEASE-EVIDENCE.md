@@ -56,6 +56,23 @@ Sample important indexable pages and record whether critical SEO content is pres
 - Google-Extended/training crawler policy reviewed separately from Search:
 - `llms.txt` present only if there is a real interoperability reason:
 
+## 4A. Page-type trust / structured-data evidence
+
+Follow `TRUST-AND-STRUCTURED-DATA-GATE.md`. Use PASS / FAIL / NOT RUN / N/A and supply reasons for N/A. Do not claim a release passed when applicable P0/P1 checks are unverified.
+
+| Check | Page type / route | Actual test or URL evidence | Severity (or N/A) | Result and rationale |
+|---|---|---|---|---|
+| Site/operator identity, matching WebSite/Person/Organization/WebApplication schema | | | | |
+| Authentic sameAs and editorial author/date fields if applicable | | | | |
+| Formula, units, rounding, sample expected outputs and edge cases | | | | |
+| Official sources/effective dates for regulatory/financial calculations | | | | |
+| Browser/network/storage/analytics/ad data flows match Privacy copy | | | | |
+| About/Contact/Privacy/Terms and applicable limitations/disclaimers | | | | |
+| Syntax, semantic accuracy and Google schema eligibility checks separately | | | | |
+| Vendor GEO issues triaged; optional items N/A or documented | | | | |
+
+P0/P1 errors block affected release; P2 improvements can be documented as owner-approved follow-up. Optional P3/N/A items never independently block release.
+
 ## 5. Performance / UX / accessibility
 
 Record actual tools/results when measured.
