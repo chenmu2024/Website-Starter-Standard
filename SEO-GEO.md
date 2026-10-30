@@ -22,6 +22,10 @@
 - Valid sitemap coverage for canonical indexable routes.
 - Working images/assets and correct 404/redirect behavior.
 
+## Trust, structured data and GEO scorecards
+
+For third-party GEO reports, consult `TRUST-AND-STRUCTURED-DATA-GATE.md`; prioritize real calculations, true data-use statements, genuine identities and sources. Do not force author/date/Article/sameAs or `llms.txt` on unrelated pages. Mark untested checks NOT RUN, inapplicable suggestions N/A. E-E-A-T and GEO vendor scores are not standalone Google ranking signals.
+
 ## GEO / AI-search readiness
 
 Google's generative-AI Search features still depend on core Search ranking and quality systems. Do not build a parallel "AI SEO" layer that weakens normal SEO.

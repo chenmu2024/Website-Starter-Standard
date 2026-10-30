@@ -74,6 +74,15 @@
 - [ ] `x-default` is used only where a real fallback exists.
 - [ ] Localized pages differ where market context requires it.
 
+## GEO / trust and accuracy (by page type)
+- [ ] `TRUST-AND-STRUCTURED-DATA-GATE.md` applied; any third-party GEO report issues classified by actual evidence/severity, not an arbitrary 90/100 target.
+- [ ] Core calculator formulas, units, rounding, local formatting, real examples and error/edge inputs checked where applicable; high-stakes rate/legal claims grounded in official sources and effective dates.
+- [ ] Actual WebSite/Organization/Person/WebApplication schema and IDs match visible information; no fabricated operator, credentials or official accounts.
+- [ ] Article author/dateModified/sameAs only where genuine and applicable; no automatic daily freshness date changes.
+- [ ] Privacy claims verified against actual browser processing, input uploads, third-party requests, analytics/ads, storage and backend behavior; record NOT RUN if unchecked.
+- [ ] About/Contact/Privacy and applicable Terms/disclaimers are reachable, accurate and useful; absence of Terms alone is not a Google ranking error.
+- [ ] Inapplicable llms.txt, decorative citations, author markup or external social identities marked N/A rather than treated as launch blockers.
+
 ## GEO / AI-search readiness
 - [ ] Important pages answer/define the core topic early where appropriate.
 - [ ] Factual blocks can be understood without surrounding fluff.

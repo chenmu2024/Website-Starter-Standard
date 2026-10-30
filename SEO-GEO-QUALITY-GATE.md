@@ -180,9 +180,13 @@ For multilingual or multi-region sites:
 
 ## 8. Structured data gate
 
+Apply `TRUST-AND-STRUCTURED-DATA-GATE.md` to select real entity/schema information and page-type-specific trust requirements. Triage vendor GEO findings by evidence, user impact and severity, not a point score.
+
 - Structured data must describe visible, truthful page content.
 - Prefer JSON-LD unless a project constraint justifies another format.
 - Use stable `@id` entities for Organization/Person/WebSite relationships when useful.
+- Include Organization or Person only for an actual truthful operator; use WebSite/WebApplication where they accurately describe the site. Never manufacture a registered organization, person, credentials or organization profiles to satisfy a scanner.
+- Use `sameAs` only for authentic verified profiles. Article authors and publication/modified dates belong to relevant editorial content, not automatically to tool homepages.
 - Validate generated schema and prevent template placeholders from shipping.
 - Do not add schema solely because a type exists in Schema.org; confirm current Google eligibility before promising a rich result.
 - FAQ content may still be useful to users, but do not promise Google FAQ rich results based on legacy guidance.
@@ -196,6 +200,9 @@ For multilingual or multi-region sites:
 - AI-assisted content must add meaningful original value; mass generation or summarization without added value fails this gate.
 - Claims that can change should carry a source and date when useful.
 - Tool pages must explain inputs, outputs, assumptions, edge cases, and examples where relevant.
+- Calculator results must be checkable with independently recomputed examples, correct units, precision and local formats. Financial/payroll/tax tools require authoritative date- and region-specific sources where legal rules/rates are asserted. Basic percentage arithmetic does not need decorative quotations.
+- Privacy claims (browser-local processing, collection, files, cookies, analytics and ads) must match observed code and network/storage behavior. Make truthful About/Contact/Privacy and applicable Terms discoverable without forcing unnecessary pages.
+- Never add invented authors or automated daily modification dates as fake freshness signals.
 - Avoid generic intros written only to lengthen the page.
 - Avoid repeated paragraphs across a programmatic set.
 - Distinguish factual content from opinion or internal recommendation.
@@ -333,6 +340,7 @@ A site is not SEO/GEO complete until all applicable items below are verified:
 - Critical content is crawlable and visible in raw HTML where required.
 - Metadata, headings, canonicals, robots, and sitemap are correct.
 - Structured data is truthful and valid where used.
+- Applicable page-type checks from `TRUST-AND-STRUCTURED-DATA-GATE.md` have verified operator/schema facts, tool calculations, real data flows, source/date claims and relevant policy links; record NOT RUN/N/A. A vendor GEO score is not a launch threshold.
 - Programmatic pages pass uniqueness/value sampling.
 - Multilingual equivalents pass canonical/hreflang parity.
 - Internal-link architecture has no important orphan pages.

@@ -13,6 +13,10 @@ This is **Website-Starter-Standard engineering**, not an opportunity or keyword 
 - Schema/JSON-LD describes visible truthful content only; Google does not require special AI-only schema. `llms.txt` is optional and never a reason to degrade normal SEO.
 - Use naturally effective native CSS/SVG/JS animation when it helps the user task and metrics permit; provide `prefers-reduced-motion`, no-JS/static fallback, no hidden critical copy, and do not run expensive offscreen loops.
 
+## Page-type trust and accuracy
+
+Before changing JSON-LD, authorship, tool formulas, About/Contact/Privacy/Terms or responding to third-party GEO scans, read `TRUST-AND-STRUCTURED-DATA-GATE.md`. Inspect real rendered/raw content and relevant network/storage behavior; verify representative expected result calculations. Offline HTML audits can flag syntax and broken links, not formula correctness, law, data-flow truthfulness or Google visibility.
+
 ## Engineering acceptance by area
 
 | Area | Concrete evidence/check |
