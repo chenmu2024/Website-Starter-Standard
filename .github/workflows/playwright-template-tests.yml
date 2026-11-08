@@ -32,6 +32,8 @@ jobs:
           mkdir -p tests/e2e release-evidence
           cp templates/playwright/playwright.config.ts ./playwright.config.ts
           cp templates/playwright/site-quality.spec.ts tests/e2e/site-quality.spec.ts
+          cp templates/playwright/visual.config.ts ./playwright.visual.config.ts
+          cp templates/playwright/visual-baseline.spec.ts tests/e2e/visual-baseline.spec.ts
       - name: Start the deterministic HTML fixture
         run: |
           python -m http.server 4173 --directory tests/fixtures/playwright-site > /tmp/playwright-fixture.log 2>&1 &
@@ -65,6 +67,11 @@ jobs:
           QA_ROUTES_JSON: '["/"]'
           QA_PRIMARY_TASK_SELECTOR: '[data-testid="qa-primary-task"]'
         run: npx playwright test --config=playwright.config.ts
+      - name: Execute collision-resistant visual route identifier regression
+        env:
+          QA_BASE_URL: http://127.0.0.1:4173
+          QA_VISUAL_ROUTES_JSON: '["/"]'
+        run: npx playwright test --config=playwright.visual.config.ts --grep "visual snapshot route identifiers"
       - name: Upload real browser execution evidence
         if: always()
         uses: actions/upload-artifact@v4
