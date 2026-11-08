@@ -60,10 +60,12 @@ def classify(kind, evidence):
         skipped = stats.get("skipped", 0)
         if not all(isinstance(x, int) and x >= 0 for x in (expected, unexpected, flaky, skipped)):
             return "FAIL", "Playwright stats must be nonnegative integers"
-        if expected == 0:
-            return "NOT_RUN", "No passing browser tests recorded"
+        # A zero-pass report can still contain executed failures. Classify
+        # those as FAIL before treating an empty passing count as NOT_RUN.
         if unexpected or flaky:
             return "FAIL", f"Browser tests: unexpected={unexpected}, flaky={flaky}"
+        if expected == 0:
+            return "NOT_RUN", "No passing browser tests recorded"
         if skipped:
             return "PARTIAL", f"Browser tests passed={expected}, skipped={skipped}"
         return "PASS", f"{expected} browser test results passed"
