@@ -196,6 +196,14 @@ class AuditTests(unittest.TestCase):
         report = audit_tool.audit(self.root, "https://example.org")
         self.assertIn("HREFLANG_EXTERNAL_UNVERIFIED", self.codes(report))
 
+    def test_hreflang_accepts_script_and_numeric_region_subtags(self):
+        tags = ('<link rel="alternate" hreflang="zh-Hans" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es-419" href="https://example.org/">')
+        self.write("index.html", page(extra_head=tags, lang="zh-Hans"))
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertNotIn("HREFLANG_CODE_INVALID", self.codes(report))
+
+
 
 if __name__ == "__main__":
     unittest.main()
