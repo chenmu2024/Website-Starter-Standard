@@ -247,5 +247,32 @@ class ReleaseReportTests(unittest.TestCase):
 
 
 
+    def test_malformed_unhashable_json_values_fail_without_crashing(self):
+        malformed_browser = {
+            "errors": [],
+            "stats": {"expected": 1, "unexpected": 0, "flaky": 0, "skipped": 0},
+            "suites": [{"specs": [{"tests": [{"results": [{"status": []}]}]}]}],
+        }
+        for kind, evidence in (("playwright", malformed_browser),
+                               ("deployment", {"status": []}),
+                               ("manual", {"status": []})):
+            with self.subTest(kind=kind):
+                status, detail = compiler.classify(kind, evidence)
+                self.assertEqual(status, "FAIL", detail)
+
+        invalid_manifest = {"version": 1, "checks": [
+            {"id": "bad", "type": [], "required": True, "file": "bad.json"}
+        ]}
+        report = compiler.compile_report(invalid_manifest, self.root)
+        self.assertEqual(report["decision"], "INVALID_MANIFEST")
+
+    def test_boolean_manifest_version_is_not_integer_version_one(self):
+        report = compiler.compile_report({"version": True, "checks": [
+            {"id": "seo", "type": "seo", "required": True, "file": "seo.json"}
+        ]}, self.root)
+        self.assertEqual(report["decision"], "INVALID_MANIFEST")
+
+
+
 if __name__ == "__main__":
     unittest.main()
