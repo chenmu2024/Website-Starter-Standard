@@ -90,6 +90,7 @@ def compile_report(manifest, evidence_root):
     root = Path(evidence_root).resolve()
     results = []
     errors = []
+    warnings = []
     seen = set()
     required_count = 0
     for index, item in enumerate(checks):
@@ -120,13 +121,13 @@ def compile_report(manifest, evidence_root):
             result = {"id": key, "type": kind, "required": required,
                       "status": status, "file": relative, "detail": detail}
             if status == "FAIL":
-                errors.append(f"{key}: {detail}")
+                (errors if required else warnings).append(f"{key}: {detail}")
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             result = {"id": item.get("id") if isinstance(item, dict) else label,
                       "type": item.get("type") if isinstance(item, dict) else None,
                       "required": item.get("required", True) if isinstance(item, dict) else True,
                       "status": "FAIL", "detail": str(exc)}
-            errors.append(f"{label}: {exc}")
+            (errors if result["required"] is True else warnings).append(f"{label}: {exc}")
         results.append(result)
         if result["required"] is True:
             required_count += 1
@@ -146,7 +147,7 @@ def compile_report(manifest, evidence_root):
         "project": manifest.get("project", "UNSPECIFIED"),
         "required_checks": required_count,
         "required_passed": sum(x["required"] and x["status"] in {"PASS", "NOT_APPLICABLE"} for x in results),
-        "checks": results, "errors": errors,
+        "checks": results, "errors": errors, "warnings": warnings,
         "scope": "Overall status evaluates required checks only; optional gaps remain visible. No missing evidence is inferred as PASS."
     }
 
