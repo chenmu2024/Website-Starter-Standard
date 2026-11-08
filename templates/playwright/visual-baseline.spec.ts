@@ -20,7 +20,7 @@ for (const route of routes) {
       const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(response?.status()).toBeLessThan(400);
       await page.waitForLoadState('load', { timeout: 8_000 }).catch(() => undefined);
-      await page.evaluate(() => document.fonts?.ready);
+      await page.evaluate(async () => { await document.fonts.ready; });
       await expect(page).toHaveScreenshot(safe + '-' + viewport.name + '.png', {
         fullPage: true,
         animations: 'disabled',
