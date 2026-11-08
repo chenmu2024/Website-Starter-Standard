@@ -249,6 +249,25 @@ class AuditTests(unittest.TestCase):
         self.assertIn("SITEMAP_HREFLANG_INVALID_ENTRY", self.codes(report))
 
 
+    def test_hreflang_source_mismatch_blocks_explicit_production_policy(self):
+        tags = ('<link rel="alternate" hreflang="en" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es" href="https://example.org/es/">'
+                '<link rel="alternate" hreflang="pt" href="https://example.org/pt/">')
+        self.write("index.html", page("Home", "https://example.org/", extra_head=tags, lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", extra_head=tags, lang="es"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", extra_head=tags, lang="pt"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_SOURCE_MISMATCH")
+        self.assertEqual(finding["severity"], "error")
+
+
 
 if __name__ == "__main__":
     unittest.main()
