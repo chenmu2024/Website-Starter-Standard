@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "exports": [
+    {
+      "id": "cut-list-csv",
+      "kind": "csv",
+      "path": "exports/cut-list.csv",
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "expected_headers": [
+        "Part",
+        "Length",
+        "Unit",
+        "Quantity"
+      ],
+      "expected_rows": [
+        {
+          "Part": "Side panel",
+          "Length": 304.8,
+          "Unit": "mm",
+          "Quantity": 2
+        },
+        {
+          "Part": "Shelf",
+          "Length": 609.6,
+          "Unit": "mm",
+          "Quantity": 3
+        }
+      ],
+      "numeric_tolerance": {
+        "Length": 0.001,
+        "Quantity": 0
+      }
+    },
+    {
+      "id": "cut-plan-pdf",
+      "kind": "pdf",
+      "path": "exports/cut-plan.pdf",
+      "expected_page_count": 1,
+      "expected_text_contains": [
+        "Cut plan",
+        "Total length"
+      ],
+      "expected_page_size_pt": [
+        612,
+        792
+      ],
+      "page_size_tolerance_pt": 1
+    },
+    {
+      "id": "cut-layout-svg",
+      "kind": "svg",
+      "path": "exports/cut-layout.svg",
+      "expected_viewbox": "0 0 1200 800",
+      "expected_width": "1200",
+      "expected_height": "800"
+    }
+  ]
+}
