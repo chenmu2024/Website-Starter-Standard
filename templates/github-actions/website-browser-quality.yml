@@ -21,6 +21,7 @@ jobs:
       QA_ROUTES_JSON: '["/"]'
       QA_VISUAL_ROUTES_JSON: '[]'
       QA_VISUAL_DIFF_RATIO: '0.005'
+      QA_VISUAL_UPDATE: '0'
       QA_CAPTURE_SCREENSHOTS: '0'
       QA_PRIMARY_TASK_SELECTOR: ''
       PRODUCT_KIND: static
@@ -146,8 +147,11 @@ jobs:
           PY
       - name: Run Chromium, Firefox and WebKit at five viewports
         run: npx playwright test --config=playwright.config.ts
-      - name: Run reviewed Chromium visual baselines (opt-in)
-        if: env.QA_VISUAL_ROUTES_JSON != '[]'
+      - name: Generate visual baselines in pinned CI environment (explicit opt-in)
+        if: env.QA_VISUAL_ROUTES_JSON != '[]' && env.QA_VISUAL_UPDATE == '1'
+        run: npx playwright test --config=playwright.visual.config.ts --update-snapshots
+      - name: Compare reviewed visual baselines
+        if: env.QA_VISUAL_ROUTES_JSON != '[]' && env.QA_VISUAL_UPDATE != '1'
         run: npx playwright test --config=playwright.visual.config.ts
       - name: Compile unified release evidence report
         if: always()
@@ -172,5 +176,6 @@ jobs:
             visual-report/
             test-results/
             visual-test-results/
+            tests/e2e/__screenshots__/
           if-no-files-found: warn
           retention-days: 14
