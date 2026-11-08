@@ -24,6 +24,7 @@ class P1TemplateTests(unittest.TestCase):
             self.assertIn(hidden_rule, spec)
         self.assertIn("npx playwright install --with-deps chromium firefox webkit", workflow)
         self.assertIn("npx playwright test --config=playwright.config.ts", workflow)
+        self.assertIn("tests/fixtures/playwright-site", workflow)
         self.assertIn("if: always()", workflow)
         self.assertIn("tools/compile_release_report.py", workflow)
         self.assertIn("tools/validate_export_artifacts.py", workflow)
@@ -77,6 +78,7 @@ class P1TemplateTests(unittest.TestCase):
             "templates/github-actions/website-quality.yml",
             "templates/github-actions/website-post-deploy.yml",
             "templates/github-actions/website-browser-quality.yml",
+            ".github/workflows/playwright-template-tests.yml",
         ]
         for relative in paths:
             with self.subTest(path=relative):
