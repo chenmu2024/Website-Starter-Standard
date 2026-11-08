@@ -164,5 +164,62 @@ class ReleaseReportTests(unittest.TestCase):
 
 
 
+    def test_malformed_minimal_pass_reports_are_rejected(self):
+        cases = [
+            ("seo", {"summary": {"error": False, "warning": 0, "info": 0},
+                     "pages_scanned": 1, "pages": [{"route": "/"}], "findings": []}),
+            ("calculation", {"status": "PASS"}),
+            ("exports", {"status": "PASS"}),
+            ("deployment", {"status": "PASS"}),
+            ("playwright", {"stats": {"expected": 1, "unexpected": 0, "flaky": 0, "skipped": 0},
+                            "errors": []}),
+        ]
+        for kind, evidence in cases:
+            with self.subTest(kind=kind):
+                status, detail = compiler.classify(kind, evidence)
+                self.assertEqual(status, "FAIL", detail)
+
+    def test_seo_summary_must_match_findings(self):
+        evidence = seo_evidence()
+        evidence["summary"]["error"] = 1
+        status, detail = compiler.classify("seo", evidence)
+        self.assertEqual(status, "FAIL")
+        self.assertIn("disagree", detail)
+
+    def test_playwright_stats_must_match_concrete_result_records(self):
+        evidence = browser_evidence(expected=3, result_count=1)
+        status, detail = compiler.classify("playwright", evidence)
+        self.assertEqual(status, "FAIL")
+        self.assertIn("only 1 result records", detail)
+
+    def test_all_skipped_browser_tests_are_partial_not_not_run(self):
+        evidence = browser_evidence(expected=0, skipped=2)
+        status, detail = compiler.classify("playwright", evidence)
+        self.assertEqual(status, "PARTIAL")
+        self.assertIn("skipped=2", detail)
+
+    def test_deployment_pass_requires_live_release_check_set_and_critical_route(self):
+        evidence = {
+            "scope": "live HTTP only; no Cloudflare account verification",
+            "production": "https://example.org",
+            "status": "PASS", "errors": [],
+            "checks": [{"name": "homepage", "status": "PASS", "detail": "HTTP 200"}],
+        }
+        status, detail = compiler.classify("deployment", evidence)
+        self.assertEqual(status, "FAIL")
+        self.assertIn("missing required checks", detail)
+
+    def test_invalid_optional_manifest_entry_invalidates_manifest(self):
+        manifest = {"version": 1, "checks": [
+            {"id": "seo", "type": "seo", "required": True, "file": "seo.json"},
+            {"id": "optional", "type": "manual", "required": "", "file": "optional.json"},
+        ]}
+        report = compiler.compile_report(manifest, self.root)
+        self.assertEqual(report["status"], "FAIL")
+        self.assertEqual(report["decision"], "INVALID_MANIFEST")
+        self.assertIn("required must be boolean", report["errors"][0])
+
+
+
 if __name__ == "__main__":
     unittest.main()
