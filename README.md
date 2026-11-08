@@ -71,6 +71,7 @@ The P1 layer adds a copyable Playwright suite for Chromium/Firefox/WebKit at 360
 - `tools/verify_deployment.py` — read-only live HTTP and deployment SHA verification; never a substitute for a browser or Cloudflare account review.
 - `INTERNATIONAL-SEO-AUTOMATION.md` — explicit hreflang group schema, self/return-link and canonical checks with external-domain limitations.
 - `templates/playwright/` — copyable Chromium/Firefox/WebKit responsive QA and opt-in reviewed visual baselines.
+- `.github/workflows/playwright-template-tests.yml` — executes the copied browser harness against a deterministic fixture on the three browser engines; this does not certify downstream app routes.
 - `templates/github-actions/website-browser-quality.yml` — integrated Node P1 workflow for build, SEO, calculation/export, browser and release report.
 - `tools/validate_export_artifacts.py` / `templates/exports/` — compare real CSV/PDF/SVG files against expected content and geometry.
 - `tools/compile_release_report.py` / `templates/release-evidence/` — fail-closed unified report over required automated and human evidence.
