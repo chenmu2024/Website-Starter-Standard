@@ -2,6 +2,7 @@
 import json
 import unittest
 from pathlib import Path
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -63,6 +64,25 @@ class P1TemplateTests(unittest.TestCase):
         self.assertIn("EVIDENCE_INCOMPLETE", script)
         self.assertIn("SCHEMA_VALID", script)
         self.assertIn("NOT_RUN", script)
+
+    def test_github_workflow_templates_parse_as_yaml(self):
+        paths = [
+            ".github/workflows/seo-audit-tests.yml",
+            "templates/github-actions/website-quality.yml",
+            "templates/github-actions/website-post-deploy.yml",
+            "templates/github-actions/website-browser-quality.yml",
+        ]
+        for relative in paths:
+            with self.subTest(path=relative):
+                document = yaml.safe_load((ROOT / relative).read_text())
+                self.assertIsInstance(document, dict)
+                self.assertIn("jobs", document)
+                self.assertTrue("on" in document or True in document)
+
+    def test_export_paths_are_relative_to_export_output_directory(self):
+        manifest = json.loads((ROOT / "templates/exports/export-manifest.example.json").read_text())
+        for item in manifest["exports"]:
+            self.assertFalse(item["path"].startswith("exports/"))
 
 
 if __name__ == "__main__":
