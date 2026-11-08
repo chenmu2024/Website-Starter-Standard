@@ -248,6 +248,40 @@ def compile_report(manifest, evidence_root):
     if not isinstance(checks, list) or not checks:
         return {"status": "FAIL", "decision": "INVALID_MANIFEST",
                 "checks": [], "errors": ["Manifest requires a nonempty checks list"]}
+
+    # Validate the complete manifest before reading evidence. A malformed
+    # optional-looking entry must not be downgraded to a warning and ignored.
+    manifest_errors = []
+    manifest_ids = set()
+    required_count = 0
+    for index, item in enumerate(checks):
+        label = f"checks[{index}]"
+        if not isinstance(item, dict):
+            manifest_errors.append(f"{label}: entry must be an object")
+            continue
+        key = item.get("id")
+        kind = item.get("type")
+        required = item.get("required")
+        relative = item.get("file")
+        if not isinstance(key, str) or not key.strip() or key in manifest_ids:
+            manifest_errors.append(f"{label}: check id must be unique and nonempty")
+        else:
+            manifest_ids.add(key)
+            label = key
+        if kind not in EVIDENCE_TYPES:
+            manifest_errors.append(f"{label}: unsupported evidence type {kind!r}")
+        if not isinstance(required, bool):
+            manifest_errors.append(f"{label}: required must be boolean")
+        elif required:
+            required_count += 1
+        if not _nonempty(relative):
+            manifest_errors.append(f"{label}: file must be a nonempty relative path")
+    if required_count == 0:
+        manifest_errors.append("At least one required release check must be declared")
+    if manifest_errors:
+        return {"status": "FAIL", "decision": "INVALID_MANIFEST",
+                "checks": [], "errors": manifest_errors}
+
     root = Path(evidence_root).resolve()
     results = []
     errors = []
