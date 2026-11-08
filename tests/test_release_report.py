@@ -54,6 +54,7 @@ class ReleaseReportTests(unittest.TestCase):
         report = compiler.compile_report(manifest, self.root)
         self.assertEqual(report["status"], "FAIL")
         self.assertEqual(report["checks"][1]["status"], "FAIL")
+        self.assertTrue(any("exports" in item for item in report["warnings"]))
 
     def test_schema_only_calculation_and_skipped_browser_are_partial(self):
         self.put("calc.json", {"status": "SCHEMA_VALID"})
