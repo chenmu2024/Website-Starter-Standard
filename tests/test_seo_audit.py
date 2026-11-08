@@ -204,6 +204,51 @@ class AuditTests(unittest.TestCase):
         self.assertNotIn("HREFLANG_CODE_INVALID", self.codes(report))
 
 
+    def test_sitemap_hreflang_group_passes_without_html_alternate_tags(self):
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es-ES"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", lang="pt-BR"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/es/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es-ES" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/pt/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es-ES" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
+        self.assertNotIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+
+    def test_html_and_sitemap_hreflang_mismatch_is_reported(self):
+        html_tags = ('<link rel="alternate" hreflang="es" href="https://example.org/">'
+                     '<link rel="alternate" hreflang="pt" href="https://example.org/pt/">')
+        self.write("index.html", page(extra_head=html_tags))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("HREFLANG_SOURCE_MISMATCH", self.codes(report))
+
+    def test_malformed_sitemap_hreflang_entry_is_not_silently_ignored(self):
+        self.write("index.html", page())
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("SITEMAP_HREFLANG_INVALID_ENTRY", self.codes(report))
+
+
 
 if __name__ == "__main__":
     unittest.main()
