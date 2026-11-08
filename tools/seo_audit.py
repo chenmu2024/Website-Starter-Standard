@@ -348,14 +348,16 @@ def audit(root, base_url, policy=None):
                 for entry in url_entries:
                     locs = [child.text.strip() for child in entry
                             if child.tag.split("}")[-1] == "loc" and child.text]
-                    alternates = [
-                        {"code": child.attrib.get("hreflang", "").strip(),
-                         "href": child.attrib.get("href", "").strip()}
-                        for child in entry
-                        if child.tag.split("}")[-1] == "link" and
-                        "alternate" in child.attrib.get("rel", "").lower().split() and
-                        child.attrib.get("hreflang") and child.attrib.get("href")
-                    ]
+                    alternates = []
+                    for child in entry:
+                        if child.tag.split("}")[-1] != "link" or "alternate" not in child.attrib.get("rel", "").lower().split():
+                            continue
+                        if not child.attrib.get("hreflang") or not child.attrib.get("href"):
+                            issue("warning", "SITEMAP_HREFLANG_INVALID_ENTRY", "/sitemap.xml",
+                                  "xhtml:link alternate requires hreflang and href")
+                            continue
+                        alternates.append({"code": child.attrib["hreflang"].strip(),
+                                           "href": child.attrib["href"].strip()})
                     if len(locs) != 1:
                         issue("warning", "SITEMAP_URL_LOC_COUNT", "/sitemap.xml",
                               f"Expected one loc in url entry; found {len(locs)}")
