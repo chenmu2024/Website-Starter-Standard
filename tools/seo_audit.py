@@ -392,6 +392,83 @@ def audit(root, base_url, policy=None):
                 issue("warning", "SITEMAP_UNEXPECTED_ROOT", "/sitemap.xml", tag)
 
         read_sitemap(sitemap, 0)
+        # Sitemap-based hreflang is supported alongside HTML alternate links.
+        # If both mechanisms exist for a page, their mappings must agree.
+        for route, tags in sitemap_hreflang.items():
+            page = page_by_route.get(resolve_route(route))
+            if page and page["hreflang"]:
+                html_map = {(x["code"].casefold(), local_url(x["href"], route, base_url))
+                            for x in page["hreflang"]}
+                sitemap_map = {(x["code"].casefold(), local_url(x["href"], route, base_url))
+                               for x in tags}
+                if html_map != sitemap_map:
+                    issue("warning", "HREFLANG_SOURCE_MISMATCH", route,
+                          "HTML alternate links and Sitemap xhtml:link mappings differ")
+                continue
+            seen_codes = {}
+            self_code = None
+            for item in tags:
+                code, href = item["code"], item["href"]
+                folded = code.casefold()
+                if not (folded == "x-default" or HREFLANG_RE.fullmatch(code)):
+                    issue("warning", "HREFLANG_CODE_INVALID", route, code)
+                if folded in seen_codes:
+                    issue("warning", "HREFLANG_DUPLICATE_CODE", route,
+                          f"{code} also declared as {seen_codes[folded]}")
+                else:
+                    seen_codes[folded] = href
+                parsed = urlparse(href)
+                if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+                    issue("warning", "HREFLANG_NOT_ABSOLUTE", route, href)
+                target = local_url(href, route, base_url)
+                if target is None:
+                    issue("info", "HREFLANG_EXTERNAL_UNVERIFIED", route,
+                          f"External Sitemap alternate cannot be checked offline: {href}")
+                    continue
+                destination = resolve_route(target)
+                if destination is None:
+                    issue("warning", "HREFLANG_TARGET_MISSING", route, href)
+                    continue
+                target_page = page_by_route.get(destination)
+                if target_page and target_page["canonical"] != [base_url.rstrip("/") + destination]:
+                    issue("warning", "HREFLANG_TARGET_CANONICAL", route,
+                          f"{href} target canonical is {target_page['canonical']}")
+                if folded != "x-default" and destination == route:
+                    self_code = code
+            if tags and self_code is None:
+                issue("warning", "HREFLANG_SELF_MISSING", route,
+                      "Sitemap hreflang set has no self-reference")
+            if self_code and page and page["html_lang"]:
+                if page["html_lang"].split("-", 1)[0].casefold() != self_code.split("-", 1)[0].casefold():
+                    issue("warning", "HREFLANG_HTML_LANG_MISMATCH", route,
+                          f"html lang={page['html_lang']} but Sitemap self hreflang={self_code}")
+        for route, tags in sitemap_hreflang.items():
+            page = page_by_route.get(resolve_route(route))
+            if page and page["hreflang"]:
+                continue
+            self_code = next((x["code"] for x in tags
+                              if x["code"].casefold() != "x-default" and
+                              local_url(x["href"], route, base_url) == route), None)
+            if not self_code:
+                continue
+            for item in tags:
+                if item["code"].casefold() == "x-default":
+                    continue
+                target = local_url(item["href"], route, base_url)
+                destination = resolve_route(target) if target else None
+                if not destination or destination == route:
+                    continue
+                target_page = page_by_route.get(destination)
+                target_tags = (target_page["hreflang"] if target_page and target_page["hreflang"]
+                               else sitemap_hreflang.get(destination, []))
+                reciprocal = any(
+                    back["code"].casefold() == self_code.casefold() and
+                    local_url(back["href"], destination, base_url) == route
+                    for back in target_tags
+                )
+                if not reciprocal:
+                    issue("warning", "HREFLANG_RETURN_MISSING", route,
+                          f"{destination} does not link back with hreflang={self_code}")
         for url in routes:
             if url not in sitemap_listed:
                 issue("info", "SITEMAP_PAGE_NOT_LISTED", url,
