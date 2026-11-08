@@ -49,6 +49,8 @@ class P1TemplateTests(unittest.TestCase):
         self.assertIn("QA_VISUAL_UPDATE", workflow)
         self.assertIn("--update-snapshots", workflow)
         self.assertIn("tests/e2e/__screenshots__", workflow)
+        self.assertIn("visual-environment.txt", workflow)
+        self.assertIn("browser.version()", workflow)
         self.assertIn("createHash", spec)
         self.assertIn("routeSnapshotId", spec)
         self.assertIn("visual snapshot route identifiers remain unique", spec)
