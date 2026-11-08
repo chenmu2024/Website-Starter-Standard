@@ -13,6 +13,7 @@
 - Applicable `DESIGN.md` version or reference:
 - Before/after screenshots or recording references, if actually captured:
 - Baseline route/SEO data checked and where recorded:
+- Visual snapshot environment (runner OS/image, Playwright/browser version, approved route list, snapshot artifact and approval commit):
 
 ## Verification ledger
 
@@ -29,6 +30,15 @@ Use `PASS`, `FAIL`, `NOT RUN`, or `NOT APPLICABLE`. For PASS/FAIL, include a rep
 | Keyboard/focus/labels/contrast | NOT RUN | | |
 | Touch/custom interaction where relevant | NOT RUN | | |
 | Spanish/Portuguese Unicode and overflow, if relevant | NOT RUN | | |
+| Chromium / Firefox / WebKit on all required routes | NOT RUN | | |
+| Responsive viewport matrix 360/390/768/1024/1440 | NOT RUN | | |
+| Visual baseline comparison (approved snapshot version) | NOT RUN | | |
+| Browser runtime errors / broken visible images / accessible names | NOT RUN | | |
+| CSV expected headers, row values, units and tolerance | NOT APPLICABLE | | |
+| PDF extracted text, page count and page geometry | NOT APPLICABLE | | |
+| SVG XML and viewBox / dimensions | NOT APPLICABLE | | |
+| Multilingual hreflang self/return/group parity | NOT APPLICABLE | | |
+| Unified release evidence report | NOT RUN | | |
 | Design tokens/components and content fidelity | NOT RUN | | |
 | Matched reference/render desktop+mobile (when approved reference exists) | NOT APPLICABLE | | |
 | Working primary CTA and truthful claims/offer proof (Persuade/ad/comparison) | NOT APPLICABLE | | |

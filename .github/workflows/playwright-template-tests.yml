@@ -1,0 +1,85 @@
+name: Playwright template browser smoke tests
+on:
+  push:
+    paths:
+      - 'templates/playwright/**'
+      - 'tests/fixtures/playwright-site/**'
+      - '.github/workflows/playwright-template-tests.yml'
+  pull_request:
+    paths:
+      - 'templates/playwright/**'
+      - 'tests/fixtures/playwright-site/**'
+      - '.github/workflows/playwright-template-tests.yml'
+permissions:
+  contents: read
+jobs:
+  browser-template:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Playwright test runner
+        run: |
+          npm init -y
+          npm install --no-save --no-package-lock @playwright/test@1.56.1
+      - name: Install Chromium, Firefox and WebKit
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Stage the copied browser QA template
+        run: |
+          mkdir -p tests/e2e release-evidence
+          cp templates/playwright/playwright.config.ts ./playwright.config.ts
+          cp templates/playwright/site-quality.spec.ts tests/e2e/site-quality.spec.ts
+          cp templates/playwright/visual.config.ts ./playwright.visual.config.ts
+          cp templates/playwright/visual-baseline.spec.ts tests/e2e/visual-baseline.spec.ts
+      - name: Start the deterministic HTML fixture
+        run: |
+          python -m http.server 4173 --directory tests/fixtures/playwright-site > /tmp/playwright-fixture.log 2>&1 &
+      - name: Wait for fixture server
+        run: |
+          python - <<'PY'
+          import time, urllib.request
+          from pathlib import Path
+          Path('release-evidence').mkdir(exist_ok=True)
+          from pathlib import Path
+          Path('release-evidence').mkdir(exist_ok=True)
+          for attempt in range(30):
+              try:
+                  with urllib.request.urlopen("http://127.0.0.1:4173/", timeout=2) as response:
+                      if response.status == 200:
+                          break
+              except Exception:
+                  time.sleep(1)
+          else:
+              log = open("/tmp/playwright-fixture.log", encoding="utf8").read()
+              print(log)
+              Path("release-evidence/playwright-fixture.log").write_text(log, encoding="utf8")
+              raise SystemExit("Browser fixture server did not start")
+          Path("release-evidence/playwright-fixture.log").write_text(
+              open("/tmp/playwright-fixture.log", encoding="utf8").read(), encoding="utf8")
+          PY
+      - name: Execute template in Chromium, Firefox and WebKit
+        env:
+          CI: '1'
+          QA_BASE_URL: http://127.0.0.1:4173
+          QA_ROUTES_JSON: '["/"]'
+          QA_PRIMARY_TASK_SELECTOR: '[data-testid="qa-primary-task"]'
+        run: npx playwright test --config=playwright.config.ts
+      - name: Execute collision-resistant visual route identifier regression
+        env:
+          QA_BASE_URL: http://127.0.0.1:4173
+          QA_VISUAL_ROUTES_JSON: '["/"]'
+        run: npx playwright test --config=playwright.visual.config.ts --grep "visual snapshot route identifiers"
+      - name: Upload real browser execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-template-browser-evidence
+          path: |
+            release-evidence/
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14

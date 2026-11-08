@@ -13,8 +13,8 @@ audit_tool = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(audit_tool)
 
 
-def page(title="Example", canon="https://example.org/", body="", extra_head=""):
-    return (f'<!doctype html><html lang="en"><head><title>{title}</title>'
+def page(title="Example", canon="https://example.org/", body="", extra_head="", lang="en"):
+    return (f'<!doctype html><html lang="{lang}"><head><title>{title}</title>'
             f'<meta name="description" content="Useful {title} example">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<link rel="canonical" href="{canon}">{extra_head}</head>'
@@ -143,6 +143,257 @@ class AuditTests(unittest.TestCase):
                                   {"mode": "production", "indexable_routes": ["/"]})
         self.assertIn("SITEMAP_INDEX_CHILD_MISSING", self.codes(report))
         self.assertIn("INDEXABLE_SITEMAP", self.codes(report))
+
+    def test_hreflang_valid_self_and_return_links_pass_explicit_group(self):
+        es_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
+                   '<link rel="alternate" hreflang="x-default" href="https://example.org/es/">')
+        pt_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
+                   '<link rel="alternate" hreflang="x-default" href="https://example.org/es/">')
+        self.write("es/index.html", page("Español", "https://example.org/es/",
+                                         extra_head=es_tags, lang="es-ES"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/",
+                                         extra_head=pt_tags, lang="pt-BR"))
+        self.write("sitemap.xml",
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<url><loc>https://example.org/es/</loc></url>'
+                   '<url><loc>https://example.org/pt/</loc></url></urlset>')
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {
+                      "es-ES": "/es/", "pt-BR": "/pt/", "x-default": "/es/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
+        self.assertNotIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+
+    def test_hreflang_group_missing_variant_and_return_is_reported(self):
+        es_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">')
+        pt_tags = '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
+        self.write("es/index.html", page("Español", "https://example.org/es/", extra_head=es_tags))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", extra_head=pt_tags))
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertEqual({item["route"] for item in report["pages"]}, {"/es/", "/pt/"}, report["pages"])
+        self.assertEqual(len(report["pages"][0]["hreflang"]), 2, report["pages"])
+        self.assertIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report))
+        self.assertIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+
+    def test_hreflang_invalid_duplicate_code_and_missing_target_are_reported(self):
+        tags = ('<link rel="alternate" hreflang="bad_code" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es" href="https://example.org/missing/">'
+                '<link rel="alternate" hreflang="es" href="https://example.org/">')
+        self.write("index.html", page(extra_head=tags))
+        report = audit_tool.audit(self.root, "https://example.org")
+        codes = self.codes(report)
+        self.assertIn("HREFLANG_CODE_INVALID", codes)
+        self.assertIn("HREFLANG_DUPLICATE_CODE", codes)
+        self.assertIn("HREFLANG_TARGET_MISSING", codes)
+
+    def test_hreflang_external_alternate_is_explicitly_unverified(self):
+        tags = ('<link rel="alternate" hreflang="es" href="https://example.org/">'
+                '<link rel="alternate" hreflang="pt-BR" href="https://example.com.br/">')
+        self.write("index.html", page(extra_head=tags))
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("HREFLANG_EXTERNAL_UNVERIFIED", self.codes(report))
+
+    def test_hreflang_accepts_script_and_numeric_region_subtags(self):
+        tags = ('<link rel="alternate" hreflang="zh-Hans" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es-419" href="https://example.org/">')
+        self.write("index.html", page(extra_head=tags, lang="zh-Hans"))
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertNotIn("HREFLANG_CODE_INVALID", self.codes(report))
+
+
+    def test_sitemap_hreflang_group_passes_without_html_alternate_tags(self):
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es-ES"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", lang="pt-BR"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/es/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es-ES" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/pt/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es-ES" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
+        self.assertNotIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+
+    def test_html_and_sitemap_hreflang_mismatch_is_reported(self):
+        html_tags = ('<link rel="alternate" hreflang="es" href="https://example.org/">'
+                     '<link rel="alternate" hreflang="pt" href="https://example.org/pt/">')
+        self.write("index.html", page(extra_head=html_tags))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("HREFLANG_SOURCE_MISMATCH", self.codes(report))
+
+    def test_malformed_sitemap_hreflang_entry_is_not_silently_ignored(self):
+        self.write("index.html", page())
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("SITEMAP_HREFLANG_INVALID_ENTRY", self.codes(report))
+
+
+    def test_hreflang_source_mismatch_blocks_explicit_production_policy(self):
+        tags = ('<link rel="alternate" hreflang="en" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es" href="https://example.org/es/">'
+                '<link rel="alternate" hreflang="pt" href="https://example.org/pt/">')
+        self.write("index.html", page("Home", "https://example.org/", extra_head=tags, lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", extra_head=tags, lang="es"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", extra_head=tags, lang="pt"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_SOURCE_MISMATCH")
+        self.assertEqual(finding["severity"], "error")
+
+
+    def test_html_sitemap_external_hreflang_urls_are_compared_in_full(self):
+        html_tags = ('<link rel="alternate" hreflang="en" href="https://example.org/">'
+                     '<link rel="alternate" hreflang="es" href="https://spanish.example/a/">')
+        self.write("index.html", page("Home", "https://example.org/", extra_head=html_tags))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://wrong.example/b/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_SOURCE_MISMATCH")
+        self.assertEqual(finding["severity"], "error")
+
+
+    def test_hreflang_return_links_work_when_html_and_sitemap_modes_are_mixed(self):
+        es_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">')
+        self.write("es/index.html", page("Español", "https://example.org/es/",
+                                         extra_head=es_tags, lang="es-ES"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", lang="pt-BR"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/es/</loc></url>'
+                   '<url><loc>https://example.org/pt/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es-ES" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+        self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
+
+
+    def test_html_hreflang_href_must_match_destination_canonical_protocol_and_query(self):
+        tags = ('<link rel="alternate" hreflang="en" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es" href="http://example.org/es/?wrong=1">')
+        self.write("index.html", page("Home", "https://example.org/", extra_head=tags, lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es"))
+        report = audit_tool.audit(
+            self.root, "https://example.org",
+            {"mode": "production", "indexable_routes": ["/", "/es/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_TARGET_CANONICAL")
+        self.assertEqual(finding["severity"], "error")
+        self.assertIn("does not exactly match", finding["message"])
+
+    def test_sitemap_hreflang_href_must_match_destination_canonical_protocol_and_query(self):
+        self.write("index.html", page("Home", "https://example.org/", lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="http://example.org/es/?wrong=1"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/es/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(
+            self.root, "https://example.org",
+            {"mode": "production", "indexable_routes": ["/", "/es/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_TARGET_CANONICAL")
+        self.assertEqual(finding["severity"], "error")
+        self.assertIn("does not exactly match", finding["message"])
+
+
+    def test_x_default_self_reference_counts_for_html_language_selector(self):
+        tags = (
+            '<link rel="alternate" hreflang="en" href="https://example.org/en/">'
+            '<link rel="alternate" hreflang="es" href="https://example.org/es/">'
+            '<link rel="alternate" hreflang="x-default" href="https://example.org/">'
+        )
+        self.write("index.html", page("Language", "https://example.org/", extra_head=tags, lang="en"))
+        self.write("en/index.html", page("English", "https://example.org/en/", extra_head=tags, lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", extra_head=tags, lang="es"))
+        self.write("sitemap.xml",
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<url><loc>https://example.org/</loc></url>'
+                   '<url><loc>https://example.org/en/</loc></url>'
+                   '<url><loc>https://example.org/es/</loc></url></urlset>')
+        policy = {"mode": "production", "indexable_routes": ["/", "/en/", "/es/"],
+                  "hreflang_groups": [{"routes": {
+                      "en": "/en/", "es": "/es/", "x-default": "/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        missing = [x for x in report["findings"]
+                   if x["code"] == "HREFLANG_SELF_MISSING" and x["page"] == "/"]
+        self.assertEqual(missing, [], report["findings"])
+
+    def test_x_default_self_reference_counts_for_sitemap_language_selector(self):
+        self.write("index.html", page("Language", "https://example.org/", lang="en"))
+        self.write("en/index.html", page("English", "https://example.org/en/", lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/en/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="x-default" href="https://example.org/"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/en/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/en/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="x-default" href="https://example.org/"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/es/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/en/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="x-default" href="https://example.org/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        policy = {"mode": "production", "indexable_routes": ["/", "/en/", "/es/"],
+                  "hreflang_groups": [{"routes": {
+                      "en": "/en/", "es": "/es/", "x-default": "/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        missing = [x for x in report["findings"]
+                   if x["code"] == "HREFLANG_SELF_MISSING" and x["page"] == "/"]
+        self.assertEqual(missing, [], report["findings"])
+
 
 
 if __name__ == "__main__":

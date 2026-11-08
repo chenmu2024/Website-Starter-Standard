@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "project": "REPLACE_WITH_PROJECT_AND_RELEASE_SHA",
+  "checks": [
+    {
+      "id": "seo",
+      "type": "seo",
+      "required": true,
+      "file": "seo.json"
+    },
+    {
+      "id": "browser",
+      "type": "playwright",
+      "required": true,
+      "file": "playwright-report.json"
+    },
+    {
+      "id": "visual",
+      "type": "playwright",
+      "required": false,
+      "file": "visual-report.json"
+    },
+    {
+      "id": "exports",
+      "type": "exports",
+      "required": false,
+      "file": "exports.json"
+    },
+    {
+      "id": "calculation",
+      "type": "calculation",
+      "required": false,
+      "file": "calculation.json"
+    },
+    {
+      "id": "deployment",
+      "type": "deployment",
+      "required": false,
+      "file": "http-release.json"
+    },
+    {
+      "id": "physical-print",
+      "type": "manual",
+      "required": false,
+      "file": "physical-print.json"
+    },
+    {
+      "id": "search-indexing",
+      "type": "manual",
+      "required": false,
+      "file": "search-indexing.json"
+    }
+  ]
+}

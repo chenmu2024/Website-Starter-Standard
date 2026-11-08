@@ -1,0 +1,23 @@
+{
+  "mode": "production",
+  "required_routes": [
+    "/",
+    "/es/",
+    "/pt-br/"
+  ],
+  "indexable_routes": [
+    "/",
+    "/es/",
+    "/pt-br/"
+  ],
+  "hreflang_groups": [
+    {
+      "routes": {
+        "en": "/",
+        "es-ES": "/es/",
+        "pt-BR": "/pt-br/",
+        "x-default": "/"
+      }
+    }
+  ]
+}

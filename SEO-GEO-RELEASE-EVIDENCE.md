@@ -39,6 +39,10 @@
 | Duplicate title/description/H1 | | | |
 | Structured-data syntax | | | |
 | hreflang parity | | | |
+| BCP47 hreflang code validity and duplicates | | | |
+| Self-reference and reciprocal return links | | | |
+| Target canonical and explicit language-group completeness | | | |
+| External-domain alternate verification (live crawl) | | | |
 | Orphan pages | | | |
 
 ## 2. Raw HTML verification
@@ -92,6 +96,10 @@ Record actual tools/results when measured.
 
 | Check | Environment | Result | Notes |
 |---|---|---|---|
+| Chromium / Firefox / WebKit | | | |
+| Viewport matrix 360/390/768/1024/1440 | | | |
+| Visual snapshot baseline | | | |
+| Browser runtime errors / broken images / accessible names | | | |
 | Mobile layout | | | |
 | Desktop layout | | | |
 | LCP lab | | | |
@@ -99,6 +107,10 @@ Record actual tools/results when measured.
 | CLS lab | | | |
 | Keyboard/focus | | | |
 | Touch targets | | | |
+| CSV export content parity | | | |
+| PDF text/page count/page dimensions | | | |
+| SVG geometry and viewBox | | | |
+| Physical print measurement (human evidence only) | | | |
 | Reduced motion | | | |
 
 Do not label lab data as CrUX field data.
