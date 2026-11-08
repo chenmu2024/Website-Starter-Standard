@@ -22,6 +22,16 @@ on:
       - 'templates/playwright/**'
       - 'templates/exports/**'
       - 'templates/release-evidence/**'
+      - 'tools/validate_export_artifacts.py'
+      - 'tools/compile_release_report.py'
+      - 'tests/test_export_artifacts.py'
+      - 'tests/test_release_report.py'
+      - 'tests/test_p1_templates.py'
+      - 'requirements-qa.txt'
+      - 'INTERNATIONAL-SEO-AUTOMATION.md'
+      - 'templates/playwright/**'
+      - 'templates/exports/**'
+      - 'templates/release-evidence/**'
       - '.github/workflows/seo-audit-tests.yml'
   pull_request:
     paths:
@@ -35,6 +45,16 @@ on:
       - 'tests/test_downstream_templates.py'
       - 'templates/**'
       - 'tools/verify_deployment.py'
+      - 'tools/validate_export_artifacts.py'
+      - 'tools/compile_release_report.py'
+      - 'tests/test_export_artifacts.py'
+      - 'tests/test_release_report.py'
+      - 'tests/test_p1_templates.py'
+      - 'requirements-qa.txt'
+      - 'INTERNATIONAL-SEO-AUTOMATION.md'
+      - 'templates/playwright/**'
+      - 'templates/exports/**'
+      - 'templates/release-evidence/**'
       - '.github/workflows/seo-audit-tests.yml'
 permissions:
   contents: read
