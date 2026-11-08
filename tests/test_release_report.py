@@ -106,6 +106,14 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertFalse(report["errors"])
 
 
+    def test_playwright_run_level_teardown_errors_block_green_test_stats(self):
+        evidence = {"stats": {"expected": 25, "unexpected": 0, "flaky": 0, "skipped": 0},
+                    "errors": [{"message": "globalTeardown failed"}]}
+        status, detail = compiler.classify("playwright", evidence)
+        self.assertEqual(status, "FAIL")
+        self.assertIn("setup/teardown", detail)
+
+
 
 if __name__ == "__main__":
     unittest.main()
