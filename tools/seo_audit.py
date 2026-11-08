@@ -291,24 +291,6 @@ def audit(root, base_url, policy=None):
             if html_language != hreflang_language:
                 issue(hreflang_severity, "HREFLANG_HTML_LANG_MISMATCH", route,
                       f"html lang={page['html_lang']} but self hreflang={self_code}")
-        if self_code:
-            for item in tags:
-                if item["code"].casefold() == "x-default":
-                    continue
-                target = local_url(item["href"], route, base_url)
-                destination = resolve_route(target) if target else None
-                target_page = page_by_route.get(destination)
-                if not target_page or destination == route:
-                    continue
-                reciprocal = any(
-                    back["code"].casefold() == self_code.casefold() and
-                    local_url(back["href"], destination, base_url) == route
-                    for back in target_page["hreflang"]
-                )
-                if not reciprocal:
-                    issue(hreflang_severity, "HREFLANG_RETURN_MISSING", route,
-                          f"{destination} does not link back with hreflang={self_code}")
-
     if not html_files:
         issue("error", "NO_HTML", "/", "No built HTML files found")
     for url in routes:
@@ -445,10 +427,15 @@ def audit(root, base_url, policy=None):
                 if page["html_lang"].split("-", 1)[0].casefold() != self_code.split("-", 1)[0].casefold():
                     issue(hreflang_severity, "HREFLANG_HTML_LANG_MISMATCH", route,
                           f"html lang={page['html_lang']} but Sitemap self hreflang={self_code}")
-        for route, tags in sitemap_hreflang.items():
-            page = page_by_route.get(resolve_route(route))
-            if page and page["hreflang"]:
-                continue
+        # Check return relationships across mixed HTML and Sitemap declaration modes.
+        def tags_for(route):
+            target_page = page_by_route.get(route)
+            if target_page and target_page["hreflang"]:
+                return target_page["hreflang"]
+            return sitemap_hreflang.get(route, [])
+
+        for route, page in page_by_route.items():
+            tags = tags_for(route)
             self_code = next((x["code"] for x in tags
                               if x["code"].casefold() != "x-default" and
                               local_url(x["href"], route, base_url) == route), None)
@@ -461,9 +448,7 @@ def audit(root, base_url, policy=None):
                 destination = resolve_route(target) if target else None
                 if not destination or destination == route:
                     continue
-                target_page = page_by_route.get(destination)
-                target_tags = (target_page["hreflang"] if target_page and target_page["hreflang"]
-                               else sitemap_hreflang.get(destination, []))
+                target_tags = tags_for(destination)
                 reciprocal = any(
                     back["code"].casefold() == self_code.casefold() and
                     local_url(back["href"], destination, base_url) == route
