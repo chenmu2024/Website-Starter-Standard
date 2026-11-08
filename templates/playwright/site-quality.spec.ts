@@ -1,5 +1,47 @@
 import { test, expect } from '@playwright/test';
 
+async function findUnnamedControls(page: import('@playwright/test').Page): Promise<string[]> {
+  return page.evaluate(() => {
+    return Array.from(document.querySelectorAll(
+      'button, input:not([type="hidden"]), select, textarea, a[href]'
+    )).filter(element => {
+      const el = element as HTMLElement;
+      if (el.closest('[hidden], [inert], [aria-hidden="true"]') || el.getClientRects().length === 0) {
+        return false;
+      }
+      let ancestor: HTMLElement | null = el;
+      while (ancestor) {
+        const style = getComputedStyle(ancestor);
+        if (style.display === 'none' || style.visibility === 'hidden' ||
+            style.visibility === 'collapse' || style.contentVisibility === 'hidden') {
+          return false;
+        }
+        ancestor = ancestor.parentElement;
+      }
+      const labelledBy = (el.getAttribute('aria-labelledby') || '').split(/\s+/)
+        .filter(Boolean)
+        .map(id => document.getElementById(id)?.textContent?.trim() || '')
+        .filter(Boolean).join(' ');
+      const nativeLabels = ('labels' in el
+        ? Array.from((el as HTMLInputElement).labels || [])
+            .map(label => label.textContent?.trim() || '').filter(Boolean).join(' ')
+        : '');
+      const input = el instanceof HTMLInputElement ? el : null;
+      const valueName = input && ['button', 'submit', 'reset'].includes(input.type)
+        ? input.value.trim() : '';
+      const imageInputAlt = input?.type === 'image' ? input.alt.trim() : '';
+      const supportsContentName = el instanceof HTMLButtonElement || el instanceof HTMLAnchorElement;
+      const contentName = supportsContentName ? el.innerText?.trim() || '' : '';
+      const imageAlt = supportsContentName ? el.querySelector('img')?.getAttribute('alt') || '' : '';
+      const svgTitle = supportsContentName ? el.querySelector('svg title')?.textContent?.trim() || '' : '';
+      const labelled = el.getAttribute('aria-label') || labelledBy ||
+        el.getAttribute('title') || nativeLabels ||
+        valueName || imageInputAlt || contentName || imageAlt || svgTitle;
+      return !labelled;
+    }).map(element => element.tagName.toLowerCase() + '.' + (element as HTMLElement).className);
+  });
+}
+
 const routes = JSON.parse(process.env.QA_ROUTES_JSON || '[]') as string[];
 if (!Array.isArray(routes) || routes.length === 0 ||
     routes.some(route => typeof route !== 'string' || !route.startsWith('/') || route.startsWith('//'))) {
@@ -38,52 +80,17 @@ for (const route of routes) {
             rect.bottom > 0 && rect.top < window.innerHeight;
           return visible && image.complete && image.naturalWidth === 0;
         }).map(image => image.currentSrc || image.src);
-        const unnamedControls = Array.from(document.querySelectorAll(
-          'button, input:not([type="hidden"]), select, textarea, a[href]'
-        )).filter(element => {
-          const el = element as HTMLElement;
-          if (el.closest('[hidden], [inert], [aria-hidden="true"]') || el.getClientRects().length === 0) {
-            return false;
-          }
-          let ancestor: HTMLElement | null = el;
-          while (ancestor) {
-            const style = getComputedStyle(ancestor);
-            if (style.display === 'none' || style.visibility === 'hidden' ||
-                style.visibility === 'collapse' || style.contentVisibility === 'hidden') {
-              return false;
-            }
-            ancestor = ancestor.parentElement;
-          }
-          const labelledBy = (el.getAttribute('aria-labelledby') || '').split(/\s+/)
-            .filter(Boolean)
-            .map(id => document.getElementById(id)?.textContent?.trim() || '')
-            .filter(Boolean).join(' ');
-          const nativeLabels = ('labels' in el
-            ? Array.from((el as HTMLInputElement).labels || [])
-                .map(label => label.textContent?.trim() || '').filter(Boolean).join(' ')
-            : '');
-          const input = el instanceof HTMLInputElement ? el : null;
-          const valueName = input && ['button', 'submit', 'reset'].includes(input.type)
-            ? input.value.trim() : '';
-          const imageInputAlt = input?.type === 'image' ? input.alt.trim() : '';
-          const labelled = el.getAttribute('aria-label') || labelledBy ||
-            el.getAttribute('title') || nativeLabels || el.innerText?.trim() ||
-            valueName || imageInputAlt ||
-            (el.querySelector('img')?.getAttribute('alt') || '') ||
-            (el.querySelector('svg title')?.textContent?.trim() || '');
-          return !labelled;
-        }).map(element => element.tagName.toLowerCase() + '.' + (element as HTMLElement).className);
         return {
           width: window.innerWidth,
           documentWidth: Math.max(root.scrollWidth, document.body?.scrollWidth || 0),
           visibleBrokenImages,
-          unnamedControls,
         };
       });
       expect(layout.documentWidth, 'Horizontal overflow: ' + JSON.stringify(layout))
         .toBeLessThanOrEqual(layout.width + 1);
       expect(layout.visibleBrokenImages, 'Visible images must load').toEqual([]);
-      expect(layout.unnamedControls, 'Interactive controls need accessible names').toEqual([]);
+      const unnamedControls = await findUnnamedControls(page);
+      expect(unnamedControls, 'Interactive controls need accessible names').toEqual([]);
       expect(uncaught, 'Uncaught browser runtime errors').toEqual([]);
 
       if (process.env.QA_PRIMARY_TASK_SELECTOR) {
@@ -99,3 +106,18 @@ for (const route of routes) {
     });
   }
 }
+
+test('accessible-name check does not treat option text or textarea contents as labels', async ({ page }) => {
+  await page.setContent(`<!doctype html>
+      <html lang="en"><body>
+        <select class="unlabelled-select"><option>Choose a size</option></select>
+        <textarea class="unlabelled-textarea">Default notes</textarea>
+        <label for="named-select">Named size</label>
+        <select id="named-select"><option>Small</option></select>
+      </body></html>`);
+  const unnamed = await findUnnamedControls(page);
+  expect(unnamed).toEqual([
+    'select.unlabelled-select',
+    'textarea.unlabelled-textarea',
+  ]);
+});
