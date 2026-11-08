@@ -287,6 +287,27 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(finding["severity"], "error")
 
 
+    def test_hreflang_return_links_work_when_html_and_sitemap_modes_are_mixed(self):
+        es_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">')
+        self.write("es/index.html", page("Español", "https://example.org/es/",
+                                         extra_head=es_tags, lang="es-ES"))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", lang="pt-BR"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/es/</loc></url>'
+                   '<url><loc>https://example.org/pt/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="es-ES" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+        self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
