@@ -41,6 +41,8 @@ jobs:
           import time, urllib.request
           from pathlib import Path
           Path('release-evidence').mkdir(exist_ok=True)
+          from pathlib import Path
+          Path('release-evidence').mkdir(exist_ok=True)
           for attempt in range(30):
               try:
                   with urllib.request.urlopen("http://127.0.0.1:4173/", timeout=2) as response:
