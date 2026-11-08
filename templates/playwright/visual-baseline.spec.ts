@@ -13,7 +13,8 @@ const viewports = [
 ];
 
 function routeSnapshotId(route: string): string {
-  const slug = route === '/' ? 'home' : route.replace(/^\\/|\\/$/g, '').replaceAll('/', '-') || 'route';
+  const trimmed = route === '/' ? '' : route.slice(1, route.endsWith('/') ? -1 : undefined);
+  const slug = route === '/' ? 'home' : trimmed.replaceAll('/', '-') || 'route';
   const digest = createHash('sha256').update(route).digest('hex').slice(0, 12);
   return slug + '-' + digest;
 }
