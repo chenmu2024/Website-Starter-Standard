@@ -92,6 +92,13 @@ class P1TemplateTests(unittest.TestCase):
         for item in manifest["exports"]:
             self.assertFalse(item["path"].startswith("exports/"))
 
+    def test_browser_fixture_exercises_native_and_hidden_control_cases(self):
+        fixture = (ROOT / "tests/fixtures/playwright-site/index.html").read_text()
+        for case in ('<label for="amount">', 'id="amount"', 'type="submit"',
+                     'aria-hidden="true"', '<div inert>', '<dialog', '<div hidden>'):
+            self.assertIn(case, fixture)
+
+
 
 if __name__ == "__main__":
     unittest.main()
