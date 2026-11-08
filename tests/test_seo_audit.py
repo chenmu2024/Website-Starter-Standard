@@ -318,7 +318,7 @@ class AuditTests(unittest.TestCase):
             {"mode": "production", "indexable_routes": ["/", "/es/"]})
         finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_TARGET_CANONICAL")
         self.assertEqual(finding["severity"], "error")
-        self.assertIn("does not exactly match", finding["detail"])
+        self.assertIn("does not exactly match", finding["message"])
 
     def test_sitemap_hreflang_href_must_match_destination_canonical_protocol_and_query(self):
         self.write("index.html", page("Home", "https://example.org/", lang="en"))
@@ -339,7 +339,7 @@ class AuditTests(unittest.TestCase):
             {"mode": "production", "indexable_routes": ["/", "/es/"]})
         finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_TARGET_CANONICAL")
         self.assertEqual(finding["severity"], "error")
-        self.assertIn("does not exactly match", finding["detail"])
+        self.assertIn("does not exactly match", finding["message"])
 
 
 
