@@ -4,7 +4,7 @@ The offline SEO auditor validates only the HTML and sitemap files in a built art
 
 ## What is now checked
 
-When alternate language links exist in built HTML:
+When alternate language links exist in built HTML or Sitemap XML (xhtml:link):
 
 - hreflang code syntax (language, optional script, region and variant subtags; plus x-default);
 - duplicate hreflang codes on one page;
@@ -13,6 +13,8 @@ When alternate language links exist in built HTML:
 - whether the target page uses the expected self-canonical;
 - whether each page declares a self-reference;
 - whether same-origin language variants return-link to the source language;
+- whether HTML and Sitemap alternate mappings agree when both are emitted;
+- whether Sitemap urlset hreflang mappings satisfy the same language-group contract;
 - whether html[lang] language prefix agrees with the page's self hreflang code.
 
 External alternate URLs are reported as EXTERNAL_UNVERIFIED because the offline build cannot inspect another domain. This is not automatically an error: multi-domain international sites may be valid, but their other properties need a separate crawl or live check.
