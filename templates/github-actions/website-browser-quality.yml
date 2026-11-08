@@ -59,6 +59,18 @@ jobs:
             test "$EXPORT_RUNTIME_COMMAND" != "REPLACE_ME"
             test -f "$EXPORT_MANIFEST"
           fi
+          python - <<'PY'
+          import json, os
+          path = os.environ["RELEASE_EVIDENCE_MANIFEST"]
+          manifest = json.load(open(path, encoding="utf8"))
+          required = {item["id"]: item["required"] for item in manifest.get("checks", [])}
+          if not required.get("seo") or not required.get("browser"):
+              raise SystemExit("SEO and browser checks must be required in the release evidence manifest")
+          if os.environ["PRODUCT_KIND"] == "calculator" and not required.get("calculation"):
+              raise SystemExit("Calculator projects must require calculation evidence")
+          if os.environ["EXPORT_MANIFEST"] != "REPLACE_ME" and not required.get("exports"):
+              raise SystemExit("Projects with configured exports must require export evidence")
+          PY
       - name: Install locked project and QA dependencies
         run: |
           npm ci
