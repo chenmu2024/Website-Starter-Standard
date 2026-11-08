@@ -221,5 +221,31 @@ class ReleaseReportTests(unittest.TestCase):
 
 
 
+    def test_complete_validator_reports_are_accepted(self):
+        calculation = calculation_evidence("PASS")
+        status, detail = compiler.classify("calculation", calculation)
+        self.assertEqual(status, "PASS", detail)
+
+        exports = {
+            "status": "PASS", "exports_checked": 1,
+            "results": [{"id": "csv-basic", "status": "PASS", "path": "basic.csv"}],
+            "errors": [],
+            "scope": "Generated artifact content/structure only; physical printer output is not verified",
+        }
+        status, detail = compiler.classify("exports", exports)
+        self.assertEqual(status, "PASS", detail)
+
+        status, detail = compiler.classify("deployment", deployment_evidence())
+        self.assertEqual(status, "PASS", detail)
+
+    def test_empty_playwright_suite_with_zero_stats_is_not_run(self):
+        evidence = {"errors": [], "stats": {"expected": 0, "unexpected": 0, "flaky": 0, "skipped": 0},
+                    "suites": []}
+        status, detail = compiler.classify("playwright", evidence)
+        self.assertEqual(status, "NOT_RUN")
+        self.assertIn("No passing browser tests", detail)
+
+
+
 if __name__ == "__main__":
     unittest.main()
