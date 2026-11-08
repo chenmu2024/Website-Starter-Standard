@@ -122,7 +122,7 @@ def local_url(target, current_route, base_url):
     return normalized_path(unquote(parsed.path))
 
 
-def audit(root, base_url):
+def audit(root, base_url, policy=None):
     root = root.resolve()
     html_files = sorted(root.rglob("*.html"))
     routes = {built_route(f, root): f for f in html_files}
@@ -136,6 +136,8 @@ def audit(root, base_url):
     inbound = Counter({url: 0 for url in routes})
     seen_titles = {}
     seen_canonicals = {}
+    seen_descriptions = {}
+    sitemap_listed = None
 
     def issue(level, code, route, detail):
         findings.append({"severity": level, "code": code, "page": route, "message": detail})
@@ -165,6 +167,13 @@ def audit(root, base_url):
             issue("warning", "DESCRIPTION_MISSING", url, "Missing non-empty meta description")
         if len(parser.descriptions) > 1:
             issue("warning", "DESCRIPTION_MULTIPLE", url, "Multiple meta descriptions")
+        if parser.descriptions and parser.descriptions[0].strip():
+            normalized = " ".join(parser.descriptions[0].split()).casefold()
+            if normalized in seen_descriptions:
+                issue("warning", "DUPLICATE_DESCRIPTION", url,
+                      f"Also used on {seen_descriptions[normalized]}")
+            else:
+                seen_descriptions[normalized] = url
         if not parser.lang:
             issue("warning", "LANG_MISSING", url, "html lang missing")
         if not parser.viewport:
@@ -220,7 +229,7 @@ def audit(root, base_url):
 
         pages.append({"route": url, "title": title, "h1_count": len(parser.h1_nodes),
                       "canonical": parser.canonicals, "in_site_links": valid_links,
-                      "robots_meta": parser.robots})
+                      "robots_meta": parser.robots, "description": parser.descriptions})
 
     if not html_files:
         issue("error", "NO_HTML", "/", "No built HTML files found")
@@ -239,6 +248,7 @@ def audit(root, base_url):
             tag = sitemap_root.tag.split("}")[-1]
             if tag == "urlset":
                 listed = set()
+                sitemap_listed = listed
                 for elem in sitemap_root.iter():
                     if elem.tag.split("}")[-1] == "loc" and elem.text:
                         path = local_url(elem.text.strip(), "/", base_url)
@@ -256,6 +266,46 @@ def audit(root, base_url):
         except ET.ParseError as exc:
             issue("error", "SITEMAP_XML_INVALID", "/sitemap.xml", str(exc))
 
+    # The default audit is advisory. An explicit release policy makes the
+    # indexability contract fail-closed without assuming all sites are indexable.
+    if policy is not None:
+        if not isinstance(policy, dict) or policy.get("mode") not in {"preview", "production"}:
+            raise ValueError("Policy must specify mode=preview or production")
+        for field in ("required_routes", "indexable_routes"):
+            if field in policy and (not isinstance(policy[field], list)
+                                    or any(not isinstance(x, str) or not x.startswith("/")
+                                           for x in policy[field])):
+                raise ValueError(f"Policy {field} must contain absolute URL paths")
+        for target in policy.get("required_routes", []):
+            if resolve_route(target) is None:
+                issue("error", "REQUIRED_ROUTE_MISSING", target, "Approved route absent from build")
+        by_route = {p["route"]: p for p in pages}
+        if policy["mode"] == "preview":
+            if policy.get("indexable_routes"):
+                raise ValueError("Preview policy cannot declare indexable_routes")
+            for p in pages:
+                if not any("noindex" in r.lower().replace(" ", "")
+                           for r in p["robots_meta"]):
+                    issue("error", "PREVIEW_INDEXABLE", p["route"],
+                          "Preview HTML lacks meta noindex; HTTP headers require separate live checks")
+        else:
+            targets = policy.get("indexable_routes")
+            if not isinstance(targets, list) or not targets:
+                raise ValueError("Production policy needs nonempty explicit indexable_routes")
+            for target in targets:
+                route_key = resolve_route(target)
+                if route_key not in by_route:
+                    issue("error", "INDEXABLE_ROUTE_MISSING", target, "Approved indexable route absent")
+                    continue
+                p = by_route[route_key]
+                if any("noindex" in r.lower().replace(" ", "") for r in p["robots_meta"]):
+                    issue("error", "INDEXABLE_NOINDEX", route_key, "Production route has noindex")
+                if p["canonical"] != [base_url.rstrip("/") + route_key]:
+                    issue("error", "INDEXABLE_CANONICAL", route_key,
+                          "Canonical must exactly match approved origin and route")
+                if sitemap_listed is None or route_key not in sitemap_listed:
+                    issue("error", "INDEXABLE_SITEMAP", route_key,
+                          "Indexable route must be listed in a parsed urlset sitemap")
     counts = {s: sum(f["severity"] == s for f in findings) for s in ("error", "warning", "info")}
     return {
         "scope": "Built static HTML only; no HTTP/crawl rendering, Search Console, field CWV or ranking checks",
@@ -270,13 +320,18 @@ def main(argv=None):
     cli.add_argument("--base-url", required=True)
     cli.add_argument("--output", type=Path)
     cli.add_argument("--fail-on", choices=("error", "warning", "never"), default="error")
+    cli.add_argument("--policy-json", type=Path, help="Optional explicit preview/production route contract")
     args = cli.parse_args(argv)
     if not args.site_dir.is_dir():
         cli.error("--site-dir must point to an existing directory")
     parsed = urlparse(args.base_url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path not in ("", "/"):
         cli.error("--base-url must be an absolute HTTP(S) site origin without a path")
-    report = audit(args.site_dir, args.base_url)
+    try:
+        policy = json.loads(args.policy_json.read_text(encoding="utf8")) if args.policy_json else None
+        report = audit(args.site_dir, args.base_url, policy)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        cli.error(f"Invalid release policy: {exc}")
     data = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
