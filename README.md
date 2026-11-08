@@ -42,7 +42,7 @@ The P1 layer adds a copyable Playwright suite for Chromium/Firefox/WebKit at 360
 - See INTERNATIONAL-SEO-AUTOMATION.md for self/return links, canonical parity and language-group policy.
 - See UI-RELEASE-EVIDENCE.md and templates/playwright/ for cross-browser responsive setup; follow VISUAL-REGRESSION-BASELINES.md for collision-safe, pinned-CI visual snapshot generation and approval.
 - Use tools/validate_export_artifacts.py with templates/exports/export-manifest.example.json to compare real CSV/PDF/SVG artifacts against reviewed expected content and dimensions.
-- Use tools/compile_release_report.py with templates/release-evidence/manifest.example.json to combine SEO, browser, calculation, export, deployment and manual results without inferring missing evidence as PASS.
+- Use tools/compile_release_report.py with templates/release-evidence/manifest.example.json to combine SEO, browser, calculation, export, deployment and manual results without inferring missing evidence as PASS. The compiler validates each report's internal counts, result records, route checks and scope; a top-level `status: PASS` alone is rejected.
 - Copy templates/github-actions/website-browser-quality.yml for the integrated Node/Playwright P1 workflow. The standard repo also runs the copied browser harness against a controlled HTML fixture in Chromium/Firefox/WebKit; that validates the harness itself, not a downstream site.
 - PDF text/page checks require the free QA dependency in requirements-qa.txt. Physical paper measurement still requires a real printer and ruler.
 

@@ -28,6 +28,8 @@ For independent layers (SEARCH, AI, PHYSICAL) report state per dimension. A site
 - do not mark PASS when only a plan/script/template exists.
 
 Do not rewrite NOT RUN as PASS just because the check "could have run", was previously successful, or an AI agent says it completed.
+ 
+The release-evidence compiler validates the source report structure, not only a top-level `status` field. SEO counts must reconcile with page/finding records; calculation evidence must prove runtime golden-case execution; export evidence must enumerate verified artifacts; Playwright stats must be backed by test-result records and have no run-level errors; and deployment PASS must include the live critical-route, sitemap, 404 and deployed-SHA checks. A hand-written `{"status":"PASS"}` is never sufficient.
 
 ## CI and production workflow
 
