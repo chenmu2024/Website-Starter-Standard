@@ -510,7 +510,8 @@ def audit(root, base_url, policy=None):
                 if not source:
                     continue
                 actual = {}
-                for item in source["hreflang"]:
+                source_tags = source["hreflang"] or sitemap_hreflang.get(source["route"], [])
+                for item in source_tags:
                     target = local_url(item["href"], source_route, base_url)
                     actual[item["code"].casefold()] = target
                 for code, target_route in expected.items():
