@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 VALID = {"PASS", "FAIL", "PARTIAL", "NOT_RUN", "NOT_APPLICABLE"}
@@ -48,7 +49,13 @@ def _playwright_result_count(suites):
                     if not isinstance(test, dict) or not isinstance(test.get("results"), list):
                         malformed = True
                         continue
-                    total += len(test["results"])
+                    for result in test["results"]:
+                        if not isinstance(result, dict) or result.get("status") not in {
+                            "passed", "failed", "timedOut", "skipped", "interrupted"
+                        }:
+                            malformed = True
+                            continue
+                        total += 1
             children = suite.get("suites", [])
             if children:
                 visit(children)
@@ -81,7 +88,8 @@ def classify(kind, evidence):
             return "FAIL", "SEO evidence requires a findings list"
         observed = {"error": 0, "warning": 0, "info": 0}
         for finding in findings:
-            if not isinstance(finding, dict) or finding.get("severity") not in observed:
+            if (not isinstance(finding, dict) or not isinstance(finding.get("severity"), str)
+                    or finding["severity"] not in observed):
                 return "FAIL", "SEO findings must be objects with error/warning/info severity"
             if not all(_nonempty(finding.get(field)) for field in ("code", "page", "message")):
                 return "FAIL", "SEO findings require code, page and message"
@@ -142,7 +150,7 @@ def classify(kind, evidence):
         status = evidence.get("status")
         if status == "FAIL":
             return "FAIL", "Live HTTP release probe failed"
-        if status not in {"PASS", "PARTIAL"}:
+        if not isinstance(status, str) or status not in {"PASS", "PARTIAL"}:
             return "FAIL", f"Unknown deployment status: {status!r}"
         checks = evidence.get("checks")
         errors = evidence.get("errors")
@@ -152,15 +160,19 @@ def classify(kind, evidence):
             return "FAIL", "Deployment evidence requires nonempty checks and an errors list"
         if errors:
             return "FAIL", "Deployment report has errors despite its non-failing status"
-        if not _nonempty(production) or not production.startswith("https://"):
-            return "FAIL", "Deployment evidence requires an HTTPS production origin"
+        parsed_production = urlparse(production) if _nonempty(production) else None
+        if (parsed_production is None or parsed_production.scheme != "https" or
+                not parsed_production.netloc or parsed_production.path not in ("", "/") or
+                parsed_production.query or parsed_production.fragment):
+            return "FAIL", "Deployment evidence requires an HTTPS production origin without path/query"
         if not _nonempty(scope) or not scope.startswith("live HTTP only"):
             return "FAIL", "Deployment evidence must identify its live-HTTP-only scope"
         by_name = {}
         allowed = {"PASS", "FAIL", "PARTIAL", "NOT_RUN", "NOT_APPLICABLE"}
         for check in checks:
             if (not isinstance(check, dict) or not _nonempty(check.get("name")) or
-                    check.get("status") not in allowed or not _nonempty(check.get("detail"))):
+                    not isinstance(check.get("status"), str) or check["status"] not in allowed or
+                    not _nonempty(check.get("detail"))):
                 return "FAIL", "Deployment checks require unique names, valid statuses and details"
             if check["name"] in by_name:
                 return "FAIL", f"Duplicate deployment check: {check['name']}"
@@ -236,7 +248,7 @@ def classify(kind, evidence):
 
     if kind == "manual":
         status = evidence.get("status")
-        if status not in VALID:
+        if not isinstance(status, str) or status not in VALID:
             return "FAIL", f"Manual evidence status must be one of {sorted(VALID)}"
         if status == "PASS" and not all(
             _nonempty(evidence.get(field))
@@ -250,7 +262,7 @@ def classify(kind, evidence):
     return "FAIL", f"Unsupported evidence type: {kind!r}"
 
 def compile_report(manifest, evidence_root):
-    if not isinstance(manifest, dict) or manifest.get("version") != 1:
+    if not isinstance(manifest, dict) or type(manifest.get("version")) is not int or manifest.get("version") != 1:
         return {"status": "FAIL", "decision": "INVALID_MANIFEST",
                 "checks": [], "errors": ["Manifest must be an object with version=1"]}
     checks = manifest.get("checks")
@@ -277,7 +289,7 @@ def compile_report(manifest, evidence_root):
         else:
             manifest_ids.add(key)
             label = key
-        if kind not in EVIDENCE_TYPES:
+        if not isinstance(kind, str) or kind not in EVIDENCE_TYPES:
             manifest_errors.append(f"{label}: unsupported evidence type {kind!r}")
         if not isinstance(required, bool):
             manifest_errors.append(f"{label}: required must be boolean")
