@@ -1,0 +1,9 @@
+{
+  "mode": "production",
+  "required_routes": [
+    "/"
+  ],
+  "indexable_routes": [
+    "/"
+  ]
+}
