@@ -12,6 +12,7 @@ Core Web Vitals, Google indexation, ranking or revenue.
 import argparse
 import json
 import posixpath
+import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -249,7 +250,7 @@ def audit(root, base_url, policy=None):
             href = item["href"]
             folded = code.casefold()
             if not (folded == "x-default" or
-                    __import__("re").fullmatch(r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=__import__("re").I)):
+                    re.fullmatch(r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=__import__("re").I)):
                 issue("warning", "HREFLANG_CODE_INVALID", route, code)
             if folded in seen_codes:
                 issue("warning", "HREFLANG_DUPLICATE_CODE", route,
@@ -387,24 +388,24 @@ def audit(root, base_url, policy=None):
             raise ValueError("hreflang_groups must be a list")
         for index, group in enumerate(groups):
             if not isinstance(group, dict) or not isinstance(group.get("routes"), dict):
-                raise ValueError(f"hreflang_groups[{index}] requires a routes object")
+                raise ValueError(f"hreflang_groups[{index}] requires a routes object mapping language codes to URL paths")
             mapping = group["routes"]
             if len(mapping) < 2:
-                raise ValueError(f"hreflang_groups[{index}] requires at least two route variants")
+                raise ValueError(f"hreflang_groups[{index}] requires at least two language variants")
             expected = {}
-            for route, code in mapping.items():
+            for code, route in mapping.items():
                 if not isinstance(route, str) or not route.startswith("/") or not isinstance(code, str):
-                    raise ValueError(f"hreflang_groups[{index}] has invalid route/code")
-                if code.casefold() != "x-default" and not __import__("re").fullmatch(
-                        r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=__import__("re").I):
+                    raise ValueError(f"hreflang_groups[{index}] has invalid language code/route")
+                if code.casefold() != "x-default" and not re.fullmatch(
+                        r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=re.I):
                     raise ValueError(f"hreflang_groups[{index}] has invalid language code {code}")
-                if code.casefold() in {x.casefold() for x in expected.values()}:
+                if code.casefold() in {x.casefold() for x in expected}:
                     raise ValueError(f"hreflang_groups[{index}] has duplicate language code {code}")
-                expected[route] = code
+                expected[code] = route
                 if resolve_route(route) is None:
                     issue("error", "HREFLANG_GROUP_ROUTE_MISSING", route,
                           f"Declared in hreflang group {index} but absent from build")
-            for source_route in expected:
+            for source_route in set(expected.values()):
                 source = page_by_route.get(resolve_route(source_route))
                 if not source:
                     continue
@@ -412,7 +413,7 @@ def audit(root, base_url, policy=None):
                 for item in source["hreflang"]:
                     target = local_url(item["href"], source_route, base_url)
                     actual[item["code"].casefold()] = target
-                for target_route, code in expected.items():
+                for code, target_route in expected.items():
                     if actual.get(code.casefold()) != target_route:
                         issue("error", "HREFLANG_GROUP_INCOMPLETE", source_route,
                               f"Expected {code} -> {base_url.rstrip('/') + target_route}; "
