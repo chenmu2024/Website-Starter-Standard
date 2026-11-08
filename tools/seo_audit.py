@@ -283,11 +283,18 @@ def audit(root, base_url, policy=None):
         if policy["mode"] == "preview":
             if policy.get("indexable_routes"):
                 raise ValueError("Preview policy cannot declare indexable_routes")
-            for p in pages:
-                if not any("noindex" in r.lower().replace(" ", "")
-                           for r in p["robots_meta"]):
-                    issue("error", "PREVIEW_INDEXABLE", p["route"],
-                          "Preview HTML lacks meta noindex; HTTP headers require separate live checks")
+            mechanism = policy.get("preview_noindex_via", "meta")
+            if mechanism not in {"meta", "header"}:
+                raise ValueError("preview_noindex_via must be meta or header")
+            if mechanism == "header":
+                issue("info", "PREVIEW_HEADER_NOT_CHECKED", "/",
+                      "Offline scan cannot verify Cloudflare X-Robots-Tag; check live preview headers")
+            else:
+                for p in pages:
+                    if not any("noindex" in r.lower().replace(" ", "")
+                               for r in p["robots_meta"]):
+                        issue("error", "PREVIEW_INDEXABLE", p["route"],
+                              "Preview HTML lacks meta noindex; HTTP headers require separate live checks")
         else:
             targets = policy.get("indexable_routes")
             if not isinstance(targets, list) or not targets:
