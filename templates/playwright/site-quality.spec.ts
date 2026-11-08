@@ -42,6 +42,18 @@ for (const route of routes) {
           'button, input:not([type="hidden"]), select, textarea, a[href]'
         )).filter(element => {
           const el = element as HTMLElement;
+          if (el.closest('[hidden], [inert], [aria-hidden="true"]') || el.getClientRects().length === 0) {
+            return false;
+          }
+          let ancestor: HTMLElement | null = el;
+          while (ancestor) {
+            const style = getComputedStyle(ancestor);
+            if (style.display === 'none' || style.visibility === 'hidden' ||
+                style.visibility === 'collapse' || style.contentVisibility === 'hidden') {
+              return false;
+            }
+            ancestor = ancestor.parentElement;
+          }
           const labelledBy = (el.getAttribute('aria-labelledby') || '').split(/\s+/)
             .filter(Boolean)
             .map(id => document.getElementById(id)?.textContent?.trim() || '')
