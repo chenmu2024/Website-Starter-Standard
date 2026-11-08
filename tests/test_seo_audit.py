@@ -13,8 +13,8 @@ audit_tool = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(audit_tool)
 
 
-def page(title="Example", canon="https://example.org/", body="", extra_head=""):
-    return (f'<!doctype html><html lang="en"><head><title>{title}</title>'
+def page(title="Example", canon="https://example.org/", body="", extra_head="", lang="en"):
+    return (f'<!doctype html><html lang="{lang}"><head><title>{title}</title>'
             f'<meta name="description" content="Useful {title} example">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<link rel="canonical" href="{canon}">{extra_head}</head>'
@@ -152,9 +152,13 @@ class AuditTests(unittest.TestCase):
                    '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
                    '<link rel="alternate" hreflang="x-default" href="https://example.org/es/">')
         self.write("es/index.html", page("Español", "https://example.org/es/",
-                                         extra_head=es_tags.replace('<html', '<html')))
+                                         extra_head=es_tags, lang="es-ES")))
         self.write("pt/index.html", page("Português", "https://example.org/pt/",
-                                         extra_head=pt_tags))
+                                         extra_head=pt_tags, lang="pt-BR"))
+        self.write("sitemap.xml",
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<url><loc>https://example.org/es/</loc></url>'
+                   '<url><loc>https://example.org/pt/</loc></url></urlset>')
         policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
                   "hreflang_groups": [{"routes": {
                       "es-ES": "/es/", "pt-BR": "/pt/", "x-default": "/es/"}}]}
