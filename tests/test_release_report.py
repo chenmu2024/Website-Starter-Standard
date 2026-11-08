@@ -11,6 +11,49 @@ compiler = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(compiler)
 
 
+def seo_evidence(errors=0, warnings=0):
+    findings = []
+    for index in range(errors):
+        findings.append({"severity": "error", "code": f"ERR_{index}", "page": "/",
+                         "message": "Fixture error"})
+    for index in range(warnings):
+        findings.append({"severity": "warning", "code": f"WARN_{index}", "page": "/",
+                         "message": "Fixture warning"})
+    return {"scope": "Built static HTML only", "base_url": "https://example.org",
+            "pages_scanned": 1,
+            "summary": {"error": errors, "warning": warnings, "info": 0},
+            "pages": [{"route": "/", "title": "Example"}], "findings": findings}
+
+
+def browser_evidence(expected=1, unexpected=0, flaky=0, skipped=0, errors=None, result_count=None):
+    if result_count is None:
+        result_count = expected + unexpected + flaky + skipped
+    return {
+        "errors": errors or [],
+        "stats": {"expected": expected, "unexpected": unexpected, "flaky": flaky, "skipped": skipped},
+        "suites": [{"title": "e2e", "specs": [{"title": "task",
+                    "tests": [{"results": [{"status": "passed"} for _ in range(result_count)]}]}]}],
+    }
+
+
+def calculation_evidence(status="PASS"):
+    return {"status": status, "cases_checked": 3, "errors": [],
+            "scope": ("schema-only; NOT a calculation pass" if status == "SCHEMA_VALID"
+                      else "actual runtime outputs compared to independent golden fixtures")}
+
+
+def deployment_evidence():
+    names = ("homepage", "home-canonical", "production-indexable", "home-title",
+             "route:/robots.txt", "route:/sitemap.xml", "sitemap-xml", "sitemap-coverage",
+             "real-404", "deployed-commit", "route:/tool/", "canonical:/tool/",
+             "indexable:/tool/", "preview-noindex")
+    return {"scope": "live HTTP only; not Cloudflare account/WAF/verified bot/GSC or AI citations",
+            "production": "https://example.org", "preview": None, "status": "PASS", "errors": [],
+            "checks": [{"name": name,
+                        "status": "NOT_APPLICABLE" if name == "preview-noindex" else "PASS",
+                        "detail": "Fixture check"} for name in names]}
+
+
 class ReleaseReportTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
