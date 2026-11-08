@@ -177,6 +177,10 @@ For multilingual or multi-region sites:
 - Do not place hreflang relationships on URLs that canonicalize elsewhere.
 - For large multilingual sites, sitemap-based hreflang is acceptable if generated and tested consistently.
 - Localize examples, terminology, units, currency, legal/contextual copy, and search intent where relevant; translation alone is not sufficient localization.
+- Use the explicit language-code-to-route contract in INTERNATIONAL-SEO-AUTOMATION.md when a set of same-site alternate routes is known. The static audit checks code syntax, duplicate codes, absolute URLs, target existence, target self-canonical, self-reference, return links and html[lang] language-prefix agreement.
+- Every page in an explicitly declared hreflang group must contain the complete mapping, including self-reference and x-default where configured. Missing group routes or entries are release errors under that policy.
+- The offline audit cannot verify alternate URLs on another domain or hreflang emitted only in HTTP headers. Record those as unverified and perform a live cross-domain check; do not silently treat them as passed.
+- The scanner cannot infer which pages are true translations/region equivalents. Do not create hreflang groups for pages with different intent or merely translated slugs.
 
 ## 8. Structured data gate
 
