@@ -76,7 +76,7 @@ For a Node-based public site that needs the integrated P1 pipeline:
 8. Read INTERNATIONAL-SEO-AUTOMATION.md and copy templates/indexation-policy.multilingual.example.json only when the listed pages are genuine language/region equivalents. Use live verification for external-domain alternate links.
 9. The unified report requires SEO and browser evidence. Required calculation/export checks must be enabled for the relevant product. Physical printer measurements, real-device screen readers, search indexing and Cloudflare account settings remain separate manual/first-party evidence.
 
-The P1 workflow is a Node/Playwright template. Non-Node projects can reuse the Python validators and adapt their browser runner; do not force an unsuitable package manager or framework.
+The P1 workflow is a Node/Playwright template and pins Ubuntu 24.04 because browser dependency support must not drift with ubuntu-latest. The standard repository separately executes the copied browser harness against a deterministic fixture on all three engines; that validates the harness but does not certify downstream routes. Non-Node projects can reuse the Python validators and adapt their browser runner; do not force an unsuitable package manager or framework.
 
 ## F. Local checks on this standard itself
 
