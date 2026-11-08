@@ -175,8 +175,10 @@ class AuditTests(unittest.TestCase):
         policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
                   "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
         report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertEqual({item["route"] for item in report["pages"]}, {"/es/", "/pt/"}, report["pages"])
+        self.assertEqual(len(report["pages"][0]["hreflang"]), 2, report["pages"])
         self.assertIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report))
-        self.assertIn("HREFLANG_RETURN_MISSING", self.codes(report))
+        self.assertIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
 
     def test_hreflang_invalid_duplicate_code_and_missing_target_are_reported(self):
         tags = ('<link rel="alternate" hreflang="bad_code" href="https://example.org/">'
