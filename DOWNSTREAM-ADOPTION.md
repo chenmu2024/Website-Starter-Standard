@@ -64,15 +64,15 @@ For a Node-based public site that needs the integrated P1 pipeline:
 4. Copy tools/seo_audit.py, tools/compile_release_report.py, tools/validate_export_artifacts.py, requirements-qa.txt, tests/indexation-policy.preview.json, and templates/release-evidence/manifest.example.json (rename to tests/release-evidence-manifest.json). Customize the required check list and all route paths.
 5. For a calculator, also copy tools/validate_calculation_cases.py and its independently reviewed golden fixtures; set PRODUCT_KIND=calculator, implement CALC_RUNTIME_COMMAND and mark calculation required in the evidence manifest.
 6. If the app exports files, copy templates/exports/export-manifest.example.json, customize expected content and page geometry, set EXPORT_MANIFEST and EXPORT_RUNTIME_COMMAND and mark exports required. The runtime command must create real files in EXPORT_OUTPUT_DIR; do not copy example files into the output directory.
-7. Run the browser workflow once with QA_VISUAL_ROUTES_JSON='[]'. For true visual regression, generate Chromium baselines with npx playwright test --config=playwright.visual.config.ts --update-snapshots, inspect and commit the snapshots, then set QA_VISUAL_ROUTES_JSON to the approved routes. Never update snapshots automatically in CI.
+7. Run the browser workflow once with QA_VISUAL_ROUTES_JSON='[]'. For true visual regression, follow [VISUAL-REGRESSION-BASELINES.md](VISUAL-REGRESSION-BASELINES.md): set QA_VISUAL_ROUTES_JSON to the approved routes and temporarily set QA_VISUAL_UPDATE='1' in the downstream GitHub Actions workflow. The explicit baseline-generation step runs on the same pinned ubuntu-24.04 runner, locked Playwright dependency and Chromium revision used by comparison CI. Download the uploaded candidate snapshots, inspect every route/viewport image, and commit only reviewed files from tests/e2e/__screenshots__/. Set QA_VISUAL_UPDATE='0' again before normal comparison CI. Never update snapshots automatically after a visual mismatch.
 
-   On Windows PowerShell, with the local preview server already running:
+   On Windows PowerShell, with the local preview server already running, local images are previews only and must not be committed as Linux CI baselines:
 
        $env:QA_BASE_URL = "http://127.0.0.1:4173"
        $env:QA_VISUAL_ROUTES_JSON = '["/","/calculator/"]'
-       npx playwright test --config=playwright.visual.config.ts --update-snapshots
+       npx playwright test --config=playwright.visual.config.ts
 
-   Review every generated image before committing it. The CI job must run without --update-snapshots.
+   A developer may use a temporary local snapshot update to inspect a rendering, but those Windows files are not approved CI baselines. If the matching CI environment is unavailable, keep the visual gate NOT RUN rather than committing cross-platform snapshots.
 8. Read INTERNATIONAL-SEO-AUTOMATION.md and copy templates/indexation-policy.multilingual.example.json only when the listed pages are genuine language/region equivalents. Use live verification for external-domain alternate links.
 9. The unified report requires SEO and browser evidence. Required calculation/export checks must be enabled for the relevant product. Physical printer measurements, real-device screen readers, search indexing and Cloudflare account settings remain separate manual/first-party evidence.
 
