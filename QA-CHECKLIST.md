@@ -12,6 +12,15 @@
 - [ ] Empty/error/loading states exist where necessary.
 - [ ] All agreed important pages/features are present; required scope is not deferred behind an unfinished V1.
 
+## P0 calculation and release contracts (when applicable)
+- [ ] `CALCULATION-QUALITY-GATE.md` applied: all independent inputs and formula definitions match production behavior, and independent expected normal/boundary/invalid golden cases are reviewed.
+- [ ] Actual production calculation engine generated observed JSON and `tools/validate_calculation_cases.py` passed; schema-only validation is NOT marked as numerical verification.
+- [ ] CSV/PDF/SVG/table/diagram agree on units, precision, actual outputs; any physical printing/sawing/sewing/teacher review is separately verified or marked NOT RUN.
+- [ ] `RELEASE-STATE-CONTRACT.md` used: implemented/CI/preview/live production/GSC-AI/physical states are not collapsed into one PASS.
+- [ ] Live custom-domain source commit checked (deployed build-info or equivalent provenance), not inferred from PR merge or Cloudflare preview.
+- [ ] Real Cloudflare preview noindex, production HTTP/404/sitemap/robots, actual browser task and zone-level AI/WAF policies verified or marked NOT RUN.
+- [ ] Downstream GitHub quality workflow is truly installed, configured and executed; template existence alone is not reported as implementation.
+
 ## Design system
 - [ ] `DESIGN.md` is project-specific and complete.
 - [ ] Pages use shared tokens/components.
