@@ -24,7 +24,7 @@ for (const route of routes) {
       expect(response, 'No document response for ' + route).not.toBeNull();
       expect(response!.status(), 'HTTP status for ' + route).toBeLessThan(400);
       await page.waitForLoadState('load', { timeout: 8_000 }).catch(() => undefined);
-      await page.evaluate(() => document.fonts?.ready);
+      await page.evaluate(async () => { await document.fonts.ready; });
 
       await expect(page).toHaveTitle(/\S/);
       await expect(page.locator('html')).toHaveAttribute('lang', /\S+/);
