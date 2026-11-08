@@ -8,8 +8,6 @@ PDF checks require the optional pypdf dependency (see requirements-qa.txt).
 import argparse
 import csv
 import json
-import math
-import re
 import sys
 import xml.etree.ElementTree as ET
 from decimal import Decimal, InvalidOperation
@@ -83,6 +81,9 @@ def validate_csv(path, spec):
         raise ValueError("CSV manifest requires expected_rows list (use [] for an intentionally header-only export)")
     if len(rows) != len(expected_rows):
         raise ValueError(f"CSV row count differs: observed={len(rows)}, expected={len(expected_rows)}")
+    for row_index, row in enumerate(rows):
+        if None in row or any(row.get(header) is None for header in headers):
+            raise ValueError(f"CSV row[{row_index}] has a different number of cells than the header")
     tolerances = spec.get("numeric_tolerance", {})
     if not isinstance(tolerances, dict):
         raise ValueError("numeric_tolerance must be an object")
@@ -184,7 +185,7 @@ def validate(manifest, output_root):
             else:
                 raise ValueError(f"unsupported export kind: {kind!r}")
             results.append({"id": key, "status": "PASS", "path": spec["path"], **detail})
-        except (OSError, UnicodeError, ValueError, ET.ParseError, csv.Error) as exc:
+        except Exception as exc:
             issues.append(f"{label}: {exc}")
             results.append({"id": spec.get("id") if isinstance(spec, dict) else label,
                             "status": "FAIL", "error": str(exc)})
