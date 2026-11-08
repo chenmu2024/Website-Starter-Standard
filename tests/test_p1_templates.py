@@ -12,6 +12,7 @@ class P1TemplateTests(unittest.TestCase):
         config = (ROOT / "templates/playwright/playwright.config.ts").read_text()
         spec = (ROOT / "templates/playwright/site-quality.spec.ts").read_text()
         workflow = (ROOT / "templates/github-actions/website-browser-quality.yml").read_text()
+        smoke_workflow = (ROOT / ".github/workflows/playwright-template-tests.yml").read_text()
         for browser in ("chromium", "firefox", "webkit"):
             self.assertIn(browser, config)
         for width in ("360", "390", "768", "1024", "1440"):
@@ -25,8 +26,8 @@ class P1TemplateTests(unittest.TestCase):
         self.assertIn("npx playwright install --with-deps chromium firefox webkit", workflow)
         self.assertIn("runs-on: ubuntu-24.04", workflow)
         self.assertIn("npx playwright test --config=playwright.config.ts", workflow)
-        self.assertIn("tests/fixtures/playwright-site", workflow)
-        self.assertIn("runs-on: ubuntu-24.04", workflow)
+        self.assertIn("tests/fixtures/playwright-site", smoke_workflow)
+        self.assertIn("runs-on: ubuntu-24.04", smoke_workflow)
         self.assertIn("if: always()", workflow)
         self.assertIn("tools/compile_release_report.py", workflow)
         self.assertIn("tools/validate_export_artifacts.py", workflow)
