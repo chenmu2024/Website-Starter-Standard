@@ -74,6 +74,15 @@ Attach or summarize concrete evidence in `SEO-GEO-RELEASE-EVIDENCE.md` or the PR
 - [ ] Broken links/assets introduced by this change were checked.
 - [ ] SEO-sensitive regressions were checked against the previous accepted state where possible.
 
+## P0 executable quality evidence
+
+- [ ] Numeric tool changes include independent normal/boundary/invalid golden cases and a real production-engine output comparison (not a schema-only run), or are explicitly N/A.
+- [ ] Existing formula, CSV/PDF/SVG and print consistency checked or recorded NOT RUN where a physical proof is unavailable.
+- [ ] Canonical offline scanner is used; approved preview/production indexation policy is explicitly selected for the actual build.
+- [ ] Downstream GitHub Actions quality job ran (not just a template in Website-Starter-Standard), with exact commit/run evidence.
+- [ ] Live deploy SHA/HTTP/preview noindex and Cloudflare account policies reported separately, with NOT RUN for missing evidence.
+- [ ] Implementation/CI/preview/production/indexing/AI citation/physical acceptance states follow RELEASE-STATE-CONTRACT.md.
+
 ## Production readiness
 
 - [ ] Build succeeds.

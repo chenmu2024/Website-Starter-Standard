@@ -52,6 +52,14 @@ The checker has no network, paid API or third-party dependencies. It analyzes on
 Stop a release on actual P0/P1 blockers. No tool/CI access means mark check `NOT RUN`, not `PASS`.
 
 
+## One canonical audit implementation and explicit indexation contracts
+
+Use `tools/seo_audit.py` for all new integrations. The older `scripts/seo_static_audit.py` forwards to the same engine and provides legacy result aliases, not an independent implementation. The scanner now also warns on duplicated descriptions.
+
+For a real site with an indexation policy JSON, pass `--policy-json tests/indexation-policy.production.json` or its preview variant. Production policies must explicitly list indexable routes and require those URLs in a parsed Sitemap and without noindex. Preview policies may require raw HTML meta noindex, or mark Cloudflare-managed header noindex as unverified until a real HTTP check runs. Neither mode establishes actual Google indexing.
+
+Run `tools/verify_deployment.py` after deployment to verify real HTTP status and deployed commit parity, and `tools/validate_calculation_cases.py` for numeric tools. See `DOWNSTREAM-ADOPTION.md`, `CALCULATION-QUALITY-GATE.md` and `CLOUDFLARE.md`.
+
 ## Optional local automated audit (zero paid dependencies)
 
 After building the target project to static HTML (e.g. dist/), copy or invoke the script with:

@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "demo-normal",
+      "tool": "sample-length-converter",
+      "kind": "normal",
+      "inputs": {
+        "inches": 12
+      },
+      "expected": {
+        "millimeters": 304.8
+      },
+      "tolerance": {
+        "millimeters": 0.0001
+      },
+      "independent_reference": {
+        "method": "Manual unit definition: 1 inch = 25.4 millimeters exact",
+        "evidence": "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors"
+      }
+    },
+    {
+      "id": "demo-boundary",
+      "tool": "sample-length-converter",
+      "kind": "boundary",
+      "inputs": {
+        "inches": 0
+      },
+      "expected": {
+        "millimeters": 0
+      },
+      "independent_reference": {
+        "method": "Manual zero conversion",
+        "evidence": "review-notes/example-zero.md"
+      }
+    },
+    {
+      "id": "demo-invalid",
+      "tool": "sample-length-converter",
+      "kind": "invalid",
+      "inputs": {
+        "inches": -1
+      },
+      "expected_error": "NEGATIVE_LENGTH",
+      "independent_reference": {
+        "method": "Example tool input policy; negative length prohibited",
+        "evidence": "review-notes/example-input-policy.md"
+      }
+    }
+  ]
+}

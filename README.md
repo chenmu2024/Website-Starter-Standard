@@ -25,12 +25,22 @@ This starter prevents a common failure mode in AI-built websites: development be
 11. Deploy and verify the real production site.
 12. Record a production SEO baseline for later drift/regression checks; use L3 audits when real production data exists.
 
+## P0 executable quality gates (new)
+
+The standard now ships a single canonical offline SEO audit engine, an independently reviewed calculator golden-case contract, a read-only live Cloudflare release checker, and **copyable** GitHub Actions templates. These are standards and utilities, not proof that downstream sites already run them.
+
+- Follow [DOWNSTREAM-ADOPTION.md](DOWNSTREAM-ADOPTION.md) for installation and project-specific setup.
+- Apply [CALCULATION-QUALITY-GATE.md](CALCULATION-QUALITY-GATE.md) to numerical tools, including invalid/boundary examples and independent expected results.
+- Use [CLOUDFLARE.md](CLOUDFLARE.md) and [RELEASE-STATE-CONTRACT.md](RELEASE-STATE-CONTRACT.md) to keep CI, preview, production, indexing and physical checks distinct.
+- Copy templates from [templates/github-actions](templates/github-actions) into each site; fill real commands and enable required checks. The starter does not silently deploy or modify existing sites.
+- Run the standard's deterministic validators via `python -m unittest discover -s tests -v`; passing these tests does **not** certify a downstream site's formula or production deployment.
+
 ## Files
 
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
 - `BUILD-INTAKE-CONTRACT.md` — the research-to-implementation intake, source-of-truth ownership and approval gate.
 - `TECHNICAL-SEO-IMPLEMENTATION.md` — framework-aware SEO implementation, testing and performance safeguards.
-- `tools/seo_audit.py` — zero-dependency, **offline static-build** SEO audit (title, H1, canonical, internal links, missing local assets, JSON-LD syntax and Sitemap); not a live Google crawl.
+- `tools/seo_audit.py` — **single canonical** zero-dependency offline SEO audit, with optional explicit preview/production indexation policy; `scripts/seo_static_audit.py` is a legacy compatibility adapter.
 - `tests/test_seo_audit.py` — standard-library test cases; `.github/workflows/seo-audit-tests.yml` runs them for script changes.
 - `OPC-BUSINESS-GATE.md` / `OPC-BUSINESS-EVIDENCE.md` — **legacy compatibility pointers**; all new opportunity decisions belong to `gefei-seo`.
 - `TASTE-UI-PROTOCOL.md` — selective Taste Skill-inspired visual audit, anti-generic design, reference-to-code workflow and UI regression gate.
@@ -44,7 +54,11 @@ This starter prevents a common failure mode in AI-built websites: development be
 - `TRUST-AND-STRUCTURED-DATA-GATE.md` — page-aware trust, calculator accuracy, privacy, relevant schema, evidence, and third-party GEO-scanner triage.
 - `SEO-GEO-PROJECT-BRIEF.md` — project-level keyword, intent, indexation, source, entity, schema, and AI-search plan.
 - `SEO-GEO-RELEASE-EVIDENCE.md` — release proof template for route checks, raw HTML, schema, crawlability, performance, and production verification.
-- `CLOUDFLARE.md` — Cloudflare deployment record and checks.
+- `CLOUDFLARE.md` — Cloudflare deployment, preview/production isolation, AI/WAF account checks and real HTTP acceptance.
+- `RELEASE-STATE-CONTRACT.md` — do not confuse implemented, CI-tested, preview, live deployment, search indexed or physically verified states.
+- `CALCULATION-QUALITY-GATE.md` and `tools/validate_calculation_cases.py` — independently worked cases and real calculator output comparisons.
+- `tools/verify_deployment.py` — read-only live HTTP and deployment SHA verification; never a substitute for a browser or Cloudflare account review.
+- `DOWNSTREAM-ADOPTION.md` and `templates/github-actions/` — optional copied CI and live post-deploy workflows; downstream commands must be supplied.
 - `QA-CHECKLIST.md` — final acceptance checklist.
 - `.github/PULL_REQUEST_TEMPLATE.md` — change-level compliance checklist.
 

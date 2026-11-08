@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "results": [
+    {
+      "id": "demo-normal",
+      "status": "ok",
+      "outputs": {
+        "millimeters": 304.8
+      }
+    },
+    {
+      "id": "demo-boundary",
+      "status": "ok",
+      "outputs": {
+        "millimeters": 0
+      }
+    },
+    {
+      "id": "demo-invalid",
+      "status": "error",
+      "error": "NEGATIVE_LENGTH"
+    }
+  ]
+}

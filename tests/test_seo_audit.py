@@ -15,7 +15,7 @@ spec.loader.exec_module(audit_tool)
 
 def page(title="Example", canon="https://example.org/", body="", extra_head=""):
     return (f'<!doctype html><html lang="en"><head><title>{title}</title>'
-            f'<meta name="description" content="Useful example">'
+            f'<meta name="description" content="Useful {title} example">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<link rel="canonical" href="{canon}">{extra_head}</head>'
             f'<body><h1>{title}</h1>{body}</body></html>')
@@ -76,6 +76,73 @@ class AuditTests(unittest.TestCase):
     def test_empty_site_is_error(self):
         report = audit_tool.audit(self.root, "https://example.org")
         self.assertIn("NO_HTML", self.codes(report))
+
+    def test_duplicate_descriptions_are_review_flags_not_fake_length_rules(self):
+        self.write("index.html", page(title="Home"))
+        self.write("tools/index.html",
+                   page("Tools", "https://example.org/tools/",
+                        body='<a href="/">Home</a>').replace(
+                            'content="Useful Tools example"', 'content="Useful Home example"'))
+        self.write("index.html", page(title="Home", body='<a href="/tools/">Tools</a>'))
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("DUPLICATE_DESCRIPTION", self.codes(report))
+
+    def test_preview_contract_requires_noindex_on_every_built_html(self):
+        self.write("index.html", page())
+        policy = {"mode": "preview", "required_routes": ["/"]}
+        self.assertIn("PREVIEW_INDEXABLE",
+                      self.codes(audit_tool.audit(self.root, "https://example.org", policy)))
+        self.write("index.html", page(extra_head='<meta name="robots" content="noindex,nofollow">'))
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("PREVIEW_INDEXABLE", self.codes(report))
+
+    def test_production_contract_checks_route_noindex_canonical_and_sitemap(self):
+        self.write("index.html", page(extra_head='<meta name="robots" content="noindex">'))
+        self.write("sitemap.xml", '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>')
+        policy = {"mode": "production", "required_routes": ["/", "/not-built/"],
+                  "indexable_routes": ["/"]}
+        findings = self.codes(audit_tool.audit(self.root, "https://example.org", policy))
+        self.assertIn("REQUIRED_ROUTE_MISSING", findings)
+        self.assertIn("INDEXABLE_NOINDEX", findings)
+        self.assertIn("INDEXABLE_SITEMAP", findings)
+        self.write("index.html", page())
+        self.write("sitemap.xml", '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://example.org/</loc></url></urlset>')
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        self.assertEqual(report["summary"]["error"], 0, report["findings"])
+
+    def test_production_policy_must_explicitly_list_indexable_routes(self):
+        self.write("index.html", page())
+        with self.assertRaises(ValueError):
+            audit_tool.audit(self.root, "https://example.org", {"mode": "production"})
+
+    def test_production_policy_accepts_local_sitemap_index_children(self):
+        self.write("index.html", page(body='<a href="/tools/">Tools</a>'))
+        self.write("tools/index.html", page("Tools", "https://example.org/tools/",
+                                            body='<a href="/">Home</a>'))
+        self.write("sitemap.xml",
+                   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<sitemap><loc>https://example.org/maps/content.xml</loc></sitemap></sitemapindex>')
+        self.write("maps/content.xml",
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<url><loc>https://example.org/</loc></url>'
+                   '<url><loc>https://example.org/tools/</loc></url></urlset>')
+        policy = {"mode": "production",
+                  "required_routes": ["/", "/tools/"],
+                  "indexable_routes": ["/", "/tools/"]}
+        result = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("INDEXABLE_SITEMAP", self.codes(result), result["findings"])
+        self.assertEqual(result["summary"]["error"], 0, result["findings"])
+
+    def test_missing_sitemap_index_child_is_not_a_false_pass(self):
+        self.write("index.html", page())
+        self.write("sitemap.xml",
+                   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<sitemap><loc>https://example.org/not-present.xml</loc></sitemap></sitemapindex>')
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        self.assertIn("SITEMAP_INDEX_CHILD_MISSING", self.codes(report))
+        self.assertIn("INDEXABLE_SITEMAP", self.codes(report))
 
 
 if __name__ == "__main__":

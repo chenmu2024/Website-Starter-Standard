@@ -1,0 +1,56 @@
+# COPY to .github/workflows/website-post-deploy.yml of a downstream site.
+# Manual, READ-ONLY verification AFTER the Cloudflare deployment reports success.
+# Requires tools/verify_deployment.py to be copied into the downstream repo.
+name: Verify live production release
+on:
+  workflow_dispatch:
+    inputs:
+      production_url:
+        description: Full HTTPS production origin (e.g. https://example.com)
+        required: true
+        type: string
+      expected_sha:
+        description: Full source SHA actually deployed by Cloudflare
+        required: true
+        type: string
+      preview_url:
+        description: Preview HTTPS origin; empty if genuinely not applicable
+        required: false
+        type: string
+      critical_route:
+        description: A critical route to test (e.g. /calculator/)
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run read-only live HTTP checks
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, sys
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf8") as fp:
+              inputs = json.load(fp)["inputs"]
+          cmd = [sys.executable, "tools/verify_deployment.py",
+                 "--url", inputs["production_url"],
+                 "--expected-sha", inputs["expected_sha"],
+                 "--route", inputs["critical_route"],
+                 "--output", "release-evidence/http-release.json"]
+          if inputs.get("preview_url"):
+              cmd += ["--preview-url", inputs["preview_url"]]
+          raise SystemExit(subprocess.call(cmd))
+          PY
+      - name: Preserve live release evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-http-release-evidence
+          path: release-evidence/
+          if-no-files-found: warn
+          retention-days: 14
