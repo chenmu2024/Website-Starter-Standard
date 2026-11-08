@@ -116,6 +116,34 @@ class AuditTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             audit_tool.audit(self.root, "https://example.org", {"mode": "production"})
 
+    def test_production_policy_accepts_local_sitemap_index_children(self):
+        self.write("index.html", page(body='<a href="/tools/">Tools</a>'))
+        self.write("tools/index.html", page("Tools", "https://example.org/tools/",
+                                            body='<a href="/">Home</a>'))
+        self.write("sitemap.xml",
+                   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<sitemap><loc>https://example.org/maps/content.xml</loc></sitemap></sitemapindex>')
+        self.write("maps/content.xml",
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<url><loc>https://example.org/</loc></url>'
+                   '<url><loc>https://example.org/tools/</loc></url></urlset>')
+        policy = {"mode": "production",
+                  "required_routes": ["/", "/tools/"],
+                  "indexable_routes": ["/", "/tools/"]}
+        result = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("INDEXABLE_SITEMAP", self.codes(result), result["findings"])
+        self.assertEqual(result["summary"]["error"], 0, result["findings"])
+
+    def test_missing_sitemap_index_child_is_not_a_false_pass(self):
+        self.write("index.html", page())
+        self.write("sitemap.xml",
+                   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<sitemap><loc>https://example.org/not-present.xml</loc></sitemap></sitemapindex>')
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        self.assertIn("SITEMAP_INDEX_CHILD_MISSING", self.codes(report))
+        self.assertIn("INDEXABLE_SITEMAP", self.codes(report))
+
 
 if __name__ == "__main__":
     unittest.main()
