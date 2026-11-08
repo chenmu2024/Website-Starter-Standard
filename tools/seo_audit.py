@@ -399,8 +399,7 @@ def audit(root, base_url, policy=None):
             for code, route in mapping.items():
                 if not isinstance(route, str) or not route.startswith("/") or not isinstance(code, str):
                     raise ValueError(f"hreflang_groups[{index}] has invalid language code/route")
-                if code.casefold() != "x-default" and not re.fullmatch(
-                        r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=re.I):
+                if code.casefold() != "x-default" and not HREFLANG_RE.fullmatch(code):
                     raise ValueError(f"hreflang_groups[{index}] has invalid language code {code}")
                 if code.casefold() in {x.casefold() for x in expected}:
                     raise ValueError(f"hreflang_groups[{index}] has duplicate language code {code}")
