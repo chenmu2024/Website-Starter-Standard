@@ -308,6 +308,40 @@ class AuditTests(unittest.TestCase):
         self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
 
 
+    def test_html_hreflang_href_must_match_destination_canonical_protocol_and_query(self):
+        tags = ('<link rel="alternate" hreflang="en" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es" href="http://example.org/es/?wrong=1">')
+        self.write("index.html", page("Home", "https://example.org/", extra_head=tags, lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es"))
+        report = audit_tool.audit(
+            self.root, "https://example.org",
+            {"mode": "production", "indexable_routes": ["/", "/es/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_TARGET_CANONICAL")
+        self.assertEqual(finding["severity"], "error")
+        self.assertIn("does not exactly match", finding["detail"])
+
+    def test_sitemap_hreflang_href_must_match_destination_canonical_protocol_and_query(self):
+        self.write("index.html", page("Home", "https://example.org/", lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="http://example.org/es/?wrong=1"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/es/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(
+            self.root, "https://example.org",
+            {"mode": "production", "indexable_routes": ["/", "/es/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_TARGET_CANONICAL")
+        self.assertEqual(finding["severity"], "error")
+        self.assertIn("does not exactly match", finding["detail"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
