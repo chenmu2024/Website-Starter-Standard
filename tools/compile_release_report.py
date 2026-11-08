@@ -165,12 +165,16 @@ def classify(kind, evidence):
             if check["name"] in by_name:
                 return "FAIL", f"Duplicate deployment check: {check['name']}"
             by_name[check["name"]] = check["status"]
+        if any(value == "FAIL" for value in by_name.values()):
+            return "FAIL", "Deployment report contains a failed check"
         if status == "PARTIAL":
+            if not any(value in {"NOT_RUN", "PARTIAL"} for value in by_name.values()):
+                return "FAIL", "Deployment status is PARTIAL but no check records missing/partial evidence"
             return "PARTIAL", "Live HTTP probe has unverified required evidence"
         required_names = (
             "homepage", "home-canonical", "production-indexable", "home-title",
             "route:/robots.txt", "route:/sitemap.xml", "sitemap-xml",
-            "sitemap-coverage", "real-404", "deployed-commit",
+            "sitemap-coverage", "real-404", "deployed-commit", "preview-noindex",
         )
         missing = [name for name in required_names if name not in by_name]
         if missing:
@@ -207,14 +211,19 @@ def classify(kind, evidence):
         if not all(_count(value) for value in values.values()):
             return "FAIL", "Playwright stats must contain nonnegative integer counts (not booleans)"
         suites = evidence.get("suites")
-        if not isinstance(suites, list) or not suites:
-            return "FAIL", "Playwright evidence requires nonempty suite records"
+        if not isinstance(suites, list):
+            return "FAIL", "Playwright evidence requires a suites list"
+        if not suites and any(values[field] for field in fields):
+            return "FAIL", "Playwright stats claim test activity but the suite list is empty"
         result_count, malformed = _playwright_result_count(suites)
         if malformed:
             return "FAIL", "Playwright suite/spec/test result structure is malformed"
         if values["unexpected"] or values["flaky"]:
             return "FAIL", f"Browser tests: unexpected={values['unexpected']}, flaky={values['flaky']}"
         if values["skipped"]:
+            required_results = sum(values.values())
+            if result_count < required_results:
+                return "FAIL", f"Playwright stats claim {required_results} test outcomes but only {result_count} result records exist"
             return "PARTIAL", f"Browser tests passed={values['expected']}, skipped={values['skipped']}"
         if values["expected"] == 0:
             return "FAIL" if result_count else "NOT_RUN", (
