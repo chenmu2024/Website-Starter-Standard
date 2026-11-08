@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { test, expect } from '@playwright/test';
 
 const routes = JSON.parse(process.env.QA_VISUAL_ROUTES_JSON || '[]') as string[];
@@ -11,8 +12,20 @@ const viewports = [
   { name: 'desktop-1440', width: 1440, height: 900 },
 ];
 
+function routeSnapshotId(route: string): string {
+  const slug = route === '/' ? 'home' : route.replace(/^\\/|\\/$/g, '').replaceAll('/', '-') || 'route';
+  const digest = createHash('sha256').update(route).digest('hex').slice(0, 12);
+  return slug + '-' + digest;
+}
+
+test('visual snapshot route identifiers remain unique for colliding slugs', () => {
+  const samples = ['/', '/home/', '/foo/bar/', '/foo-bar/'];
+  const ids = samples.map(routeSnapshotId);
+  expect(new Set(ids).size).toBe(samples.length);
+});
+
 for (const route of routes) {
-  const safe = route === '/' ? 'home' : route.replace(/^\/|\/$/g, '').replaceAll('/', '-');
+  const safe = routeSnapshotId(route);
   for (const viewport of viewports) {
     test(route + ' · ' + viewport.name + ' · reviewed visual baseline', async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
