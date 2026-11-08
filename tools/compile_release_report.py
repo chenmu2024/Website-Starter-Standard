@@ -106,8 +106,6 @@ def compile_report(manifest, evidence_root):
             required = item.get("required")
             if not isinstance(required, bool):
                 raise ValueError("required must be boolean")
-            if required:
-                required_count += 1
             relative = item.get("file")
             if not isinstance(relative, str) or not relative.strip():
                 raise ValueError("file must be a nonempty relative path")
@@ -128,10 +126,10 @@ def compile_report(manifest, evidence_root):
                       "type": item.get("type") if isinstance(item, dict) else None,
                       "required": item.get("required", True) if isinstance(item, dict) else True,
                       "status": "FAIL", "detail": str(exc)}
-            if result["required"] is True:
-                required_count += 1
             errors.append(f"{label}: {exc}")
         results.append(result)
+        if result["required"] is True:
+            required_count += 1
     if required_count == 0:
         errors.append("At least one required release check must be declared")
         status, decision = "FAIL", "INVALID_MANIFEST"
