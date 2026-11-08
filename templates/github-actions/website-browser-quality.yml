@@ -1,6 +1,6 @@
 # Copy to .github/workflows/website-browser-quality.yml in a downstream Node website.
-# Install @playwright/test as a dev dependency and copy the templates/playwright files.
-name: Cross-browser and visual UI QA
+# Customize project commands, SEO origin, routes, calculator and export manifests.
+name: Website P1 browser, export and release evidence
 on:
   pull_request:
   push:
@@ -8,26 +8,61 @@ on:
 permissions:
   contents: read
 jobs:
-  browser:
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       SITE_DIR: dist
+      SEO_BASE_URL: https://replace-me.invalid
       BUILD_COMMAND: npm run build
+      CORE_TEST_COMMAND: npm test
       PREVIEW_SERVER_COMMAND: npm run preview -- --host 0.0.0.0
       QA_BASE_URL: http://127.0.0.1:4173
       QA_ROUTES_JSON: '["/"]'
       QA_VISUAL_ROUTES_JSON: '[]'
       QA_VISUAL_DIFF_RATIO: '0.005'
       QA_CAPTURE_SCREENSHOTS: '0'
+      PRODUCT_KIND: static
+      CALC_RUNTIME_COMMAND: REPLACE_ME
+      EXPORT_MANIFEST: REPLACE_ME
+      EXPORT_RUNTIME_COMMAND: REPLACE_ME
+      EXPORT_OUTPUT_DIR: release-evidence/exports
+      RELEASE_EVIDENCE_MANIFEST: tests/release-evidence-manifest.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-      - name: Install locked project dependencies
-        run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate P1 project contract (never silently skip)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$SEO_BASE_URL" != "https://replace-me.invalid"
+          test "$PRODUCT_KIND" = "static" || test "$PRODUCT_KIND" = "calculator"
+          test -f tests/indexation-policy.preview.json
+          test -f "$RELEASE_EVIDENCE_MANIFEST"
+          test -f tools/seo_audit.py
+          test -f tools/compile_release_report.py
+          test -f tools/validate_export_artifacts.py
+          test -f playwright.config.ts
+          test -f tests/e2e/site-quality.spec.ts
+          if test "$PRODUCT_KIND" = "calculator"; then
+            test "$CALC_RUNTIME_COMMAND" != "REPLACE_ME"
+            test -f tests/golden-cases.json
+            test -f tools/validate_calculation_cases.py
+          fi
+          if test "$EXPORT_MANIFEST" != "REPLACE_ME"; then
+            test "$EXPORT_RUNTIME_COMMAND" != "REPLACE_ME"
+            test -f "$EXPORT_MANIFEST"
+          fi
+      - name: Install locked project and QA dependencies
+        run: |
+          npm ci
+          python -m pip install -r requirements-qa.txt
       - name: Build the actual production artifact
         shell: bash
         run: |
@@ -35,6 +70,36 @@ jobs:
           bash -lc "$BUILD_COMMAND"
           test -d "$SITE_DIR"
           test -f "$SITE_DIR/index.html"
+      - name: Run core application regression tests
+        shell: bash
+        run: bash -lc "$CORE_TEST_COMMAND"
+      - name: Run static SEO and preview indexation policy
+        run: |
+          mkdir -p release-evidence
+          python tools/seo_audit.py --site-dir "$SITE_DIR" --base-url "$SEO_BASE_URL" \
+            --policy-json tests/indexation-policy.preview.json \
+            --output release-evidence/seo.json --fail-on error
+      - name: Run independent calculator golden cases (calculator only)
+        if: env.PRODUCT_KIND == 'calculator'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$CALC_RUNTIME_COMMAND"
+          test -f release-evidence/calculation-observed.json
+          python tools/validate_calculation_cases.py \
+            --cases tests/golden-cases.json \
+            --observed release-evidence/calculation-observed.json \
+            --output release-evidence/calculation.json
+      - name: Generate and validate real CSV/PDF/SVG exports (opt-in)
+        if: env.EXPORT_MANIFEST != 'REPLACE_ME'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$EXPORT_RUNTIME_COMMAND"
+          python tools/validate_export_artifacts.py \
+            --manifest "$EXPORT_MANIFEST" \
+            --output-dir "$EXPORT_OUTPUT_DIR" \
+            --output release-evidence/exports.json
       - name: Install Chromium, Firefox and WebKit
         run: npx playwright install --with-deps chromium firefox webkit
       - name: Start the project's built preview server
@@ -61,17 +126,27 @@ jobs:
               raise SystemExit("Preview server did not become ready")
           PY
       - name: Run Chromium, Firefox and WebKit at five viewports
-        run: |
-          mkdir -p release-evidence
-          npx playwright test --config=playwright.config.ts
+        run: npx playwright test --config=playwright.config.ts
       - name: Run reviewed Chromium visual baselines (opt-in)
         if: env.QA_VISUAL_ROUTES_JSON != '[]'
         run: npx playwright test --config=playwright.visual.config.ts
-      - name: Upload browser and visual evidence
+      - name: Compile unified release evidence report
+        if: always()
+        run: |
+          if test -f release-evidence/seo.json && test -f release-evidence/playwright-report.json; then
+            python tools/compile_release_report.py \
+              --manifest "$RELEASE_EVIDENCE_MANIFEST" \
+              --evidence-dir release-evidence \
+              --output release-evidence/release-summary.json
+          else
+            echo "Required SEO or Playwright evidence missing; release report cannot be marked PASS."
+            exit 1
+          fi
+      - name: Upload browser, export and release evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cross-browser-visual-evidence
+          name: website-p1-release-evidence
           path: |
             release-evidence/
             playwright-report/
