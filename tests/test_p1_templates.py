@@ -36,7 +36,7 @@ class P1TemplateTests(unittest.TestCase):
         self.assertIn("EXPORT_MANIFEST", workflow)
         self.assertIn("visual-baseline.spec.ts", smoke_workflow)
         self.assertIn("visual.config.ts", smoke_workflow)
-        self.assertIn("visual snapshot route identifier regression", smoke_workflow)
+        self.assertIn("collision-resistant visual route identifier regression", smoke_workflow)
 
     def test_visual_baselines_are_separate_opt_in_and_reviewable(self):
         config = (ROOT / "templates/playwright/visual.config.ts").read_text()
