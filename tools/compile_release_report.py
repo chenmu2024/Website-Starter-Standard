@@ -50,9 +50,9 @@ def _playwright_result_count(suites):
                         malformed = True
                         continue
                     for result in test["results"]:
-                        if not isinstance(result, dict) or result.get("status") not in {
-                            "passed", "failed", "timedOut", "skipped", "interrupted"
-                        }:
+                        if (not isinstance(result, dict) or
+                                not isinstance(result.get("status"), str) or
+                                result["status"] not in {"passed", "failed", "timedOut", "skipped", "interrupted"}):
                             malformed = True
                             continue
                         total += 1
