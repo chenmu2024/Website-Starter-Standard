@@ -15,6 +15,12 @@
       "file": "playwright-report.json"
     },
     {
+      "id": "visual",
+      "type": "playwright",
+      "required": false,
+      "file": "visual-report.json"
+    },
+    {
       "id": "exports",
       "type": "exports",
       "required": false,
