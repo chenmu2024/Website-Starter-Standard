@@ -52,7 +52,8 @@ class P1TemplateTests(unittest.TestCase):
         self.assertEqual(group["x-default"], "/")
         audit = (ROOT / "tools/seo_audit.py").read_text()
         for token in ("HREFLANG_SELF_MISSING", "HREFLANG_RETURN_MISSING",
-                      "HREFLANG_GROUP_INCOMPLETE", "HREFLANG_TARGET_CANONICAL"):
+                      "HREFLANG_GROUP_INCOMPLETE", "HREFLANG_TARGET_CANONICAL",
+                      "SITEMAP_HREFLANG", "HREFLANG_SOURCE_MISMATCH"):
             self.assertIn(token, audit)
 
     def test_release_manifest_requires_seo_and_browser_evidence(self):
@@ -60,6 +61,7 @@ class P1TemplateTests(unittest.TestCase):
         required = {x["id"] for x in manifest["checks"] if x["required"]}
         self.assertIn("seo", required)
         self.assertIn("browser", required)
+        self.assertIn("visual", {x["id"] for x in manifest["checks"]})
         script = (ROOT / "tools/compile_release_report.py").read_text()
         self.assertIn("EVIDENCE_INCOMPLETE", script)
         self.assertIn("SCHEMA_VALID", script)
