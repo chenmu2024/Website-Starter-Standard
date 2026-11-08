@@ -147,6 +147,29 @@ jobs:
           PY
       - name: Run Chromium, Firefox and WebKit at five viewports
         run: npx playwright test --config=playwright.config.ts
+      - name: Record pinned visual baseline environment
+        if: env.QA_VISUAL_ROUTES_JSON != '[]'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-evidence
+          {
+            echo "runner_label=ubuntu-24.04"
+            echo "runner_image_os=${ImageOS:-unknown}"
+            echo "runner_image_version=${ImageVersion:-unknown}"
+            echo "node=$(node --version)"
+            echo "playwright=$(npx playwright --version)"
+            echo "os_release=$(grep PRETTY_NAME /etc/os-release | cut -d= -f2-)"
+            echo "visual_routes=$QA_VISUAL_ROUTES_JSON"
+            node - <<'JS'
+          const { chromium } = require('@playwright/test');
+          (async () => {
+            const browser = await chromium.launch();
+            console.log('chromium=' + browser.version());
+            await browser.close();
+          })().catch(error => { console.error(error); process.exit(1); });
+          JS
+          } > release-evidence/visual-environment.txt
       - name: Generate visual baselines in pinned CI environment (explicit opt-in)
         if: env.QA_VISUAL_ROUTES_JSON != '[]' && env.QA_VISUAL_UPDATE == '1'
         run: npx playwright test --config=playwright.visual.config.ts --update-snapshots
