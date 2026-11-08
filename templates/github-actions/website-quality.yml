@@ -1,0 +1,100 @@
+# COPY to .github/workflows/website-quality.yml in each downstream site.
+# Customize every REPLACE_ME and commit audit tools + policy JSON with the site.
+# This starter repo intentionally does not run this template as its own CI.
+name: Website quality gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      SITE_DIR: dist
+      BASE_URL: https://replace-me.invalid
+      PRODUCT_KIND: REPLACE_ME
+      BUILD_COMMAND: REPLACE_ME
+      CORE_TEST_COMMAND: REPLACE_ME
+      BROWSER_TEST_COMMAND: REPLACE_ME
+      CALC_RUNTIME_COMMAND: REPLACE_ME
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate configured quality gates (never silently skip)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$BASE_URL" != "https://replace-me.invalid"
+          test "$PRODUCT_KIND" = "static" || test "$PRODUCT_KIND" = "calculator"
+          test "$BUILD_COMMAND" != "REPLACE_ME"
+          test "$CORE_TEST_COMMAND" != "REPLACE_ME"
+          test "$BROWSER_TEST_COMMAND" != "REPLACE_ME"
+          test -f tools/seo_audit.py
+          if test "$PRODUCT_KIND" = "calculator"; then
+            test "$CALC_RUNTIME_COMMAND" != "REPLACE_ME"
+            test -f tools/validate_calculation_cases.py
+            test -f tests/golden-cases.json
+          fi
+          if test "$GITHUB_EVENT_NAME" = "pull_request"; then
+            test -f tests/indexation-policy.preview.json
+          else
+            test -f tests/indexation-policy.production.json
+          fi
+      - name: Build actual website
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$BUILD_COMMAND"
+          test -d "$SITE_DIR"
+          test -f "$SITE_DIR/index.html"
+      - name: Execute application regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$CORE_TEST_COMMAND"
+      - name: Check offline SEO and preview/production index contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-evidence
+          if test "$GITHUB_EVENT_NAME" = "pull_request"; then
+            POLICY=tests/indexation-policy.preview.json
+          else
+            POLICY=tests/indexation-policy.production.json
+          fi
+          python tools/seo_audit.py --site-dir "$SITE_DIR" --base-url "$BASE_URL" \
+            --policy-json "$POLICY" --output release-evidence/seo.json --fail-on error
+      - name: Execute independent calculator golden cases (when applicable)
+        if: env.PRODUCT_KIND == 'calculator'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$CALC_RUNTIME_COMMAND"
+          test -f release-evidence/calculation-observed.json
+          python tools/validate_calculation_cases.py \
+            --cases tests/golden-cases.json \
+            --observed release-evidence/calculation-observed.json \
+            --output release-evidence/calculation.json
+      - name: Run browser UI and cross-browser contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$BROWSER_TEST_COMMAND"
+      - name: Preserve release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-release-evidence
+          path: |
+            release-evidence/
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
