@@ -86,23 +86,60 @@ def inspect(base, routes=(), preview_url=None, expected_sha=None,
         head.feed(main["body"].decode("utf8", errors="replace"))
         check("home-canonical", "PASS" if head.canonical == [base + "/"] else "FAIL",
               f"canonical={head.canonical}; expected={base + '/'}")
-        robots = ",".join(head.robots).lower() + "," + main["headers"].get("X-Robots-Tag", "").lower()
+        response_headers = {str(k).lower(): str(v).lower() for k, v in main["headers"].items()}
+        robots = ",".join(head.robots).lower() + "," + response_headers.get("x-robots-tag", "")
         check("production-indexable", "FAIL" if "noindex" in robots else "PASS",
               f"homepage robots directives: {robots}")
         check("home-title", "PASS" if "".join(head.title).strip() else "FAIL",
               "Homepage must serve title in raw HTML")
 
+    required_sitemap_paths = {"/", *routes}
     for path in ["/robots.txt", "/sitemap.xml", *routes]:
         res = get(path)
         if res:
             check("route:" + path, "PASS" if res["status"] == 200 else "FAIL",
                   f"HTTP {res['status']}")
+            if path == "/robots.txt" and res["status"] == 200:
+                content = res["body"].decode("utf8", errors="replace")
+                groups = []
+                current_agents = []
+                current_rules = []
+                for line in content.splitlines():
+                    line = line.split("#", 1)[0].strip()
+                    if not line or ":" not in line:
+                        if current_agents or current_rules:
+                            groups.append((current_agents, current_rules))
+                        current_agents, current_rules = [], []
+                        continue
+                    key, value = (part.strip().lower() for part in line.split(":", 1))
+                    if key == "user-agent":
+                        if current_rules:
+                            groups.append((current_agents, current_rules))
+                            current_agents, current_rules = [], []
+                        current_agents.append(value)
+                    elif key == "disallow":
+                        current_rules.append(value)
+                if current_agents or current_rules:
+                    groups.append((current_agents, current_rules))
+                sitewide_block = any("*" in agents and "/" in rules for agents, rules in groups)
+                check("robots-global-indexing", "FAIL" if sitewide_block else "PASS",
+                      "Sitewide User-agent:* Disallow:/ found" if sitewide_block
+                      else "No obvious blanket Disallow:/ on default user agent")
             if path == "/sitemap.xml" and res["status"] == 200:
                 try:
                     doc = ET.fromstring(res["body"])
                     tag = doc.tag.rsplit("}", 1)[-1]
                     check("sitemap-xml", "PASS" if tag in {"urlset", "sitemapindex"} else "FAIL",
                           f"XML root={tag}")
+                    if tag == "urlset":
+                        listed = set()
+                        for element in doc.iter():
+                            if element.tag.rsplit("}", 1)[-1] == "loc" and element.text:
+                                listed.add(element.text.strip())
+                        absent = sorted(base + route for route in required_sitemap_paths
+                                        if base + route not in listed)
+                        check("sitemap-coverage", "PASS" if not absent else "FAIL",
+                              f"Missing critical canonical URLs: {absent}")
                 except ET.ParseError as exc:
                     check("sitemap-xml", "FAIL", str(exc))
 
