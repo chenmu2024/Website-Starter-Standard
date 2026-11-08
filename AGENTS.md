@@ -101,6 +101,15 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 - The live HTTP release probe checks production source SHA parity and raw HTTP only. Real Cloudflare zone settings, approved crawlers, Google/Bing indexing, physical calibration and real-device accessibility require separate first-party or human evidence.
 - Never relax tests only to make a failing CI run green. Repair stale selectors, inherited CSS min-width, broken generated files or calculation contract drift, then re-run appropriate suites.
 
+## 4D. P1 cross-browser, export, and international SEO quality
+
+- For responsive web applications, copy the P1 Playwright templates and run Chromium, Firefox and WebKit at 360/390/768/1024/1440 CSS-pixel viewports. Record browser versions, route list, test JSON and screenshots; do not describe this as iOS/Android real-device or screen-reader acceptance.
+- Visual regression is opt-in: establish baselines on the pinned CI/browser environment, inspect the images, commit approved snapshots, and only then enable the visual workflow. Never auto-update snapshots to make a failed comparison green.
+- For exported CSV/PDF/SVG, compare artifacts emitted by the actual app with independent expected rows/text/page geometry. A PDF page size is not proof of physical printer scale; record paper measurements separately.
+- For multilingual sites, define real alternate route groups in the explicit hreflang policy. Check BCP47 codes, self-reference, reciprocal links, target canonical and group completeness. External-domain alternates remain unverified by offline scans and need a live cross-domain check.
+- Use the release evidence compiler to combine required checks. Missing, schema-only, skipped, flaky or partial evidence must remain NOT_RUN/PARTIAL/FAIL, never be rewritten as PASS.
+- Read INTERNATIONAL-SEO-AUTOMATION.md and DOWNSTREAM-ADOPTION.md before copying these P1 tools into a project.
+
 ## 5. Audit levels
 
 - Where static built HTML is available, optionally run `tools/seo_audit.py` from this standard against that build and inspect the JSON report. Run `python -m unittest discover -s tests -v` when changing the audit tool. Treat the tool as a *partial offline audit*, not a substitute for live crawl, browser QA, field CWV or GSC.
