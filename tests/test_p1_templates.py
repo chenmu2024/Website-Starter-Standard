@@ -20,6 +20,11 @@ class P1TemplateTests(unittest.TestCase):
         self.assertIn("npx playwright install --with-deps chromium firefox webkit", workflow)
         self.assertIn("npx playwright test --config=playwright.config.ts", workflow)
         self.assertIn("if: always()", workflow)
+        self.assertIn("tools/compile_release_report.py", workflow)
+        self.assertIn("tools/validate_export_artifacts.py", workflow)
+        self.assertIn("SEO_BASE_URL", workflow)
+        self.assertIn("CALC_RUNTIME_COMMAND", workflow)
+        self.assertIn("EXPORT_MANIFEST", workflow)
 
     def test_visual_baselines_are_separate_opt_in_and_reviewable(self):
         config = (ROOT / "templates/playwright/visual.config.ts").read_text()
