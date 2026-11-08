@@ -18,6 +18,8 @@ class P1TemplateTests(unittest.TestCase):
             self.assertIn(width, spec)
         for contract in ("documentWidth", "visibleBrokenImages", "unnamedControls", "pageerror"):
             self.assertIn(contract, spec)
+        for native_name in ("\.labels", "labelledBy", "valueName", "imageInputAlt"):
+            self.assertIn(native_name, spec)
         self.assertIn("npx playwright install --with-deps chromium firefox webkit", workflow)
         self.assertIn("npx playwright test --config=playwright.config.ts", workflow)
         self.assertIn("if: always()", workflow)
