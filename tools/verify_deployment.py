@@ -99,6 +99,16 @@ def inspect(base, routes=(), preview_url=None, expected_sha=None,
         if res:
             check("route:" + path, "PASS" if res["status"] == 200 else "FAIL",
                   f"HTTP {res['status']}")
+            if path in routes and res["status"] == 200:
+                page = Head()
+                page.feed(res["body"].decode("utf8", errors="replace"))
+                expect_url = base + path
+                check("canonical:" + path, "PASS" if page.canonical == [expect_url] else "FAIL",
+                      f"canonical={page.canonical}, expected={expect_url}")
+                headers = {str(k).lower(): str(v).lower() for k, v in res["headers"].items()}
+                directives = ",".join(page.robots).lower() + "," + headers.get("x-robots-tag", "")
+                check("indexable:" + path, "FAIL" if "noindex" in directives else "PASS",
+                      f"robots directives={directives}")
             if path == "/robots.txt" and res["status"] == 200:
                 content = res["body"].decode("utf8", errors="replace")
                 groups = []
@@ -131,6 +141,9 @@ def inspect(base, routes=(), preview_url=None, expected_sha=None,
                     tag = doc.tag.rsplit("}", 1)[-1]
                     check("sitemap-xml", "PASS" if tag in {"urlset", "sitemapindex"} else "FAIL",
                           f"XML root={tag}")
+                    if tag == "sitemapindex":
+                        check("sitemap-coverage", "NOT_RUN",
+                              "Nested sitemap contents not traversed; verify URL coverage separately")
                     if tag == "urlset":
                         listed = set()
                         for element in doc.iter():
