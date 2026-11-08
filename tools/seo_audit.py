@@ -146,6 +146,7 @@ def audit(root, base_url, policy=None):
     seen_canonicals = {}
     seen_descriptions = {}
     sitemap_listed = None
+    sitemap_hreflang = {}
 
     def issue(level, code, route, detail):
         findings.append({"severity": level, "code": code, "page": route, "message": detail})
@@ -342,16 +343,36 @@ def audit(root, base_url, policy=None):
                 return
             tag = root_tag.tag.split("}")[-1]
             if tag == "urlset":
-                for elem in root_tag.iter():
-                    if elem.tag.split("}")[-1] == "loc" and elem.text:
-                        target_url = elem.text.strip()
-                        local = local_url(target_url, "/", base_url)
-                        if local is None:
-                            issue("warning", "SITEMAP_EXTERNAL_URL", "/sitemap.xml", target_url)
-                        else:
-                            sitemap_listed.add(local)
-                            if resolve_route(local) is None:
-                                issue("warning", "SITEMAP_ROUTE_MISSING", "/sitemap.xml", target_url)
+                url_entries = [elem for elem in root_tag
+                               if elem.tag.split("}")[-1] == "url"]
+                for entry in url_entries:
+                    locs = [child.text.strip() for child in entry
+                            if child.tag.split("}")[-1] == "loc" and child.text]
+                    alternates = [
+                        {"code": child.attrib.get("hreflang", "").strip(),
+                         "href": child.attrib.get("href", "").strip()}
+                        for child in entry
+                        if child.tag.split("}")[-1] == "link" and
+                        "alternate" in child.attrib.get("rel", "").lower().split() and
+                        child.attrib.get("hreflang") and child.attrib.get("href")
+                    ]
+                    if len(locs) != 1:
+                        issue("warning", "SITEMAP_URL_LOC_COUNT", "/sitemap.xml",
+                              f"Expected one loc in url entry; found {len(locs)}")
+                        continue
+                    target_url = locs[0]
+                    local = local_url(target_url, "/", base_url)
+                    if local is None:
+                        issue("warning", "SITEMAP_EXTERNAL_URL", "/sitemap.xml", target_url)
+                        continue
+                    sitemap_listed.add(local)
+                    if resolve_route(local) is None:
+                        issue("warning", "SITEMAP_ROUTE_MISSING", "/sitemap.xml", target_url)
+                    if alternates:
+                        if local in sitemap_hreflang:
+                            issue("warning", "SITEMAP_HREFLANG_DUPLICATE_URL", local,
+                                  "URL appears more than once with hreflang declarations")
+                        sitemap_hreflang[local] = alternates
             elif tag == "sitemapindex":
                 entries = [e.text.strip() for e in root_tag.iter()
                            if e.tag.split("}")[-1] == "loc" and e.text]
