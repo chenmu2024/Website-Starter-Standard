@@ -92,6 +92,15 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 - The old `OPC-BUSINESS-*.md` files are retained as compatibility pointers only; research truth belongs to `gefei-seo`.
 
 
+## 4C. P0 executable correctness, release parity and real-world scope
+
+- Read `CALCULATION-QUALITY-GATE.md` for calculators, converters, numerical tools and worksheet generators; keep normal/boundary/invalid independent golden cases and compare them to results produced by the actual production engine. A schema-valid fixture is NOT a correctness test.
+- Read `RELEASE-STATE-CONTRACT.md` and `CLOUDFLARE.md` when verifying/deploying Cloudflare projects; a successful PR, preview, CI, build or HTTP 200 alone cannot certify the production domain, actual indexation, AI citations or physical printer/material outcomes.
+- Use `tools/seo_audit.py` as the single canonical offline scanner. The old `scripts/seo_static_audit.py` is a legacy compatibility wrapper only. Preview/production policies are explicit and site-specific, not inferred from the URL.
+- For a downstream project adopting the shared CI templates, follow `DOWNSTREAM-ADOPTION.md`; do not claim CI is active before the workflow is actually copied, configured, triggered and verified in that repository.
+- The live HTTP release probe checks production source SHA parity and raw HTTP only. Real Cloudflare zone settings, approved crawlers, Google/Bing indexing, physical calibration and real-device accessibility require separate first-party or human evidence.
+- Never relax tests only to make a failing CI run green. Repair stale selectors, inherited CSS min-width, broken generated files or calculation contract drift, then re-run appropriate suites.
+
 ## 5. Audit levels
 
 - Where static built HTML is available, optionally run `tools/seo_audit.py` from this standard against that build and inspect the JSON report. Run `python -m unittest discover -s tests -v` when changing the audit tool. Treat the tool as a *partial offline audit*, not a substitute for live crawl, browser QA, field CWV or GSC.
