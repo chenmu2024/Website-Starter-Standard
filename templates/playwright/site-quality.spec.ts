@@ -121,3 +121,19 @@ test('accessible-name check does not treat option text or textarea contents as l
     'textarea.unlabelled-textarea',
   ]);
 });
+
+test('accessible-name check honors native labels and ignores hidden inactive controls', async ({ page }) => {
+  await page.setContent(`<!doctype html>
+      <html lang="en"><body>
+        <button>Save</button>
+        <label for="amount">Amount</label><input id="amount">
+        <label>Size <select class="wrapped-select"><option>Large</option></select></label>
+        <textarea aria-label="Notes">Default notes</textarea>
+        <input type="submit" value="Submit">
+        <div hidden><button class="hidden-button"></button></div>
+        <dialog><button class="closed-dialog-button"></button></dialog>
+        <nav aria-hidden="true"><a href="#inactive" class="inactive-link">Inactive</a></nav>
+      </body></html>`);
+  const unnamed = await findUnnamedControls(page);
+  expect(unnamed).toEqual([]);
+});
