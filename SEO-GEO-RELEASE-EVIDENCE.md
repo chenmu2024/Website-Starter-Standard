@@ -12,6 +12,19 @@
 - Release date:
 - Reviewer:
 
+## P0 state/source evidence (record the actual current deployment)
+
+- Release state per RELEASE-STATE-CONTRACT.md (IMPLEMENTED / CI_VERIFIED / PREVIEW_VERIFIED / PRODUCTION_VERIFIED):
+- Browser/production environment and exact commit SHA:
+- Real downstream workflow run URL (not the starter repo's own unit tests):
+- Current Cloudflare deployment ID and custom-domain build identity evidence:
+- Preview noindex evidence, including actual X-Robots-Tag if edge-managed:
+- Calculation independent golden cases + real runtime comparison (or N/A):
+- Production HTTP probe output and explicit missing checks:
+- Zone-level AI/WAF policy evidence (or NOT RUN):
+- GSC/Bing and AI citation data status (separate, never inferred from crawlable HTML):
+- Real hardware/material/print acceptance (or NOT RUN):
+
 ## 1. Build and deterministic checks
 
 | Check | Command/tool | Result | Evidence / notes |
