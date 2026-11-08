@@ -243,28 +243,62 @@ def audit(root, base_url, policy=None):
     if not sitemap.is_file():
         issue("info", "SITEMAP_MISSING", "/sitemap.xml", "Recommended for discoverability")
     else:
-        try:
-            sitemap_root = ET.parse(sitemap).getroot()
-            tag = sitemap_root.tag.split("}")[-1]
+        sitemap_listed = set()
+        visited_sitemaps = set()
+
+        def read_sitemap(file, depth):
+            resolved = file.resolve()
+            if not resolved.is_relative_to(root):
+                issue("error", "SITEMAP_OUTSIDE_BUILD", "/sitemap.xml", str(file))
+                return
+            if resolved in visited_sitemaps:
+                issue("warning", "SITEMAP_INDEX_CYCLE", "/sitemap.xml", str(file))
+                return
+            if depth > 5 or len(visited_sitemaps) >= 100:
+                issue("error", "SITEMAP_INDEX_LIMIT", "/sitemap.xml",
+                      "Sitemap traversal exceeded bounded depth/file count")
+                return
+            visited_sitemaps.add(resolved)
+            try:
+                root_tag = ET.parse(resolved).getroot()
+            except ET.ParseError as exc:
+                issue("error", "SITEMAP_XML_INVALID", "/sitemap.xml", f"{file}: {exc}")
+                return
+            tag = root_tag.tag.split("}")[-1]
             if tag == "urlset":
-                listed = set()
-                sitemap_listed = listed
-                for elem in sitemap_root.iter():
+                for elem in root_tag.iter():
                     if elem.tag.split("}")[-1] == "loc" and elem.text:
-                        path = local_url(elem.text.strip(), "/", base_url)
-                        if path is None:
-                            issue("warning", "SITEMAP_EXTERNAL_URL", "/sitemap.xml", elem.text.strip())
+                        target_url = elem.text.strip()
+                        local = local_url(target_url, "/", base_url)
+                        if local is None:
+                            issue("warning", "SITEMAP_EXTERNAL_URL", "/sitemap.xml", target_url)
                         else:
-                            listed.add(path)
-                            if resolve_route(path) is None:
-                                issue("warning", "SITEMAP_ROUTE_MISSING", "/sitemap.xml", elem.text.strip())
-                for url in routes:
-                    if url not in listed:
-                        issue("info", "SITEMAP_PAGE_NOT_LISTED", url, "May be intentional: verify indexation policy")
-            elif tag != "sitemapindex":
+                            sitemap_listed.add(local)
+                            if resolve_route(local) is None:
+                                issue("warning", "SITEMAP_ROUTE_MISSING", "/sitemap.xml", target_url)
+            elif tag == "sitemapindex":
+                entries = [e.text.strip() for e in root_tag.iter()
+                           if e.tag.split("}")[-1] == "loc" and e.text]
+                if not entries:
+                    issue("warning", "SITEMAP_INDEX_EMPTY", "/sitemap.xml", str(file))
+                for child_url in entries:
+                    local = local_url(child_url, "/", base_url)
+                    if local is None:
+                        issue("warning", "SITEMAP_INDEX_EXTERNAL_CHILD", "/sitemap.xml", child_url)
+                        continue
+                    child = (root / local.lstrip("/")).resolve()
+                    if not child.is_relative_to(root) or not child.is_file():
+                        issue("warning", "SITEMAP_INDEX_CHILD_MISSING", "/sitemap.xml", child_url)
+                        continue
+                    read_sitemap(child, depth + 1)
+            else:
                 issue("warning", "SITEMAP_UNEXPECTED_ROOT", "/sitemap.xml", tag)
-        except ET.ParseError as exc:
-            issue("error", "SITEMAP_XML_INVALID", "/sitemap.xml", str(exc))
+
+        read_sitemap(sitemap, 0)
+        for url in routes:
+            if url not in sitemap_listed:
+                issue("info", "SITEMAP_PAGE_NOT_LISTED", url,
+                      "May be intentional: verify indexation policy")
 
     # The default audit is advisory. An explicit release policy makes the
     # indexability contract fail-closed without assuming all sites are indexable.
