@@ -21,6 +21,9 @@ from pathlib import Path
 from urllib.parse import unquote, urljoin, urlparse
 
 
+HREFLANG_RE = re.compile(r"^[a-z]{2,3}(?:-[a-z]{4})?(?:-(?:[a-z]{2}|[0-9]{3}))?(?:-[a-z0-9]{4,8})*$", re.I)
+
+
 class PageParser(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
