@@ -54,7 +54,23 @@ After Cloudflare confirms the authorized deployment:
 - Complete GSC and Bing property/sitemap verification as independent post-launch tasks.
 - Record explicit NOT RUN or NOT APPLICABLE for unavailable evidence; do not label crawler User-Agent spoofing as a real verified bot visit.
 
-## E. Local checks on this standard itself
+## E. P1 cross-browser, export and multilingual adoption
+
+For a Node-based public site that needs the integrated P1 pipeline:
+
+1. Install and lock Playwright: npm install --save-dev @playwright/test, then commit package.json and package-lock.json.
+2. Copy templates/playwright/playwright.config.ts to the repository root, site-quality.spec.ts and visual-baseline.spec.ts into tests/e2e/, and visual.config.ts to the root as playwright.visual.config.ts.
+3. Copy templates/github-actions/website-browser-quality.yml to .github/workflows/. Set the real build, core-test and preview-server commands, SEO production origin, required same-site route list and any primary-task selector. The workflow installs Chromium, Firefox and WebKit and executes five viewport widths per route.
+4. Copy tools/seo_audit.py, tools/compile_release_report.py, tools/validate_export_artifacts.py, requirements-qa.txt, tests/indexation-policy.preview.json, and templates/release-evidence/manifest.example.json (rename to tests/release-evidence-manifest.json). Customize the required check list and all route paths.
+5. For a calculator, also copy tools/validate_calculation_cases.py and its independently reviewed golden fixtures; set PRODUCT_KIND=calculator, implement CALC_RUNTIME_COMMAND and mark calculation required in the evidence manifest.
+6. If the app exports files, copy templates/exports/export-manifest.example.json, customize expected content and page geometry, set EXPORT_MANIFEST and EXPORT_RUNTIME_COMMAND and mark exports required. The runtime command must create real files in EXPORT_OUTPUT_DIR; do not copy example files into the output directory.
+7. Run the browser workflow once with QA_VISUAL_ROUTES_JSON='[]'. For true visual regression, generate Chromium baselines with npx playwright test --config=playwright.visual.config.ts --update-snapshots, inspect and commit the snapshots, then set QA_VISUAL_ROUTES_JSON to the approved routes. Never update snapshots automatically in CI.
+8. Read INTERNATIONAL-SEO-AUTOMATION.md and copy templates/indexation-policy.multilingual.example.json only when the listed pages are genuine language/region equivalents. Use live verification for external-domain alternate links.
+9. The unified report requires SEO and browser evidence. Required calculation/export checks must be enabled for the relevant product. Physical printer measurements, real-device screen readers, search indexing and Cloudflare account settings remain separate manual/first-party evidence.
+
+The P1 workflow is a Node/Playwright template. Non-Node projects can reuse the Python validators and adapt their browser runner; do not force an unsuitable package manager or framework.
+
+## F. Local checks on this standard itself
 
     python -m unittest discover -s tests -v
 
