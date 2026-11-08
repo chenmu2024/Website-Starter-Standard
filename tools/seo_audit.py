@@ -253,7 +253,7 @@ def audit(root, base_url, policy=None):
             href = item["href"]
             folded = code.casefold()
             if not (folded == "x-default" or
-                    re.fullmatch(r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=__import__("re").I)):
+                    HREFLANG_RE.fullmatch(code)):
                 issue("warning", "HREFLANG_CODE_INVALID", route, code)
             if folded in seen_codes:
                 issue("warning", "HREFLANG_DUPLICATE_CODE", route,
