@@ -27,7 +27,7 @@ def responses(preview_noindex=True, sha="abc123", prod_noindex=False):
             '<link rel="canonical" href="https://example.org/"></head><body>Tool</body></html>'),
         PROD + "/robots.txt": fake_response(PROD + "/robots.txt", 200, "User-agent: *\nAllow: /"),
         PROD + "/sitemap.xml": fake_response(PROD + "/sitemap.xml", 200,
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>'),
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://example.org/</loc></url><url><loc>https://example.org/tool/</loc></url></urlset>'),
         PROD + "/tool/": fake_response(PROD + "/tool/", 200, "tool content"),
         PROD + "/__website-standard-release-probe-missing-404__":
             fake_response(PROD + "/__website-standard-release-probe-missing-404__", 404, ""),
@@ -76,6 +76,25 @@ class DeploymentProbeTests(unittest.TestCase):
             report = probe.inspect(PROD, expected_sha="abc123")
         self.assertEqual(report["status"], "FAIL")
         self.assertTrue(any("sitemap-xml" in x for x in report["errors"]))
+
+    def test_empty_sitemap_or_global_robots_disallow_blocks_release(self):
+        mapping = responses()
+        mapping[PROD + "/sitemap.xml"] = fake_response(PROD + "/sitemap.xml", 200,
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>')
+        mapping[PROD + "/robots.txt"] = fake_response(PROD + "/robots.txt", 200,
+            "User-agent: *\nDisallow: /")
+        with patch.object(probe, "fetch", side_effect=lambda url, timeout: mapping[url]):
+            report = probe.inspect(PROD, expected_sha="abc123")
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(any("sitemap-coverage" in x for x in report["errors"]))
+        self.assertTrue(any("robots-global-indexing" in x for x in report["errors"]))
+
+    def test_case_insensitive_production_x_robots_tag_blocks(self):
+        mapping = responses()
+        mapping[PROD + "/"]["headers"] = {"x-robots-tag": "noindex,nofollow"}
+        with patch.object(probe, "fetch", side_effect=lambda url, timeout: mapping[url]):
+            report = probe.inspect(PROD, expected_sha="abc123")
+        self.assertTrue(any("production-indexable" in x for x in report["errors"]))
 
 
 if __name__ == "__main__":
