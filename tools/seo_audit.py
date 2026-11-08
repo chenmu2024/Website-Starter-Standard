@@ -252,6 +252,20 @@ def audit(root, base_url, policy=None):
             return ("invalid", href)
         return (parsed.scheme.lower(), parsed.netloc.lower(),
                 normalized_path(unquote(parsed.path)), parsed.query, parsed.fragment)
+
+    def check_hreflang_target_canonical(route, href, destination, target_page):
+        canonical = target_page["canonical"]
+        expected = base_url.rstrip("/") + destination
+        if canonical != [expected]:
+            issue(hreflang_severity, "HREFLANG_TARGET_CANONICAL", route,
+                  f"{href} target canonical is {canonical}; expected {expected}")
+            return
+        declared_key = hreflang_target_key(href, route)
+        canonical_key = hreflang_target_key(canonical[0], destination)
+        if declared_key != canonical_key:
+            issue(hreflang_severity, "HREFLANG_TARGET_CANONICAL", route,
+                  f"Alternate href {href} does not exactly match destination canonical {canonical[0]}")
+
     for page in pages:
         route = page["route"]
         tags = page["hreflang"]
@@ -283,10 +297,7 @@ def audit(root, base_url, policy=None):
                 continue
             target_page = page_by_route.get(destination)
             if target_page:
-                target_canonical = target_page["canonical"]
-                if target_canonical != [base_url.rstrip("/") + destination]:
-                    issue(hreflang_severity, "HREFLANG_TARGET_CANONICAL", route,
-                          f"{href} target canonical is {target_canonical}")
+                check_hreflang_target_canonical(route, href, destination, target_page)
             if folded != "x-default" and destination == route:
                 self_code = code
         if tags and self_code is None:
@@ -423,9 +434,8 @@ def audit(root, base_url, policy=None):
                     issue(hreflang_severity, "HREFLANG_TARGET_MISSING", route, href)
                     continue
                 target_page = page_by_route.get(destination)
-                if target_page and target_page["canonical"] != [base_url.rstrip("/") + destination]:
-                    issue(hreflang_severity, "HREFLANG_TARGET_CANONICAL", route,
-                          f"{href} target canonical is {target_page['canonical']}")
+                if target_page:
+                    check_hreflang_target_canonical(route, href, destination, target_page)
                 if folded != "x-default" and destination == route:
                     self_code = code
             if tags and self_code is None:
