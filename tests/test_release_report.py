@@ -68,8 +68,8 @@ class ReleaseReportTests(unittest.TestCase):
         path.write_text(json.dumps(value), encoding="utf8")
 
     def test_required_pass_and_optional_missing_are_distinguished(self):
-        self.put("seo.json", {"summary": {"error": 0, "warning": 2}})
-        self.put("browser.json", {"stats": {"expected": 45, "unexpected": 0, "flaky": 0, "skipped": 0}})
+        self.put("seo.json", seo_evidence(warnings=2))
+        self.put("browser.json", browser_evidence(expected=45))
         manifest = {"version": 1, "project": "Example", "checks": [
             {"id": "seo", "type": "seo", "required": True, "file": "seo.json"},
             {"id": "browser", "type": "playwright", "required": True, "file": "browser.json"},
@@ -88,7 +88,7 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertEqual(report["decision"], "EVIDENCE_INCOMPLETE")
 
     def test_required_failures_block_and_optional_failures_do_not_hide(self):
-        self.put("seo.json", {"summary": {"error": 1, "warning": 0}})
+        self.put("seo.json", seo_evidence(errors=1))
         self.put("optional.json", {"status": "FAIL"})
         manifest = {"version": 1, "checks": [
             {"id": "seo", "type": "seo", "required": True, "file": "seo.json"},
@@ -100,8 +100,8 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertTrue(any("exports" in item for item in report["warnings"]))
 
     def test_schema_only_calculation_and_skipped_browser_are_partial(self):
-        self.put("calc.json", {"status": "SCHEMA_VALID"})
-        self.put("browser.json", {"stats": {"expected": 20, "unexpected": 0, "flaky": 0, "skipped": 1}})
+        self.put("calc.json", calculation_evidence("SCHEMA_VALID"))
+        self.put("browser.json", browser_evidence(expected=20, skipped=1))
         manifest = {"version": 1, "checks": [
             {"id": "calculation", "type": "calculation", "required": True, "file": "calc.json"},
             {"id": "browser", "type": "playwright", "required": True, "file": "browser.json"}
@@ -111,7 +111,7 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertEqual([x["status"] for x in report["checks"]], ["NOT_RUN", "PARTIAL"])
 
     def test_flaky_browser_and_unsubstantiated_manual_pass_fail(self):
-        self.put("browser.json", {"stats": {"expected": 10, "unexpected": 0, "flaky": 1, "skipped": 0}})
+        self.put("browser.json", browser_evidence(expected=10, flaky=1))
         self.put("manual.json", {"status": "PASS"})
         manifest = {"version": 1, "checks": [
             {"id": "browser", "type": "playwright", "required": True, "file": "browser.json"},
@@ -134,8 +134,8 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertIn("escapes evidence directory", report["errors"][0])
 
     def test_optional_failure_is_visible_but_does_not_fail_required_gate(self):
-        self.put("seo.json", {"summary": {"error": 0, "warning": 0}})
-        self.put("browser.json", {"stats": {"expected": 5, "unexpected": 0, "flaky": 0, "skipped": 0}})
+        self.put("seo.json", seo_evidence())
+        self.put("browser.json", browser_evidence(expected=5))
         self.put("exports.json", {"status": "FAIL"})
         manifest = {"version": 1, "checks": [
             {"id": "seo", "type": "seo", "required": True, "file": "seo.json"},
@@ -150,15 +150,14 @@ class ReleaseReportTests(unittest.TestCase):
 
 
     def test_playwright_run_level_teardown_errors_block_green_test_stats(self):
-        evidence = {"stats": {"expected": 25, "unexpected": 0, "flaky": 0, "skipped": 0},
-                    "errors": [{"message": "globalTeardown failed"}]}
+        evidence = browser_evidence(expected=25, errors=[{"message": "globalTeardown failed"}])
         status, detail = compiler.classify("playwright", evidence)
         self.assertEqual(status, "FAIL")
         self.assertIn("setup/teardown", detail)
 
 
     def test_all_browser_tests_failed_is_fail_not_not_run(self):
-        evidence = {"stats": {"expected": 0, "unexpected": 15, "flaky": 0, "skipped": 0}}
+        evidence = browser_evidence(expected=0, unexpected=15)
         status, detail = compiler.classify("playwright", evidence)
         self.assertEqual(status, "FAIL")
         self.assertIn("unexpected=15", detail)
