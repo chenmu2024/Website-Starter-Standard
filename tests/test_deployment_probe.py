@@ -28,7 +28,8 @@ def responses(preview_noindex=True, sha="abc123", prod_noindex=False):
         PROD + "/robots.txt": fake_response(PROD + "/robots.txt", 200, "User-agent: *\nAllow: /"),
         PROD + "/sitemap.xml": fake_response(PROD + "/sitemap.xml", 200,
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://example.org/</loc></url><url><loc>https://example.org/tool/</loc></url></urlset>'),
-        PROD + "/tool/": fake_response(PROD + "/tool/", 200, "tool content"),
+        PROD + "/tool/": fake_response(PROD + "/tool/", 200,
+            '<html><head><link rel="canonical" href="https://example.org/tool/"></head></html>'),
         PROD + "/__website-standard-release-probe-missing-404__":
             fake_response(PROD + "/__website-standard-release-probe-missing-404__", 404, ""),
         PROD + "/build-info.json": fake_response(PROD + "/build-info.json", 200,
@@ -95,6 +96,17 @@ class DeploymentProbeTests(unittest.TestCase):
         with patch.object(probe, "fetch", side_effect=lambda url, timeout: mapping[url]):
             report = probe.inspect(PROD, expected_sha="abc123")
         self.assertTrue(any("production-indexable" in x for x in report["errors"]))
+
+    def test_critical_page_canonical_and_noindex_are_verified(self):
+        mapping = responses()
+        mapping[PROD + "/tool/"] = fake_response(PROD + "/tool/", 200,
+            '<html><head><meta name="robots" content="noindex">'
+            '<link rel="canonical" href="https://example.org/wrong/"></head></html>')
+        with patch.object(probe, "fetch", side_effect=lambda url, timeout: mapping[url]):
+            report = probe.inspect(PROD, routes=["/tool/"], expected_sha="abc123")
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(any("canonical:/tool/" in x for x in report["errors"]))
+        self.assertTrue(any("indexable:/tool/" in x for x in report["errors"]))
 
 
 if __name__ == "__main__":
