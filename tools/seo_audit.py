@@ -245,6 +245,13 @@ def audit(root, base_url, policy=None):
     # Validate every hreflang declaration that exists. Completeness for a
     # known language family is opt-in through policy.hreflang_groups below.
     page_by_route = {p["route"]: p for p in pages}
+    def hreflang_target_key(href, current_route):
+        absolute = urljoin(base_url.rstrip("/") + current_route, href)
+        parsed = urlparse(absolute)
+        if parsed.scheme.lower() not in {"http", "https"} or not parsed.netloc:
+            return ("invalid", href)
+        return (parsed.scheme.lower(), parsed.netloc.lower(),
+                normalized_path(unquote(parsed.path)), parsed.query, parsed.fragment)
     for page in pages:
         route = page["route"]
         tags = page["hreflang"]
@@ -382,14 +389,15 @@ def audit(root, base_url, policy=None):
         for route, tags in sitemap_hreflang.items():
             page = page_by_route.get(resolve_route(route))
             if page and page["hreflang"]:
-                html_map = {(x["code"].casefold(), local_url(x["href"], route, base_url))
+                html_map = {(x["code"].casefold(), hreflang_target_key(x["href"], route))
                             for x in page["hreflang"]}
-                sitemap_map = {(x["code"].casefold(), local_url(x["href"], route, base_url))
+                sitemap_map = {(x["code"].casefold(), hreflang_target_key(x["href"], route))
                                for x in tags}
                 if html_map != sitemap_map:
                     issue(hreflang_severity, "HREFLANG_SOURCE_MISMATCH", route,
                           "HTML alternate links and Sitemap xhtml:link mappings differ")
-                continue
+                else:
+                    continue
             seen_codes = {}
             self_code = None
             for item in tags:
@@ -435,9 +443,16 @@ def audit(root, base_url, policy=None):
     # Check return relationships across mixed HTML and Sitemap declaration modes.
     def tags_for(route):
         target_page = page_by_route.get(route)
-        if target_page and target_page["hreflang"]:
-            return target_page["hreflang"]
-        return sitemap_hreflang.get(route, [])
+        html_tags = target_page["hreflang"] if target_page else []
+        sitemap_tags = sitemap_hreflang.get(route, [])
+        combined = list(html_tags)
+        seen = {(x["code"].casefold(), x["href"]) for x in combined}
+        for item in sitemap_tags:
+            key = (item["code"].casefold(), item["href"])
+            if key not in seen:
+                combined.append(item)
+                seen.add(key)
+        return combined
 
     for route, page in page_by_route.items():
         tags = tags_for(route)
