@@ -23,8 +23,10 @@ class P1TemplateTests(unittest.TestCase):
         for hidden_rule in ("aria-hidden", "inert", "getClientRects", "contentVisibility"):
             self.assertIn(hidden_rule, spec)
         self.assertIn("npx playwright install --with-deps chromium firefox webkit", workflow)
+        self.assertIn("runs-on: ubuntu-24.04", workflow)
         self.assertIn("npx playwright test --config=playwright.config.ts", workflow)
         self.assertIn("tests/fixtures/playwright-site", workflow)
+        self.assertIn("runs-on: ubuntu-24.04", workflow)
         self.assertIn("if: always()", workflow)
         self.assertIn("tools/compile_release_report.py", workflow)
         self.assertIn("tools/validate_export_artifacts.py", workflow)
