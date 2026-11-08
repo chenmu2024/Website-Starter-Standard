@@ -144,6 +144,54 @@ class AuditTests(unittest.TestCase):
         self.assertIn("SITEMAP_INDEX_CHILD_MISSING", self.codes(report))
         self.assertIn("INDEXABLE_SITEMAP", self.codes(report))
 
+    def test_hreflang_valid_self_and_return_links_pass_explicit_group(self):
+        es_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
+                   '<link rel="alternate" hreflang="x-default" href="https://example.org/es/">')
+        pt_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
+                   '<link rel="alternate" hreflang="x-default" href="https://example.org/es/">')
+        self.write("es/index.html", page("Español", "https://example.org/es/",
+                                         extra_head=es_tags.replace('<html', '<html')))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/",
+                                         extra_head=pt_tags))
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {
+                      "es-ES": "/es/", "pt-BR": "/pt/", "x-default": "/es/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertNotIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report), report["findings"])
+        self.assertNotIn("HREFLANG_RETURN_MISSING", self.codes(report), report["findings"])
+
+    def test_hreflang_group_missing_variant_and_return_is_reported(self):
+        es_tags = ('<link rel="alternate" hreflang="es-ES" href="https://example.org/es/">'
+                   '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">')
+        pt_tags = '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
+        self.write("es/index.html", page("Español", "https://example.org/es/", extra_head=es_tags))
+        self.write("pt/index.html", page("Português", "https://example.org/pt/", extra_head=pt_tags))
+        policy = {"mode": "production", "indexable_routes": ["/es/", "/pt/"],
+                  "hreflang_groups": [{"routes": {"es-ES": "/es/", "pt-BR": "/pt/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        self.assertIn("HREFLANG_GROUP_INCOMPLETE", self.codes(report))
+        self.assertIn("HREFLANG_RETURN_MISSING", self.codes(report))
+
+    def test_hreflang_invalid_duplicate_code_and_missing_target_are_reported(self):
+        tags = ('<link rel="alternate" hreflang="bad_code" href="https://example.org/">'
+                '<link rel="alternate" hreflang="es" href="https://example.org/missing/">'
+                '<link rel="alternate" hreflang="es" href="https://example.org/">')
+        self.write("index.html", page(extra_head=tags))
+        report = audit_tool.audit(self.root, "https://example.org")
+        codes = self.codes(report)
+        self.assertIn("HREFLANG_CODE_INVALID", codes)
+        self.assertIn("HREFLANG_DUPLICATE_CODE", codes)
+        self.assertIn("HREFLANG_TARGET_MISSING", codes)
+
+    def test_hreflang_external_alternate_is_explicitly_unverified(self):
+        tags = ('<link rel="alternate" hreflang="es" href="https://example.org/">'
+                '<link rel="alternate" hreflang="pt-BR" href="https://example.com.br/">')
+        self.write("index.html", page(extra_head=tags))
+        report = audit_tool.audit(self.root, "https://example.org")
+        self.assertIn("HREFLANG_EXTERNAL_UNVERIFIED", self.codes(report))
+
 
 if __name__ == "__main__":
     unittest.main()
