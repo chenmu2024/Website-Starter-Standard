@@ -65,6 +65,14 @@ For a Node-based public site that needs the integrated P1 pipeline:
 5. For a calculator, also copy tools/validate_calculation_cases.py and its independently reviewed golden fixtures; set PRODUCT_KIND=calculator, implement CALC_RUNTIME_COMMAND and mark calculation required in the evidence manifest.
 6. If the app exports files, copy templates/exports/export-manifest.example.json, customize expected content and page geometry, set EXPORT_MANIFEST and EXPORT_RUNTIME_COMMAND and mark exports required. The runtime command must create real files in EXPORT_OUTPUT_DIR; do not copy example files into the output directory.
 7. Run the browser workflow once with QA_VISUAL_ROUTES_JSON='[]'. For true visual regression, generate Chromium baselines with npx playwright test --config=playwright.visual.config.ts --update-snapshots, inspect and commit the snapshots, then set QA_VISUAL_ROUTES_JSON to the approved routes. Never update snapshots automatically in CI.
+
+   On Windows PowerShell, with the local preview server already running:
+
+       $env:QA_BASE_URL = "http://127.0.0.1:4173"
+       $env:QA_VISUAL_ROUTES_JSON = '["/","/calculator/"]'
+       npx playwright test --config=playwright.visual.config.ts --update-snapshots
+
+   Review every generated image before committing it. The CI job must run without --update-snapshots.
 8. Read INTERNATIONAL-SEO-AUTOMATION.md and copy templates/indexation-policy.multilingual.example.json only when the listed pages are genuine language/region equivalents. Use live verification for external-domain alternate links.
 9. The unified report requires SEO and browser evidence. Required calculation/export checks must be enabled for the relevant product. Physical printer measurements, real-device screen readers, search indexing and Cloudflare account settings remain separate manual/first-party evidence.
 
