@@ -42,9 +42,23 @@ for (const route of routes) {
           'button, input:not([type="hidden"]), select, textarea, a[href]'
         )).filter(element => {
           const el = element as HTMLElement;
-          const labelled = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') ||
-            el.getAttribute('title') || el.innerText?.trim() ||
-            (el.querySelector('img')?.getAttribute('alt') || '');
+          const labelledBy = (el.getAttribute('aria-labelledby') || '').split(/\s+/)
+            .filter(Boolean)
+            .map(id => document.getElementById(id)?.textContent?.trim() || '')
+            .filter(Boolean).join(' ');
+          const nativeLabels = ('labels' in el
+            ? Array.from((el as HTMLInputElement).labels || [])
+                .map(label => label.textContent?.trim() || '').filter(Boolean).join(' ')
+            : '');
+          const input = el instanceof HTMLInputElement ? el : null;
+          const valueName = input && ['button', 'submit', 'reset'].includes(input.type)
+            ? input.value.trim() : '';
+          const imageInputAlt = input?.type === 'image' ? input.alt.trim() : '';
+          const labelled = el.getAttribute('aria-label') || labelledBy ||
+            el.getAttribute('title') || nativeLabels || el.innerText?.trim() ||
+            valueName || imageInputAlt ||
+            (el.querySelector('img')?.getAttribute('alt') || '') ||
+            (el.querySelector('svg title')?.textContent?.trim() || '');
           return !labelled;
         }).map(element => element.tagName.toLowerCase() + '.' + (element as HTMLElement).className);
         return {
