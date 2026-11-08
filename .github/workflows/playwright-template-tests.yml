@@ -39,6 +39,8 @@ jobs:
         run: |
           python - <<'PY'
           import time, urllib.request
+          from pathlib import Path
+          Path('release-evidence').mkdir(exist_ok=True)
           for attempt in range(30):
               try:
                   with urllib.request.urlopen("http://127.0.0.1:4173/", timeout=2) as response:
@@ -47,8 +49,12 @@ jobs:
               except Exception:
                   time.sleep(1)
           else:
-              print(open("/tmp/playwright-fixture.log", encoding="utf8").read())
+              log = open("/tmp/playwright-fixture.log", encoding="utf8").read()
+              print(log)
+              Path("release-evidence/playwright-fixture.log").write_text(log, encoding="utf8")
               raise SystemExit("Browser fixture server did not start")
+          Path("release-evidence/playwright-fixture.log").write_text(
+              open("/tmp/playwright-fixture.log", encoding="utf8").read(), encoding="utf8")
           PY
       - name: Execute template in Chromium, Firefox and WebKit
         env:
@@ -66,6 +72,5 @@ jobs:
             release-evidence/
             playwright-report/
             test-results/
-            /tmp/playwright-fixture.log
           if-no-files-found: warn
           retention-days: 14
