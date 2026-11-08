@@ -43,6 +43,16 @@ class P1TemplateTests(unittest.TestCase):
         self.assertIn("QA_VISUAL_ROUTES_JSON", spec)
         self.assertIn("data-visual-mask", spec)
         self.assertIn("QA_VISUAL_ROUTES_JSON != '[]'", workflow)
+        self.assertIn("QA_VISUAL_UPDATE", workflow)
+        self.assertIn("--update-snapshots", workflow)
+        self.assertIn("tests/e2e/__screenshots__", workflow)
+        self.assertIn("createHash", spec)
+        self.assertIn("routeSnapshotId", spec)
+        self.assertIn("visual snapshot route identifiers remain unique", spec)
+        baseline_policy = (ROOT / "VISUAL-REGRESSION-BASELINES.md").read_text()
+        self.assertIn("ubuntu-24.04", baseline_policy)
+        self.assertIn("Windows screenshots", baseline_policy)
+        self.assertIn("QA_VISUAL_UPDATE='1'", baseline_policy)
 
     def test_export_manifest_and_validator_support_csv_pdf_svg(self):
         manifest = json.loads((ROOT / "templates/exports/export-manifest.example.json").read_text())
