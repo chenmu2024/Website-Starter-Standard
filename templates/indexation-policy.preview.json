@@ -1,0 +1,7 @@
+{
+  "mode": "preview",
+  "preview_noindex_via": "header",
+  "required_routes": [
+    "/"
+  ]
+}
