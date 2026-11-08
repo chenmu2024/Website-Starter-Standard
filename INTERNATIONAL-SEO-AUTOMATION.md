@@ -17,7 +17,7 @@ When alternate language links exist in built HTML or Sitemap XML (xhtml:link):
 - whether Sitemap urlset hreflang mappings satisfy the same language-group contract;
 - whether html[lang] language prefix agrees with the page's self hreflang code.
 
-External alternate URLs are reported as EXTERNAL_UNVERIFIED because the offline build cannot inspect another domain. This is not automatically an error: multi-domain international sites may be valid, but their other properties need a separate crawl or live check.
+External alternate URLs are reported as EXTERNAL_UNVERIFIED because the offline build cannot inspect another domain. This is not automatically an error: multi-domain international sites may be valid, but their other properties need a separate crawl or live check. When HTML and Sitemap both declare an external alternate, the auditor compares the normalized full URLs to detect disagreement, but it still cannot fetch or verify the external destination.
 
 ## Explicit language-group contract
 
@@ -45,7 +45,7 @@ Run the normal static audit with:
 
     python tools/seo_audit.py --site-dir dist --base-url https://example.com --policy-json tests/indexation-policy.production.json --output release-evidence/seo.json --fail-on error
 
-A missing or wrong group entry is an ERROR under the explicit policy. Do not add a group just to silence warnings; only group genuine alternate versions that serve the same content/intent in different languages or regions.
+A missing or wrong group entry is an ERROR under the explicit policy. Hreflang defects and HTML/Sitemap disagreements also become release errors when mode is production. Do not add a group just to silence warnings; only group genuine alternate versions that serve the same content/intent in different languages or regions.
 
 ## Limitations and human review
 
