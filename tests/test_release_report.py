@@ -114,6 +114,13 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertIn("setup/teardown", detail)
 
 
+    def test_all_browser_tests_failed_is_fail_not_not_run(self):
+        evidence = {"stats": {"expected": 0, "unexpected": 15, "flaky": 0, "skipped": 0}}
+        status, detail = compiler.classify("playwright", evidence)
+        self.assertEqual(status, "FAIL")
+        self.assertIn("unexpected=15", detail)
+
+
 
 if __name__ == "__main__":
     unittest.main()
