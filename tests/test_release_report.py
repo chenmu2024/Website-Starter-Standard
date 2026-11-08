@@ -90,6 +90,22 @@ class ReleaseReportTests(unittest.TestCase):
         self.assertEqual(report["status"], "FAIL")
         self.assertIn("escapes evidence directory", report["errors"][0])
 
+    def test_optional_failure_is_visible_but_does_not_fail_required_gate(self):
+        self.put("seo.json", {"summary": {"error": 0, "warning": 0}})
+        self.put("browser.json", {"stats": {"expected": 5, "unexpected": 0, "flaky": 0, "skipped": 0}})
+        self.put("exports.json", {"status": "FAIL"})
+        manifest = {"version": 1, "checks": [
+            {"id": "seo", "type": "seo", "required": True, "file": "seo.json"},
+            {"id": "browser", "type": "playwright", "required": True, "file": "browser.json"},
+            {"id": "exports", "type": "exports", "required": False, "file": "exports.json"}
+        ]}
+        report = compiler.compile_report(manifest, self.root)
+        self.assertEqual(report["status"], "PASS")
+        self.assertEqual(report["checks"][2]["status"], "FAIL")
+        self.assertTrue(report["warnings"])
+        self.assertFalse(report["errors"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
