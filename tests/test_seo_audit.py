@@ -270,6 +270,23 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(finding["severity"], "error")
 
 
+    def test_html_sitemap_external_hreflang_urls_are_compared_in_full(self):
+        html_tags = ('<link rel="alternate" hreflang="en" href="https://example.org/">'
+                     '<link rel="alternate" hreflang="es" href="https://spanish.example/a/">')
+        self.write("index.html", page("Home", "https://example.org/", extra_head=html_tags))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://wrong.example/b/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        report = audit_tool.audit(self.root, "https://example.org",
+                                  {"mode": "production", "indexable_routes": ["/"]})
+        finding = next(x for x in report["findings"] if x["code"] == "HREFLANG_SOURCE_MISMATCH")
+        self.assertEqual(finding["severity"], "error")
+
+
 
 if __name__ == "__main__":
     unittest.main()
