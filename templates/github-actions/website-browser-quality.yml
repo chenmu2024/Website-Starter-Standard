@@ -1,0 +1,83 @@
+# Copy to .github/workflows/website-browser-quality.yml in a downstream Node website.
+# Install @playwright/test as a dev dependency and copy the templates/playwright files.
+name: Cross-browser and visual UI QA
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE_DIR: dist
+      BUILD_COMMAND: npm run build
+      PREVIEW_SERVER_COMMAND: npm run preview -- --host 0.0.0.0
+      QA_BASE_URL: http://127.0.0.1:4173
+      QA_ROUTES_JSON: '["/"]'
+      QA_VISUAL_ROUTES_JSON: '[]'
+      QA_VISUAL_DIFF_RATIO: '0.005'
+      QA_CAPTURE_SCREENSHOTS: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked project dependencies
+        run: npm ci
+      - name: Build the actual production artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$BUILD_COMMAND"
+          test -d "$SITE_DIR"
+          test -f "$SITE_DIR/index.html"
+      - name: Install Chromium, Firefox and WebKit
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Start the project's built preview server
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -lc "$PREVIEW_SERVER_COMMAND" > /tmp/website-preview.log 2>&1 &
+          echo $! > /tmp/website-preview.pid
+      - name: Wait for preview server
+        run: |
+          python - <<'PY'
+          import os, time, urllib.request
+          url = os.environ["QA_BASE_URL"]
+          for attempt in range(45):
+              try:
+                  with urllib.request.urlopen(url, timeout=2) as response:
+                      if response.status < 400:
+                          print("Preview ready:", url)
+                          break
+              except Exception:
+                  time.sleep(1)
+          else:
+              print(open("/tmp/website-preview.log", encoding="utf8").read()[-5000:])
+              raise SystemExit("Preview server did not become ready")
+          PY
+      - name: Run Chromium, Firefox and WebKit at five viewports
+        run: |
+          mkdir -p release-evidence
+          npx playwright test --config=playwright.config.ts
+      - name: Run reviewed Chromium visual baselines (opt-in)
+        if: env.QA_VISUAL_ROUTES_JSON != '[]'
+        run: npx playwright test --config=playwright.visual.config.ts
+      - name: Upload browser and visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-browser-visual-evidence
+          path: |
+            release-evidence/
+            playwright-report/
+            visual-report/
+            test-results/
+            visual-test-results/
+            /tmp/website-preview.log
+          if-no-files-found: warn
+          retention-days: 14
