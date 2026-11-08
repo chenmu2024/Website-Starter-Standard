@@ -69,6 +69,12 @@ The P1 layer adds a copyable Playwright suite for Chromium/Firefox/WebKit at 360
 - `RELEASE-STATE-CONTRACT.md` — do not confuse implemented, CI-tested, preview, live deployment, search indexed or physically verified states.
 - `CALCULATION-QUALITY-GATE.md` and `tools/validate_calculation_cases.py` — independently worked cases and real calculator output comparisons.
 - `tools/verify_deployment.py` — read-only live HTTP and deployment SHA verification; never a substitute for a browser or Cloudflare account review.
+- `INTERNATIONAL-SEO-AUTOMATION.md` — explicit hreflang group schema, self/return-link and canonical checks with external-domain limitations.
+- `templates/playwright/` — copyable Chromium/Firefox/WebKit responsive QA and opt-in reviewed visual baselines.
+- `templates/github-actions/website-browser-quality.yml` — integrated Node P1 workflow for build, SEO, calculation/export, browser and release report.
+- `tools/validate_export_artifacts.py` / `templates/exports/` — compare real CSV/PDF/SVG files against expected content and geometry.
+- `tools/compile_release_report.py` / `templates/release-evidence/` — fail-closed unified report over required automated and human evidence.
+- `requirements-qa.txt` — optional PDF parsing dependency for generated export validation.
 - `DOWNSTREAM-ADOPTION.md` and `templates/github-actions/` — optional copied CI and live post-deploy workflows; downstream commands must be supplied.
 - `QA-CHECKLIST.md` — final acceptance checklist.
 - `.github/PULL_REQUEST_TEMPLATE.md` — change-level compliance checklist.
