@@ -271,6 +271,7 @@ def audit(root, base_url, policy=None):
         tags = page["hreflang"]
         seen_codes = {}
         self_code = None
+        has_self_reference = False
         for item in tags:
             code = item["code"]
             href = item["href"]
@@ -298,9 +299,11 @@ def audit(root, base_url, policy=None):
             target_page = page_by_route.get(destination)
             if target_page:
                 check_hreflang_target_canonical(route, href, destination, target_page)
-            if folded != "x-default" and destination == route:
-                self_code = code
-        if tags and self_code is None:
+            if destination == route:
+                has_self_reference = True
+                if folded != "x-default":
+                    self_code = code
+        if tags and not has_self_reference:
             issue(hreflang_severity, "HREFLANG_SELF_MISSING", route,
                   "Page has alternate links but no hreflang entry pointing to its own canonical URL")
         if self_code and page["html_lang"]:
@@ -411,6 +414,7 @@ def audit(root, base_url, policy=None):
                     continue
             seen_codes = {}
             self_code = None
+            has_self_reference = False
             for item in tags:
                 code, href = item["code"], item["href"]
                 folded = code.casefold()
@@ -436,9 +440,11 @@ def audit(root, base_url, policy=None):
                 target_page = page_by_route.get(destination)
                 if target_page:
                     check_hreflang_target_canonical(route, href, destination, target_page)
-                if folded != "x-default" and destination == route:
-                    self_code = code
-            if tags and self_code is None:
+                if destination == route:
+                    has_self_reference = True
+                    if folded != "x-default":
+                        self_code = code
+            if tags and not has_self_reference:
                 issue(hreflang_severity, "HREFLANG_SELF_MISSING", route,
                       "Sitemap hreflang set has no self-reference")
             if self_code and page and page["html_lang"]:
