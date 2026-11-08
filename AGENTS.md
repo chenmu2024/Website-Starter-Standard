@@ -104,7 +104,7 @@ Read and apply `SEO-GEO-QUALITY-GATE.md` before changing routes, templates, meta
 ## 4D. P1 cross-browser, export, and international SEO quality
 
 - For responsive web applications, copy the P1 Playwright templates and run Chromium, Firefox and WebKit at 360/390/768/1024/1440 CSS-pixel viewports. Record browser versions, route list, test JSON and screenshots; do not describe this as iOS/Android real-device or screen-reader acceptance.
-- Visual regression is opt-in: establish baselines on the pinned CI/browser environment, inspect the images, commit approved snapshots, and only then enable the visual workflow. Never auto-update snapshots to make a failed comparison green.
+- Visual regression is opt-in: establish baselines on the pinned `ubuntu-24.04` CI/browser environment using the locked Playwright dependency, inspect the images, commit approved snapshots, and only then enable comparison. Windows-generated screenshots are local previews, not Linux CI baselines. Follow `VISUAL-REGRESSION-BASELINES.md`; never auto-update snapshots to make a failed comparison green.
 - For exported CSV/PDF/SVG, compare artifacts emitted by the actual app with independent expected rows/text/page geometry. A PDF page size is not proof of physical printer scale; record paper measurements separately.
 - For multilingual sites, define real alternate route groups in the explicit hreflang policy. Check BCP47 codes, self-reference, reciprocal links, target canonical and group completeness. External-domain alternates remain unverified by offline scans and need a live cross-domain check.
 - Use the release evidence compiler to combine required checks. Missing, schema-only, skipped, flaky or partial evidence must remain NOT_RUN/PARTIAL/FAIL, never be rewritten as PASS.
