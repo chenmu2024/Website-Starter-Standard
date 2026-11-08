@@ -35,6 +35,17 @@ The standard now ships a single canonical offline SEO audit engine, an independe
 - Copy templates from [templates/github-actions](templates/github-actions) into each site; fill real commands and enable required checks. The starter does not silently deploy or modify existing sites.
 - Run the standard's deterministic validators via `python -m unittest discover -s tests -v`; passing these tests does **not** certify a downstream site's formula or production deployment.
 
+## P1 browser, export and international SEO gates
+
+The P1 layer adds a copyable Playwright suite for Chromium/Firefox/WebKit at 360/390/768/1024/1440px, optional reviewed visual baselines, CSV/PDF/SVG output comparison, explicit multilingual hreflang groups and a unified release-evidence compiler.
+
+- See INTERNATIONAL-SEO-AUTOMATION.md for self/return links, canonical parity and language-group policy.
+- See UI-RELEASE-EVIDENCE.md and templates/playwright/ for cross-browser responsive and visual regression setup.
+- Use tools/validate_export_artifacts.py with templates/exports/export-manifest.example.json to compare real CSV/PDF/SVG artifacts against reviewed expected content and dimensions.
+- Use tools/compile_release_report.py with templates/release-evidence/manifest.example.json to combine SEO, browser, calculation, export, deployment and manual results without inferring missing evidence as PASS.
+- Copy templates/github-actions/website-browser-quality.yml for the integrated Node/Playwright P1 workflow. It is a template; it does not test this standard repo or any downstream site automatically.
+- PDF text/page checks require the free QA dependency in requirements-qa.txt. Physical paper measurement still requires a real printer and ruler.
+
 ## Files
 
 - `AGENTS.md` — mandatory operating rules for coding/design agents.
