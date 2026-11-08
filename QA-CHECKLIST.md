@@ -44,6 +44,16 @@
 - [ ] Tool controls and results path remain discoverable on small laptop and mobile viewports.
 - [ ] Long localized text, Unicode/diacritics, text zoom, and any custom touch/drag controls were tested where applicable.
 
+## P1 browser, export and localization QA (when applicable)
+- [ ] Chromium, Firefox and WebKit were executed against the built application, not just linted or type-checked.
+- [ ] Required routes were tested at 360/390/768/1024/1440 CSS-pixel viewports; horizontal overflow, runtime errors, visible broken images and accessible names were checked.
+- [ ] Visual snapshot baselines were generated from the approved browser/OS version, visually reviewed and committed; CI did not auto-update expected images.
+- [ ] CSV export headers, row count, values, units and numeric tolerances match independently reviewed expected output.
+- [ ] PDF exports have readable expected text, expected page count and intended page dimensions; physical paper dimensions are recorded separately.
+- [ ] SVG exports parse and preserve expected viewBox/width/height.
+- [ ] For multilingual pages, hreflang codes, self-reference, return links, target canonical and all explicit language-group routes pass; external-domain alternates have separate evidence.
+- [ ] Unified release report includes required SEO/browser and applicable calculation/export/deployment/manual checks; missing required evidence remains PARTIAL/NOT_RUN.
+
 ## SEO / GEO — governance
 - [ ] Approved core keywords were preserved exactly unless owner-approved changes are documented.
 - [ ] Numeric Volume/KD/CPC/SERP/traffic claims have an identified data source.
