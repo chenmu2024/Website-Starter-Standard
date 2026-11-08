@@ -70,9 +70,9 @@ For a Node-based public site that needs the integrated P1 pipeline:
 
        $env:QA_BASE_URL = "http://127.0.0.1:4173"
        $env:QA_VISUAL_ROUTES_JSON = '["/","/calculator/"]'
-       npx playwright test --config=playwright.visual.config.ts
+       npx playwright test --config=playwright.visual.config.ts --update-snapshots
 
-   A developer may use a temporary local snapshot update to inspect a rendering, but those Windows files are not approved CI baselines. If the matching CI environment is unavailable, keep the visual gate NOT RUN rather than committing cross-platform snapshots.
+   A developer may use this temporary local snapshot update to inspect a rendering, but those Windows files are not approved CI baselines. If the matching CI environment is unavailable, keep the visual gate NOT RUN rather than committing cross-platform snapshots.
 8. Read INTERNATIONAL-SEO-AUTOMATION.md and copy templates/indexation-policy.multilingual.example.json only when the listed pages are genuine language/region equivalents. Use live verification for external-domain alternate links.
 9. The unified report requires SEO and browser evidence. Required calculation/export checks must be enabled for the relevant product. Physical printer measurements, real-device screen readers, search indexing and Cloudflare account settings remain separate manual/first-party evidence.
 
