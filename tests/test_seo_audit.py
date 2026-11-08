@@ -79,9 +79,10 @@ class AuditTests(unittest.TestCase):
 
     def test_duplicate_descriptions_are_review_flags_not_fake_length_rules(self):
         self.write("index.html", page(title="Home"))
-        self.write("tools/index.html", page("Tools", "https://example.org/tools/",
-                                            body='<a href="/">Home</a>',
-                                            extra_head='<meta name="description" content="Useful Home example">'))
+        self.write("tools/index.html",
+                   page("Tools", "https://example.org/tools/",
+                        body='<a href="/">Home</a>').replace(
+                            'content="Useful Tools example"', 'content="Useful Home example"'))
         self.write("index.html", page(title="Home", body='<a href="/tools/">Tools</a>'))
         report = audit_tool.audit(self.root, "https://example.org")
         self.assertIn("DUPLICATE_DESCRIPTION", self.codes(report))
