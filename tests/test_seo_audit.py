@@ -152,7 +152,7 @@ class AuditTests(unittest.TestCase):
                    '<link rel="alternate" hreflang="pt-BR" href="https://example.org/pt/">'
                    '<link rel="alternate" hreflang="x-default" href="https://example.org/es/">')
         self.write("es/index.html", page("Español", "https://example.org/es/",
-                                         extra_head=es_tags, lang="es-ES")))
+                                         extra_head=es_tags, lang="es-ES"))
         self.write("pt/index.html", page("Português", "https://example.org/pt/",
                                          extra_head=pt_tags, lang="pt-BR"))
         self.write("sitemap.xml",
