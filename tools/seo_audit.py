@@ -30,6 +30,7 @@ class PageParser(HTMLParser):
         self.h1_depth = 0
         self.descriptions = []
         self.canonicals = []
+        self.hreflang = []
         self.robots = []
         self.viewport = []
         self.links = []
@@ -63,6 +64,9 @@ class PageParser(HTMLParser):
             rels = (a.get("rel") or "").lower().split()
             if "canonical" in rels:
                 self.canonicals.append(a.get("href") or "")
+            if "alternate" in rels and a.get("hreflang") and a.get("href"):
+                self.hreflang.append({"code": a["hreflang"].strip(),
+                                      "href": a["href"].strip()})
             if "stylesheet" in rels and a.get("href"):
                 self.assets.append(a["href"])
         elif tag == "meta":
@@ -229,7 +233,75 @@ def audit(root, base_url, policy=None):
 
         pages.append({"route": url, "title": title, "h1_count": len(parser.h1_nodes),
                       "canonical": parser.canonicals, "in_site_links": valid_links,
-                      "robots_meta": parser.robots, "description": parser.descriptions})
+                      "robots_meta": parser.robots, "description": parser.descriptions,
+                      "html_lang": parser.lang, "hreflang": parser.hreflang})
+
+    # Validate every hreflang declaration that exists. Completeness for a
+    # known language family is opt-in through policy.hreflang_groups below.
+    page_by_route = {p["route"]: p for p in pages}
+    for page in pages:
+        route = page["route"]
+        tags = page["hreflang"]
+        seen_codes = {}
+        self_code = None
+        for item in tags:
+            code = item["code"]
+            href = item["href"]
+            folded = code.casefold()
+            if not (folded == "x-default" or
+                    __import__("re").fullmatch(r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=__import__("re").I)):
+                issue("warning", "HREFLANG_CODE_INVALID", route, code)
+            if folded in seen_codes:
+                issue("warning", "HREFLANG_DUPLICATE_CODE", route,
+                      f"{code} also declared as {seen_codes[folded]}")
+            else:
+                seen_codes[folded] = href
+            parsed = urlparse(href)
+            if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+                issue("warning", "HREFLANG_NOT_ABSOLUTE", route, href)
+            target = local_url(href, route, base_url)
+            if target is None:
+                issue("info", "HREFLANG_EXTERNAL_UNVERIFIED", route,
+                      f"External alternate cannot be checked offline: {href}")
+                continue
+            destination = resolve_route(target)
+            if destination is None:
+                issue("warning", "HREFLANG_TARGET_MISSING", route, href)
+                continue
+            target_page = page_by_route.get(destination)
+            if target_page:
+                target_canonical = target_page["canonical"]
+                if target_canonical != [base_url.rstrip("/") + destination]:
+                    issue("warning", "HREFLANG_TARGET_CANONICAL", route,
+                          f"{href} target canonical is {target_canonical}")
+            if folded != "x-default" and destination == route:
+                self_code = code
+        if tags and self_code is None:
+            issue("warning", "HREFLANG_SELF_MISSING", route,
+                  "Page has alternate links but no hreflang entry pointing to its own canonical URL")
+        if self_code and page["html_lang"]:
+            html_language = page["html_lang"].split("-", 1)[0].casefold()
+            hreflang_language = self_code.split("-", 1)[0].casefold()
+            if html_language != hreflang_language:
+                issue("warning", "HREFLANG_HTML_LANG_MISMATCH", route,
+                      f"html lang={page['html_lang']} but self hreflang={self_code}")
+        if self_code:
+            for item in tags:
+                if item["code"].casefold() == "x-default":
+                    continue
+                target = local_url(item["href"], route, base_url)
+                destination = resolve_route(target) if target else None
+                target_page = page_by_route.get(destination)
+                if not target_page or destination == route:
+                    continue
+                reciprocal = any(
+                    back["code"].casefold() == self_code.casefold() and
+                    local_url(back["href"], destination, base_url) == route
+                    for back in target_page["hreflang"]
+                )
+                if not reciprocal:
+                    issue("warning", "HREFLANG_RETURN_MISSING", route,
+                          f"{destination} does not link back with hreflang={self_code}")
 
     if not html_files:
         issue("error", "NO_HTML", "/", "No built HTML files found")
@@ -310,6 +382,41 @@ def audit(root, base_url, policy=None):
                                     or any(not isinstance(x, str) or not x.startswith("/")
                                            for x in policy[field])):
                 raise ValueError(f"Policy {field} must contain absolute URL paths")
+        groups = policy.get("hreflang_groups", [])
+        if not isinstance(groups, list):
+            raise ValueError("hreflang_groups must be a list")
+        for index, group in enumerate(groups):
+            if not isinstance(group, dict) or not isinstance(group.get("routes"), dict):
+                raise ValueError(f"hreflang_groups[{index}] requires a routes object")
+            mapping = group["routes"]
+            if len(mapping) < 2:
+                raise ValueError(f"hreflang_groups[{index}] requires at least two route variants")
+            expected = {}
+            for route, code in mapping.items():
+                if not isinstance(route, str) or not route.startswith("/") or not isinstance(code, str):
+                    raise ValueError(f"hreflang_groups[{index}] has invalid route/code")
+                if code.casefold() != "x-default" and not __import__("re").fullmatch(
+                        r"[a-z]{2,3}(?:-[a-z]{2})?", code, flags=__import__("re").I):
+                    raise ValueError(f"hreflang_groups[{index}] has invalid language code {code}")
+                if code.casefold() in {x.casefold() for x in expected.values()}:
+                    raise ValueError(f"hreflang_groups[{index}] has duplicate language code {code}")
+                expected[route] = code
+                if resolve_route(route) is None:
+                    issue("error", "HREFLANG_GROUP_ROUTE_MISSING", route,
+                          f"Declared in hreflang group {index} but absent from build")
+            for source_route in expected:
+                source = page_by_route.get(resolve_route(source_route))
+                if not source:
+                    continue
+                actual = {}
+                for item in source["hreflang"]:
+                    target = local_url(item["href"], source_route, base_url)
+                    actual[item["code"].casefold()] = target
+                for target_route, code in expected.items():
+                    if actual.get(code.casefold()) != target_route:
+                        issue("error", "HREFLANG_GROUP_INCOMPLETE", source_route,
+                              f"Expected {code} -> {base_url.rstrip('/') + target_route}; "
+                              f"found route {actual.get(code.casefold())!r}")
         for target in policy.get("required_routes", []):
             if resolve_route(target) is None:
                 issue("error", "REQUIRED_ROUTE_MISSING", target, "Approved route absent from build")
