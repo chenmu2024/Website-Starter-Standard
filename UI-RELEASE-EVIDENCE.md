@@ -13,6 +13,7 @@
 - Applicable `DESIGN.md` version or reference:
 - Before/after screenshots or recording references, if actually captured:
 - Baseline route/SEO data checked and where recorded:
+- Visual snapshot environment (runner OS/image, Playwright/browser version, approved route list, snapshot artifact and approval commit):
 
 ## Verification ledger
 
