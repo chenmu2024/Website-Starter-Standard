@@ -46,6 +46,11 @@ def classify(kind, evidence):
             return "FAIL", "Live HTTP release probe failed"
         return "FAIL", f"Unknown deployment status: {status!r}"
     if kind == "playwright":
+        run_errors = evidence.get("errors", [])
+        if not isinstance(run_errors, list):
+            return "FAIL", "Playwright top-level errors must be a list"
+        if run_errors:
+            return "FAIL", f"Playwright run-level setup/teardown errors: {len(run_errors)}"
         stats = evidence.get("stats")
         if not isinstance(stats, dict):
             return "FAIL", "Playwright JSON evidence requires stats object"
