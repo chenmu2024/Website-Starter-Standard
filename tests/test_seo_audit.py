@@ -342,6 +342,59 @@ class AuditTests(unittest.TestCase):
         self.assertIn("does not exactly match", finding["message"])
 
 
+    def test_x_default_self_reference_counts_for_html_language_selector(self):
+        tags = (
+            '<link rel="alternate" hreflang="en" href="https://example.org/en/">'
+            '<link rel="alternate" hreflang="es" href="https://example.org/es/">'
+            '<link rel="alternate" hreflang="x-default" href="https://example.org/">'
+        )
+        self.write("index.html", page("Language", "https://example.org/", extra_head=tags, lang="en"))
+        self.write("en/index.html", page("English", "https://example.org/en/", extra_head=tags, lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", extra_head=tags, lang="es"))
+        self.write("sitemap.xml",
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                   '<url><loc>https://example.org/</loc></url>'
+                   '<url><loc>https://example.org/en/</loc></url>'
+                   '<url><loc>https://example.org/es/</loc></url></urlset>')
+        policy = {"mode": "production", "indexable_routes": ["/", "/en/", "/es/"],
+                  "hreflang_groups": [{"routes": {
+                      "en": "/en/", "es": "/es/", "x-default": "/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        missing = [x for x in report["findings"]
+                   if x["code"] == "HREFLANG_SELF_MISSING" and x["page"] == "/"]
+        self.assertEqual(missing, [], report["findings"])
+
+    def test_x_default_self_reference_counts_for_sitemap_language_selector(self):
+        self.write("index.html", page("Language", "https://example.org/", lang="en"))
+        self.write("en/index.html", page("English", "https://example.org/en/", lang="en"))
+        self.write("es/index.html", page("Español", "https://example.org/es/", lang="es"))
+        sitemap = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                   '<url><loc>https://example.org/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/en/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="x-default" href="https://example.org/"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/en/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/en/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="x-default" href="https://example.org/"/>'
+                   '</url>'
+                   '<url><loc>https://example.org/es/</loc>'
+                   '<xhtml:link rel="alternate" hreflang="en" href="https://example.org/en/"/>'
+                   '<xhtml:link rel="alternate" hreflang="es" href="https://example.org/es/"/>'
+                   '<xhtml:link rel="alternate" hreflang="x-default" href="https://example.org/"/>'
+                   '</url></urlset>')
+        self.write("sitemap.xml", sitemap)
+        policy = {"mode": "production", "indexable_routes": ["/", "/en/", "/es/"],
+                  "hreflang_groups": [{"routes": {
+                      "en": "/en/", "es": "/es/", "x-default": "/"}}]}
+        report = audit_tool.audit(self.root, "https://example.org", policy)
+        missing = [x for x in report["findings"]
+                   if x["code"] == "HREFLANG_SELF_MISSING" and x["page"] == "/"]
+        self.assertEqual(missing, [], report["findings"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
