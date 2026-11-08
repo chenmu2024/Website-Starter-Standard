@@ -4,7 +4,7 @@
     {
       "id": "cut-list-csv",
       "kind": "csv",
-      "path": "exports/cut-list.csv",
+      "path": "cut-list.csv",
       "encoding": "utf-8-sig",
       "delimiter": ",",
       "expected_headers": [
@@ -35,7 +35,7 @@
     {
       "id": "cut-plan-pdf",
       "kind": "pdf",
-      "path": "exports/cut-plan.pdf",
+      "path": "cut-plan.pdf",
       "expected_page_count": 1,
       "expected_text_contains": [
         "Cut plan",
@@ -50,7 +50,7 @@
     {
       "id": "cut-layout-svg",
       "kind": "svg",
-      "path": "exports/cut-layout.svg",
+      "path": "cut-layout.svg",
       "expected_viewbox": "0 0 1200 800",
       "expected_width": "1200",
       "expected_height": "800"
